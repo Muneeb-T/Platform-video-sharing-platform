@@ -17,8 +17,7 @@ const facebookAuthStrategy = () => {
             {
                 clientID: process.env.FACEBOOK_APP_ID,
                 clientSecret: process.env.FACEBOOK_APP_SECRET,
-                callbackURL:
-                    `${process.env.ROOT_URL}/api/auth/facebook-auth-callback`,
+                callbackURL: `${process.env.ROOT_URL}/api/auth/facebook-auth-callback`,
                 passReqToCallback: true,
                 profileFields: [
                     'id',
@@ -68,7 +67,7 @@ const facebookAuthStrategy = () => {
                                 'facebookAccount.email': email,
                                 'facebookAccount.dateOfBirth': birthday,
                                 'facebookAccount.gender': gender,
-                                'facebookAccount.picture': picture,
+                                'facebookAccount.picture': picture.data.url,
                             },
                             {
                                 new: true,
@@ -88,7 +87,7 @@ const facebookAuthStrategy = () => {
                         });
                     return done(null, {
                         token: user.generateJWT(),
-                        // user
+                        user,
                     });
                 } catch (err) {
                     console.log('\nFacebook authentication error');

@@ -96,7 +96,7 @@ const login = async (req, res, next) => {
                 .status(401)
                 .json({ success: false, message: 'Invalid email or password' });
 
-        const token = user.generateJWT()
+        const token = user.generateJWT();
         user = user.toObject();
         delete user.password;
 
@@ -185,7 +185,11 @@ const googleAuthCallback = async (req, res, next) => {
                 channelLogo: 1,
             });
 
-        res.status(200).json({ success: true, token: user.generateJWT() });
+        res.status(200).json({
+            success: true,
+            token: user.generateJWT(),
+            user,
+        });
     } catch (err) {
         // console.log('\nGoogle authentication error');
         // console.log('===========================');
@@ -196,8 +200,8 @@ const googleAuthCallback = async (req, res, next) => {
 
 const facebookAuthSuccess = async (req, res, next) => {
     try {
-        const { token } = req.user;
-        res.status(200).json({ success: true, token });
+        const { token, user } = req.user;
+        res.status(200).json({ success: true, token, user });
     } catch (err) {
         // console.log('\nFacebook authentication success api error');
         // console.log('=========================================');
