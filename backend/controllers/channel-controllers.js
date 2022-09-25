@@ -90,8 +90,8 @@ const updateChannel = async (req, res, next) => {
         // console.log('\nRequest body');
         // console.log('============');
 
-        const { id: channelId } = params;
         const { user, body, params, files } = req;
+        const { id: channelId } = params;
         const { id: userId, role } = user;
         const { channelLogo, banners, watermark } = files;
 
