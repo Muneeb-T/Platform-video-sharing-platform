@@ -38,7 +38,7 @@ const channelSchema = new Schema(
                 values: ['admin', 'user'],
                 message: 'Invalid role',
             },
-         ,
+         
         },
         password: {
             type: String,
