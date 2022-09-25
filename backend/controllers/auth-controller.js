@@ -18,6 +18,7 @@ const register = async (req, res, next) => {
 
         try {
             const user = await new channelModel({
+                username: email.slice(0, email.indexOf('@')),
                 'email.address': email,
                 password,
             }).save();
@@ -143,7 +144,6 @@ const verifyEmail = async (req, res, next) => {
                 googleAccount: 1,
                 facebookAccount: 1,
                 channelLogo: 1,
-                password: 1,
             });
         res.status(201).json({
             success: true,
