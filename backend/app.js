@@ -28,9 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRouter);
 app.use('/api/channel/', jwtAuthenticate, channelRouter);
 app.use('/api/video/', videoRouter);
-app.use({
-    origin: 'https://platform-video-sharing.herokuapp.com',
-});
+app.use(cors({ origin: 'https://platform-video-sharing.herokuapp.com' }));
 
 app.use(errorHandler);
 app.listen(PORT, () => {
