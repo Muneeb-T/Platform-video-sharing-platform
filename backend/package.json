@@ -1,0 +1,55 @@
+{
+    "name": "platform",
+    "version": "1.0.0",
+    "description": "Platform is a video sharing platform. It allows users(channel owners) to share their own contents to public.",
+    "main": "app.js",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node app.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Muneeb-T/Platform---Video-sharing-platform.git"
+    },
+    "keywords": [
+        "Platform",
+        "VideoSharingPlatfrom",
+        "Videos",
+        "Movies",
+        "Channels"
+    ],
+    "author": "Muneeb T",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Muneeb-T/Platform---Video-sharing-platform/issues"
+    },
+    "homepage": "https://github.com/Muneeb-T/Platform---Video-sharing-platform#readme",
+    "dependencies": {
+        "axios": "^0.27.2",
+        "bcryptjs": "^2.4.3",
+        "cookie-parser": "^1.4.6",
+        "country-list-with-dial-code-and-flag": "^1.0.3",
+        "dotenv": "^16.0.2",
+        "email-validator": "^2.0.4",
+        "express": "^4.18.1",
+        "express-async-handler": "^1.2.0",
+        "express-session": "^1.17.3",
+        "express-validator": "^6.14.2",
+        "gcp-metadata": "^5.0.0",
+        "google-auth-library": "^8.5.1",
+        "googleapis": "^107.0.0",
+        "jsonwebtoken": "^8.5.1",
+        "moment": "^2.29.4",
+        "mongoose": "^6.6.0",
+        "mongoose-find-one-or-create": "^0.2.0",
+        "multer": "^1.4.5-lts.1",
+        "multer-storage-cloudinary": "^4.0.0",
+        "nodemailer": "^6.7.8",
+        "nodemon": "^2.0.19",
+        "passport": "^0.6.0",
+        "passport-facebook": "^3.0.0",
+        "passport-jwt": "^4.0.0",
+        "phone": "^3.1.28"
+    }
+}

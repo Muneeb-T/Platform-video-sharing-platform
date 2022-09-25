@@ -1,0 +1,17 @@
+import mongoose from 'mongoose';
+
+const { Schema } = mongoose;
+
+const fileSchema = new Schema(
+    {
+        filedname: { type: String },
+        originalname: { type: String },
+        mimetype: { type: String },
+        contentType: { type: String },
+        filename: { type: String },
+        path: { type: String },
+    },
+    { timestamps: true }
+);
+
+export default fileSchema;
