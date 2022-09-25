@@ -18,7 +18,7 @@ const facebookAuthStrategy = () => {
                 clientID: process.env.FACEBOOK_APP_ID,
                 clientSecret: process.env.FACEBOOK_APP_SECRET,
                 callbackURL:
-                    'http://localhost:5000/api/auth/facebook-auth-callback',
+                    `${process.env.ROOT_URL}/api/auth/facebook-auth-callback`,
                 passReqToCallback: true,
                 profileFields: [
                     'id',
