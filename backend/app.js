@@ -10,7 +10,7 @@ import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import { jwtStrategy, jwtAuthenticate } from './middlewares/jwt-auth.js';
 import { facebookAuthStrategy } from './middlewares/facebook-auth.js';
-
+import cors from 'cors';
 
 config();
 jwtStrategy();
@@ -28,7 +28,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRouter);
 app.use('/api/channel/', jwtAuthenticate, channelRouter);
 app.use('/api/video/', videoRouter);
-
+app.use({
+    origin: 'https://platform-video-sharing.herokuapp.com',
+});
 
 app.use(errorHandler);
 app.listen(PORT, () => {
