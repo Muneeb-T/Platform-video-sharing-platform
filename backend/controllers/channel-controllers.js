@@ -115,7 +115,7 @@ const updateChannel = async (req, res, next) => {
 
         try {
             await channelModel.findByIdAndUpdate(
-                id,
+                channelId,
                 { ...update },
                 { runValidators: true }
             );

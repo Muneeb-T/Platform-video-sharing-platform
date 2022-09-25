@@ -111,7 +111,7 @@ const login = async (req, res, next) => {
     } catch (err) {
         // console.log('\nLogin api error');
         // console.log('===============');
-        // console.log(err);
+        console.log(err);
         res.status(500).json({
             success: false,
             message: 'Internal server error',
