@@ -20,15 +20,21 @@ const channelSchema = new Schema(
             maxLength: [30, 'Username exceeds the limit (30 characters only).'],
         },
         email: {
-            type: String,
-            lowercase: true,
-            unique: true,
-            sparse: true,
-            validate: {
-                validator: function (email) {
-                    return emailValidator.validate(email);
+            verified: {
+                type: Boolean,
+                default: false,
+            },
+            address: {
+                type: String,
+                lowercase: true,
+                unique: true,
+                sparse: true,
+                validate: {
+                    validator: function (email) {
+                        return emailValidator.validate(email);
+                    },
+                    message: 'Enter valid email address.',
                 },
-                message: 'Enter valid email address.',
             },
         },
         role: {
@@ -38,7 +44,6 @@ const channelSchema = new Schema(
                 values: ['admin', 'user'],
                 message: 'Invalid role',
             },
-         
         },
         password: {
             type: String,

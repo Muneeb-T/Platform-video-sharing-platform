@@ -3,7 +3,6 @@ import channelModel from '../models/channel/channel.js';
 import mongoose from 'mongoose';
 import { google } from 'googleapis';
 import { sendMail } from '../utils/send-email.js';
-import { generateVerificationCode } from '../utils/generate-verification-code.js';
 config();
 const register = async (req, res, next) => {
     try {
@@ -16,26 +15,22 @@ const register = async (req, res, next) => {
                 .status(401)
                 .json({ success: false, message: 'Bad credentials' });
         }
+
         try {
-            const newUser = new channelModel(req.body);
-            const user = await newUser.save();
-            const verificationCode = generateVerificationCode(6);
+            const user = await new channelModel({
+                'email.address': email,
+                password,
+            }).save();
             const messageDetails = {
                 to: email,
                 subject: 'Confirmation',
-                text: `One time password for verifcation is ${verificationCode}`,
+                text: `Confirm your email address.Click here - ${process.env.ROOT_URL}/api/auth/confirm-email/${user._id}`,
             };
             await sendMail(messageDetails);
             res.status(201).json({
                 success: true,
                 message: `Confirmation message has sent to email address ${email}`,
             });
-
-            // res.status(201).json({
-            //     success: true,
-            //     token: user.generateJWT(),
-            //     user: { _id: user._id, user: user.email },
-            // });
         } catch (err) {
             // console.log('\nRegister user error');
             // console.log('===================');
@@ -131,6 +126,41 @@ const login = async (req, res, next) => {
     }
 };
 
+const verifyEmail = async (req, res, next) => {
+    try {
+        const { id: userId } = req.params;
+        const user = await channelModel
+            .findByIdAndUpdate(userId, {
+                'email.verified': true,
+            })
+            .select({
+                username: 1,
+                email: 1,
+                phone: 1,
+                gender: 1,
+                country: 1,
+                dateOfBirth: 1,
+                googleAccount: 1,
+                facebookAccount: 1,
+                channelLogo: 1,
+                password: 1,
+            });
+        res.status(201).json({
+            success: true,
+            user,
+            token: user.generateJWT(),
+            message: 'Email verified successfully',
+        });
+    } catch (err) {
+        console.log('Email verification error');
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    }
+};
+
 //googleAuthClient
 const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -166,7 +196,6 @@ const googleAuthCallback = async (req, res, next) => {
         // console.log('\nUser details from google');
         // console.log('========================');
         // console.log(data);
-
         const user = await channelModel
             .findOneAndUpdate(
                 {
@@ -231,6 +260,7 @@ const facebookAuthSuccess = async (req, res, next) => {
 export {
     register,
     login,
+    verifyEmail,
     getGoogleAuthURL,
     googleAuthCallback,
     facebookAuthSuccess,
