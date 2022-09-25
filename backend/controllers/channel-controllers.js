@@ -10,8 +10,8 @@ const getUser = async (req, res, next) => {
         // console.log('User ID : ', req.user.id);
 
         const { id: channelId } = req.params;
-        const { user } = req;
-        const { id: userId, role } = user;
+        const { user: requestedUser } = req;
+        const { id: userId, role } = requestedUser;
 
         if (channelId !== userId || role !== 'admin') {
             return res
