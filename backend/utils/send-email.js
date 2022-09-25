@@ -1,29 +1,33 @@
 import nodemailer from 'nodemailer';
+import { config } from 'dotenv';
+config();
 
-const mailTransporter = nodemailer.createTransport({
-    service: 'hotmail',
+const transporter = nodemailer.createTransport({
+    service: process.env.NODEMAILER_SERVICE,
     auth: {
-        user: 'muneebmnbth17@outlook.com',
-        pass: 'MS79Q3hXwGc5cuc',
+        user: process.env.NODEMAILER_AUTH_USER,
+        pass: process.env.NODEMAILER_AUTH_PASSWORD,
     },
 });
 
-const mailDetails = {
-    from: 'muneebmnbth17@outlook.com',
-    to: 'muneebmnb17@gmail.com',
-    subject: 'Confirmantion main',
-    text: 'Node.js testing mail for GeeksforGeeks',
-};
-
-const sendMail = async function () {
-    mailTransporter.sendMail(mailDetails, function (err, data) {
-        if (err) {
-            console.log(err)
-            console.log('Error Occurs');
-        } else {
-            console.log('Email sent successfully');
-        }
-    });
-};
+async function sendMail(messageDetails) {
+    try {
+        const { to, subject, text } = messageDetails;
+        const mailOptions = {
+            from: process.env.NODEMAILER_FROM_EMAIL,
+            to,
+            subject,
+            text,
+        };
+        const mailInfo = await transporter.sendMail(mailOptions);
+        console.log('\nConfirmation email has sent successfully');
+        console.log('========================================');
+        console.log(mailInfo);
+    } catch (err) {
+        console.log('\nNodemailer error');
+        console.log('================');
+        console.log(err);
+    }
+}
 
 export { sendMail };

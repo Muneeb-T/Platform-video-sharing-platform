@@ -1,15 +1,15 @@
-// @ts-nocheck
 import { config } from 'dotenv';
 import channelModel from '../models/channel/channel.js';
 import mongoose from 'mongoose';
 import { google } from 'googleapis';
+import { sendMail } from '../utils/send-email.js';
+import { generateVerificationCode } from '../utils/generate-verification-code.js';
 config();
 const register = async (req, res, next) => {
     try {
         // console.log('\nRequest body');
         // console.log('============');
         // console.log(req.body);
-
         const { email, password } = req.body;
         if (email === '' || password === '') {
             return res
@@ -19,11 +19,23 @@ const register = async (req, res, next) => {
         try {
             const newUser = new channelModel(req.body);
             const user = await newUser.save();
+            const verificationCode = generateVerificationCode(6);
+            const messageDetails = {
+                to: email,
+                subject: 'Confirmation',
+                text: `One time password for verifcation is ${verificationCode}`,
+            };
+            await sendMail(messageDetails);
             res.status(201).json({
                 success: true,
-                token: user.generateJWT(),
-                user: { _id: user._id, user: user.email },
+                message: `Confirmation message has sent to email address ${email}`,
             });
+
+            // res.status(201).json({
+            //     success: true,
+            //     token: user.generateJWT(),
+            //     user: { _id: user._id, user: user.email },
+            // });
         } catch (err) {
             // console.log('\nRegister user error');
             // console.log('===================');
@@ -65,9 +77,9 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
     try {
-        // console.log('\nRequest body');
-        // console.log('============');
-        // console.log(req.body);
+        console.log('\nRequest body');
+        console.log('============');
+        console.log(req.body);
 
         const { email, password } = req.body;
         if (email === '' || password === '') {

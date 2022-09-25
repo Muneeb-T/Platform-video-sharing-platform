@@ -14,7 +14,10 @@ const jwtStrategy = () => {
                 if (user) return done(null, user);
                 return done(null, false);
             } catch (err) {
-                return done(err, false, { message: 'Server Error' });
+                return done(err, false, {
+                    success: false,
+                    message: 'Internal server error',
+                });
             }
         })
     );
@@ -24,7 +27,9 @@ const jwtAuthenticate = (req, res, next) => {
     passport.authenticate('jwt', function (err, user, info) {
         if (err) return next(err);
         if (!user)
-            return res.status(401).json({ message: 'Unauthorized Access' });
+            return res
+                .status(401)
+                .json({ sucess: false, message: 'Unauthorized Access' });
         req.user = user;
         next();
     })(req, res, next);
