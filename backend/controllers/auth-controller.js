@@ -30,27 +30,30 @@ const register = async (req, res, next) => {
             // console.log(err);
             let { message } = err;
             const { errors, keyPattern, name } = err;
-            console.log('Error name : ', name);
+            let status;
             if (err.code === 11000) {
                 const key = Object.keys(keyPattern)[0];
+                status = 409;
                 message = `Already have account in this ${key}`;
             }
 
             if (err instanceof mongoose.Error.CastError) {
                 const key = Object.keys(errors)[0];
+                status = 400;
                 message = `Enter valid ${key}`;
             }
 
             if (err instanceof mongoose.Error.ValidationError) {
                 const key = Object.keys(errors)[0];
                 if (errors[key].name === 'CastError') {
+                    status = 400;
                     message = `Enter a valid ${key}`;
                 } else {
                     message = errors[key].message;
                 }
             }
 
-            res.status(500).json({ success: false, message });
+            res.status(status).json({ success: false, message });
         }
     } catch (err) {
         // console.log('\nRegister user api error');
@@ -106,9 +109,9 @@ const login = async (req, res, next) => {
             user,
         });
     } catch (err) {
-        console.log('\nLogin api error');
-        console.log('===============');
-        console.log(err);
+        // console.log('\nLogin api error');
+        // console.log('===============');
+        // console.log(err);
         res.status(500).json({
             success: false,
             message: 'Internal server error',

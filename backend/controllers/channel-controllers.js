@@ -8,10 +8,18 @@ const getUser = async (req, res, next) => {
         // console.log('\nRequested user Id');
         // console.log('===================');
         // console.log('User ID : ', req.user.id);
-        
-        const { id } = req.params;
 
-        const user = await channelModel.findById(id).select({
+        const { id: channelId } = req.params;
+        const { user } = req;
+        const { id: userId, role } = user;
+
+        if (channelId !== userId || role !== 'admin') {
+            return res
+                .status(401)
+                .json({ success: false, message: 'Unautherized access' });
+        }
+
+        const user = await channelModel.findById(channelId).select({
             username: 1,
             email: 1,
             phone: 1,
@@ -23,7 +31,7 @@ const getUser = async (req, res, next) => {
             channelLogo: 1,
         });
 
-        return res.status(200).json({
+        res.status(200).json({
             success: true,
             message: 'Fetched user details succesfully',
             user,
@@ -42,9 +50,17 @@ const getChannel = async (req, res, next) => {
         // console.log('\nRequest parms');
         // console.log('==============');
         // console.log('User ID : ', req.user.id);
+        const { id: channelId } = req.params;
+        const { user } = req;
+        const { id: userId, role } = user;
 
-        const { id } = req.params;
-        const channel = await channelModel.findById(id).select({
+        if (channelId !== userId || role !== 'admin') {
+            return res
+                .status(401)
+                .json({ success: false, message: 'Unautherized access' });
+        }
+
+        const channel = await channelModel.findById(channelId).select({
             channelLogo: 1,
             username: 1,
             description: 1,
@@ -73,10 +89,18 @@ const updateChannel = async (req, res, next) => {
         // console.log('Channel ID : ', req.params.id);
         // console.log('\nRequest body');
         // console.log('============');
-        console.log(req.body);
-        const { body, params, files } = req;
-        const { id } = params;
+
+        const { id: channelId } = params;
+        const { user, body, params, files } = req;
+        const { id: userId, role } = user;
         const { channelLogo, banners, watermark } = files;
+
+        if (channelId !== userId || role !== 'admin') {
+            return res
+                .status(401)
+                .json({ success: false, message: 'Unautherized access' });
+        }
+
         // console.log('\nFiles for update');
         // console.log('================');
         // console.log(files);

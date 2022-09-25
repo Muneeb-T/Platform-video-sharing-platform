@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const fileSchema = new Schema(
     {
-        filedname: { type: String },
+        fieldname: { type: String },
         originalname: { type: String },
         mimetype: { type: String },
         contentType: { type: String },

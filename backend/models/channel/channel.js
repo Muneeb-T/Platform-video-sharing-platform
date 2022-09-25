@@ -38,11 +38,10 @@ const channelSchema = new Schema(
                 values: ['admin', 'user'],
                 message: 'Invalid role',
             },
-            required: [true, 'Specify the role of user.'],
+         ,
         },
         password: {
             type: String,
-            minLength: [8, 'Password must be atleast 8 characters long.'],
             validate: {
                 validator: function (password) {
                     const regex =
