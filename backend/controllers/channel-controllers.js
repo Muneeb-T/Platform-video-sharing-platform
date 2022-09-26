@@ -15,8 +15,8 @@ const getUser = async (req, res, next) => {
 
         if (channelId !== userId || role !== 'admin') {
             return res
-                .status(401)
-                .json({ success: false, message: 'Unautherized access' });
+                .status(404)
+                .json({ success: false, message: 'Page not found' });
         }
 
         const user = await channelModel.findById(channelId).select({
@@ -56,8 +56,8 @@ const getChannel = async (req, res, next) => {
 
         if (channelId !== userId || role !== 'admin') {
             return res
-                .status(401)
-                .json({ success: false, message: 'Unautherized access' });
+                .status(404)
+                .json({ success: false, message: 'Page not found' });
         }
 
         const channel = await channelModel.findById(channelId).select({
@@ -94,8 +94,9 @@ const updateChannel = async (req, res, next) => {
         const { id: channelId } = params;
         const { id: userId, role } = user;
         const { channelLogo, banners, watermark } = files;
+        const { email } = body;
 
-        if (channelId !== userId || role !== 'admin') {
+        if (channelId !== userId && role !== 'admin') {
             return res
                 .status(401)
                 .json({ success: false, message: 'Unautherized access' });
@@ -106,9 +107,13 @@ const updateChannel = async (req, res, next) => {
         // console.log(files);
 
         const update = { ...body };
+        if (email) {
+            update.email = { verified: true, address: email };
+        }
         if (channelLogo && channelLogo[0]) {
             update.channelLogo = channelLogo[0];
         }
+        console.log(banners);
         if (watermark && watermark[0]) {
             update.watermark = watermark[0];
         }

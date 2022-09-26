@@ -7,7 +7,6 @@ const fileSchema = new Schema(
         fieldname: { type: String },
         originalname: { type: String },
         mimetype: { type: String },
-        contentType: { type: String },
         filename: { type: String },
         path: { type: String },
     },

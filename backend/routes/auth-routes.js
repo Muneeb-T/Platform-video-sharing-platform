@@ -7,6 +7,7 @@ import {
     getGoogleAuthURL,
     googleAuthCallback,
     facebookAuthSuccess,
+    forgotPassword
 } from '../controllers/auth-controller.js';
 import { config } from 'dotenv';
 import {
@@ -36,5 +37,7 @@ router.route('/google-auth-failed').get((req, res) => {
 router.route('/google-auth-success').get((req, res) => {
     console.log('Google authentication failed');
 });
+
+router.route('/forgot-password').post(forgotPassword)
 
 export default router;

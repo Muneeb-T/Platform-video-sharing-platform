@@ -1,8 +1,10 @@
+// @ts-nocheck
 import { config } from 'dotenv';
 import channelModel from '../models/channel/channel.js';
 import mongoose from 'mongoose';
 import { google } from 'googleapis';
 import { sendMail } from '../utils/send-email.js';
+import { forgotPasswordHtml } from '../utils/html-pages.js';
 config();
 const register = async (req, res, next) => {
     try {
@@ -24,8 +26,18 @@ const register = async (req, res, next) => {
             }).save();
             const messageDetails = {
                 to: email,
-                subject: 'Confirmation',
-                text: `Confirm your email address.Click here - ${process.env.ROOT_URL}/api/auth/confirm-email/${user._id}`,
+                subject: '[Platfrom] Confirm email address',
+                text: `
+                Welcome ${
+                    user.username.charAt(0).toUpperCase() +
+                    user.username.slice(1)
+                } !
+
+                Thanks for signing up with Platform !
+
+                You must follow this link to activate your account:
+                ${process.env.ROOT_URL}/api/auth/confirm-email/${user._id}
+                Have fun and don't hesitate to contact us with your feedback`,
             };
             await sendMail(messageDetails);
             res.status(201).json({
@@ -53,8 +65,8 @@ const register = async (req, res, next) => {
 
             if (err instanceof mongoose.Error.ValidationError) {
                 const key = Object.keys(errors)[0];
+                status = 400;
                 if (errors[key].name === 'CastError') {
-                    status = 400;
                     message = `Enter a valid ${key}`;
                 } else {
                     message = errors[key].message;
@@ -84,7 +96,7 @@ const login = async (req, res, next) => {
                 .json({ success: false, message: 'Bad credentials' });
         }
 
-        let user = await channelModel.findOne({ email }).select({
+        let user = await channelModel.findOne({ 'email.address': email  }).select({
             username: 1,
             email: 1,
             phone: 1,
@@ -131,9 +143,13 @@ const verifyEmail = async (req, res, next) => {
     try {
         const { id: userId } = req.params;
         const user = await channelModel
-            .findByIdAndUpdate(userId, {
-                'email.verified': true,
-            })
+            .findByIdAndUpdate(
+                userId,
+                {
+                    'email.verified': true,
+                },
+                { new: true }
+            )
             .select({
                 username: 1,
                 email: 1,
@@ -200,7 +216,7 @@ const googleAuthCallback = async (req, res, next) => {
             .findOneAndUpdate(
                 {
                     $or: [
-                        { email },
+                        { 'email.address': email  },
                         { 'googleAccount.email': email },
                         { 'googleAccount.id': id },
                         { 'facebookAccount.email': email },
@@ -257,6 +273,56 @@ const facebookAuthSuccess = async (req, res, next) => {
     }
 };
 
+const forgotPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        if (email === '') {
+            return res.status(401).json({
+                success: false,
+                message: 'Bad credentials',
+            });
+        }
+
+        const user = await channelModel
+            .findOne({ 'email.address': email })
+            .select({
+                username: 1,
+                email: 1,
+            });
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "We couldn't find such such user",
+            });
+        }
+        const messageDetails = {
+            to: email,
+            subject: '[Platfrom] - Account recovery',
+            text: `
+            Hi ${
+                user.username.charAt(0).toUpperCase() + user.username.slice(1)
+            } !
+
+            We received a request to reset your Platform password.`,
+            html: forgotPasswordHtml,
+        };
+        await sendMail(messageDetails);
+        res.status(200).json({
+            success: true,
+            message: `Confirmation message has sent to ${email}`,
+        });
+    } catch (err) {
+        console.log('\nForgot password error');
+        console.log('=====================');
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    }
+};
+
 export {
     register,
     login,
@@ -264,4 +330,5 @@ export {
     getGoogleAuthURL,
     googleAuthCallback,
     facebookAuthSuccess,
+    forgotPassword,
 };

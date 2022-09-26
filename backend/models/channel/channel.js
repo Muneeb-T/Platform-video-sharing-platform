@@ -50,7 +50,7 @@ const channelSchema = new Schema(
             validate: {
                 validator: function (password) {
                     const regex =
-                        /^(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+                        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
                     return regex.test(password);
                 },
                 message:
@@ -153,7 +153,19 @@ const channelSchema = new Schema(
         },
         //branding
         channelLogo: { type: fileModel },
-        banners: [{ type: fileModel }],
+        banners: [
+            {
+                type: fileModel.add({
+                    size: {
+                        type: String,
+                        enum: {
+                            values: ['small', 'medium', 'large'],
+                            message: 'Invalid size',
+                        },
+                    },
+                }),
+            },
+        ],
         watermark: { type: fileModel },
         //layout
     },

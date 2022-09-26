@@ -50,7 +50,7 @@ const facebookAuthStrategy = () => {
                         .findOneAndUpdate(
                             {
                                 $or: [
-                                    { email },
+                                    { 'email.address' : email },
                                     { 'facebookAccount.email': email },
                                     { 'googleAccount.email': email },
                                     { 'facebookAccount.id': id },
