@@ -2,17 +2,16 @@
 import express from 'express';
 import { config } from 'dotenv';
 import {
-    getUser,
     getChannel,
     updateChannel,
 } from '../controllers/channel-controllers.js';
-
 import upload from '../middlewares/multer-cloudinary.js';
+import { jwtAuthenticate } from '../middlewares/jwt-auth.js';
 
 const router = express.Router();
+
 config();
 
-router.route('/get-user/:id').get(getUser);
 router.route('/get-channel/:id').get(getChannel);
 router.route('/update-channel/:id').put(
     upload.fields([
@@ -31,7 +30,5 @@ router.route('/update-channel/:id').put(
     ]),
     updateChannel
 );
-
-
 
 export default router;

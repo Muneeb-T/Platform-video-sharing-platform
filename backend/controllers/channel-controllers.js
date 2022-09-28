@@ -2,48 +2,6 @@ import { config } from 'dotenv';
 import channelModel from '../models/channel/channel.js';
 config();
 
-const getUser = async (req, res, next) => {
-    try {
-        // console.log('\nGET : Get user');
-        // console.log('\nRequested user Id');
-        // console.log('===================');
-        // console.log('User ID : ', req.user.id);
-
-        const { id: channelId } = req.params;
-        const { user: requestedUser } = req;
-        const { id: userId, role } = requestedUser;
-
-        if (channelId !== userId || role !== 'admin') {
-            return res
-                .status(404)
-                .json({ success: false, message: 'Page not found' });
-        }
-
-        const user = await channelModel.findById(channelId).select({
-            username: 1,
-            email: 1,
-            phone: 1,
-            gender: 1,
-            country: 1,
-            dateOfBirth: 1,
-            googleAccount: 1,
-            facebookAccount: 1,
-            channelLogo: 1,
-        });
-
-        res.status(200).json({
-            success: true,
-            message: 'Fetched user details succesfully',
-            user,
-        });
-    } catch (err) {
-        // console.log('\nGet user error');
-        // console.log('===============');
-        // console.log(err);
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
-
 const getChannel = async (req, res, next) => {
     try {
         // console.log('\nGET : Get channel');
@@ -54,7 +12,7 @@ const getChannel = async (req, res, next) => {
         const { user } = req;
         const { id: userId, role } = user;
 
-        if (channelId !== userId || role !== 'admin') {
+        if (channelId !== userId && role !== 'admin') {
             return res
                 .status(404)
                 .json({ success: false, message: 'Page not found' });
@@ -139,4 +97,4 @@ const updateChannel = async (req, res, next) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
-export { getUser, getChannel, updateChannel };
+export { getChannel, updateChannel };

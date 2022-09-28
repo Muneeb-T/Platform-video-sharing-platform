@@ -1,33 +1,46 @@
 // @ts-nocheck
 import { config } from 'dotenv';
-import channelModel from '../models/channel/channel.js';
-import mongoose from 'mongoose';
+import channelModel from '../models/user/user.js';
 import { google } from 'googleapis';
 import { sendMail } from '../utils/send-email.js';
-import { forgotPasswordHtml } from '../utils/html-pages.js';
+import bcrypt from 'bcryptjs'
 config();
+
 const register = async (req, res, next) => {
     try {
         // console.log('\nRequest body');
         // console.log('============');
         // console.log(req.body);
         const { email, password } = req.body;
-        if (email === '' || password === '') {
+        if (email == '' || password == '') {
             return res
                 .status(401)
                 .json({ success: false, message: 'Bad credentials' });
         }
 
-        try {
-            const user = await new channelModel({
+        const user = await channelModel.findOneAndUpdate(
+            {
+                $or: [
+                    { 'googleAccount.email': email },
+                    { 'facebookAccount.email': email },
+                ],
+            },
+            {
                 username: email.slice(0, email.indexOf('@')),
                 'email.address': email,
                 password,
-            }).save();
-            const messageDetails = {
-                to: email,
-                subject: '[Platfrom] Confirm email address',
-                text: `
+            },
+            {
+                new: true,
+                upsert: true,
+                runValidators: true,
+            }
+        );
+
+        const messageDetails = {
+            to: email,
+            subject: '[Platfrom] Confirm email address',
+            text: `
                 Welcome ${
                     user.username.charAt(0).toUpperCase() +
                     user.username.slice(1)
@@ -38,78 +51,46 @@ const register = async (req, res, next) => {
                 You must follow this link to activate your account:
                 ${process.env.ROOT_URL}/api/auth/confirm-email/${user._id}
                 Have fun and don't hesitate to contact us with your feedback`,
-            };
-            await sendMail(messageDetails);
-            res.status(201).json({
-                success: true,
-                message: `Confirmation message has sent to email address ${email}`,
-            });
-        } catch (err) {
-            // console.log('\nRegister user error');
-            // console.log('===================');
-            // console.log(err);
-            let { message } = err;
-            const { errors, keyPattern, name } = err;
-            let status;
-            if (err.code === 11000) {
-                const key = Object.keys(keyPattern)[0];
-                status = 409;
-                message = `Already have account in this ${key}`;
-            }
-
-            if (err instanceof mongoose.Error.CastError) {
-                const key = Object.keys(errors)[0];
-                status = 400;
-                message = `Enter valid ${key}`;
-            }
-
-            if (err instanceof mongoose.Error.ValidationError) {
-                const key = Object.keys(errors)[0];
-                status = 400;
-                if (errors[key].name === 'CastError') {
-                    message = `Enter a valid ${key}`;
-                } else {
-                    message = errors[key].message;
-                }
-            }
-
-            res.status(status).json({ success: false, message });
-        }
+        };
+        await sendMail(messageDetails);
+        res.status(201).json({
+            success: true,
+            message: `Confirmation message has sent to email address ${email}`,
+        });
     } catch (err) {
         // console.log('\nRegister user api error');
         // console.log('========================');
-        // console.log(err);
-        res.status(500).json({ success: false, message: err.message });
+        console.log(err);
+        if (err.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: 'Already have acccount in this email',
+            });
+        }
+        next(err);
     }
 };
 
 const login = async (req, res, next) => {
+
+
     try {
         console.log('\nRequest body');
         console.log('============');
         console.log(req.body);
 
         const { email, password } = req.body;
-        if (email === '' || password === '') {
+        if (email == '' || password == '') {
             return res
                 .status(401)
                 .json({ success: false, message: 'Bad credentials' });
         }
 
-        let user = await channelModel.findOne({ 'email.address': email  }).select({
-            username: 1,
-            email: 1,
-            phone: 1,
-            gender: 1,
-            country: 1,
-            dateOfBirth: 1,
-            googleAccount: 1,
-            facebookAccount: 1,
-            channelLogo: 1,
-            password: 1,
-        });
+        let user = await channelModel
+            .findOne({ 'email.address': email })
+            .select('+password');
 
-        if (!user)
+        if (!user || !user.email.verified)
             return res
                 .status(401)
                 .json({ success: false, message: 'Invalid email or password' });
@@ -118,6 +99,13 @@ const login = async (req, res, next) => {
             return res
                 .status(401)
                 .json({ success: false, message: 'Invalid email or password' });
+
+        if (user.isBlocked) {
+            return res.status(403).json({
+                success: false,
+                message: 'Login failed.Your account has been locked',
+            });
+        }
 
         const token = user.generateJWT();
         user = user.toObject();
@@ -132,35 +120,20 @@ const login = async (req, res, next) => {
         // console.log('\nLogin api error');
         // console.log('===============');
         console.log(err);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-        });
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 
 const verifyEmail = async (req, res, next) => {
     try {
         const { id: userId } = req.params;
-        const user = await channelModel
-            .findByIdAndUpdate(
-                userId,
-                {
-                    'email.verified': true,
-                },
-                { new: true }
-            )
-            .select({
-                username: 1,
-                email: 1,
-                phone: 1,
-                gender: 1,
-                country: 1,
-                dateOfBirth: 1,
-                googleAccount: 1,
-                facebookAccount: 1,
-                channelLogo: 1,
-            });
+        const user = await channelModel.findByIdAndUpdate(
+            userId,
+            {
+                'email.verified': true,
+            },
+            { new: true }
+        );
         res.status(201).json({
             success: true,
             user,
@@ -170,10 +143,7 @@ const verifyEmail = async (req, res, next) => {
     } catch (err) {
         console.log('Email verification error');
         console.log(err);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-        });
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 
@@ -203,47 +173,40 @@ const googleAuthCallback = async (req, res, next) => {
 
         const { tokens } = await oauth2Client.getToken(code);
         oauth2Client.setCredentials({ access_token: tokens.access_token });
-        const oauth2 = google.oauth2({
-            auth: oauth2Client,
-            version: 'v2',
-        });
+        const oauth2 = google.oauth2({ auth: oauth2Client, version: 'v2' });
         const { data } = await oauth2.userinfo.get();
         const { email, name, id, picture } = data;
         // console.log('\nUser details from google');
         // console.log('========================');
         // console.log(data);
-        const user = await channelModel
-            .findOneAndUpdate(
-                {
-                    $or: [
-                        { 'email.address': email  },
-                        { 'googleAccount.email': email },
-                        { 'googleAccount.id': id },
-                        { 'facebookAccount.email': email },
-                    ],
-                },
-                {
-                    'googleAccount.username': name,
-                    'googleAccount.id': id,
-                    'googleAccount.email': email,
-                    'googleAccount.picture': picture,
-                },
-                {
-                    new: true,
-                    upsert: true,
-                }
-            )
-            .select({
-                username: 1,
-                email: 1,
-                phone: 1,
-                gender: 1,
-                country: 1,
-                dateOfBirth: 1,
-                googleAccount: 1,
-                facebookAccount: 1,
-                channelLogo: 1,
+        const user = await channelModel.findOneAndUpdate(
+            {
+                $or: [
+                    { 'email.address': email },
+                    { 'googleAccount.email': email },
+                    { 'googleAccount.id': id },
+                    { 'facebookAccount.email': email },
+                ],
+            },
+            {
+                'googleAccount.username': name,
+                'googleAccount.id': id,
+                'googleAccount.email': email,
+                'googleAccount.picture': picture,
+            },
+            {
+                new: true,
+                upsert: true,
+                runValidators: true,
+            }
+        );
+
+        if (user.isBlocked) {
+            return res.status(403).json({
+                success: false,
+                message: 'Login failed.Your account has been locked',
             });
+        }
 
         res.status(200).json({
             success: true,
@@ -260,66 +223,23 @@ const googleAuthCallback = async (req, res, next) => {
 
 const facebookAuthSuccess = async (req, res, next) => {
     try {
-        const { token, user } = req.user;
-        res.status(200).json({ success: true, token, user });
+        const { user } = req;
+        if (user.isBlocked) {
+            return res.status(403).json({
+                success: false,
+                message: 'Login failed.Your account has been locked',
+            });
+        }
+        res.status(200).json({
+            success: true,
+            token: user.generateJWT(),
+            user,
+        });
     } catch (err) {
         // console.log('\nFacebook authentication success api error');
         // console.log('=========================================');
         // console.log(err);
-        res.status(500).json({
-            sucesss: false,
-            message: 'Internal server error',
-        });
-    }
-};
-
-const forgotPassword = async (req, res, next) => {
-    try {
-        const { email } = req.body;
-        if (email === '') {
-            return res.status(401).json({
-                success: false,
-                message: 'Bad credentials',
-            });
-        }
-
-        const user = await channelModel
-            .findOne({ 'email.address': email })
-            .select({
-                username: 1,
-                email: 1,
-            });
-
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: "We couldn't find such such user",
-            });
-        }
-        const messageDetails = {
-            to: email,
-            subject: '[Platfrom] - Account recovery',
-            text: `
-            Hi ${
-                user.username.charAt(0).toUpperCase() + user.username.slice(1)
-            } !
-
-            We received a request to reset your Platform password.`,
-            html: forgotPasswordHtml,
-        };
-        await sendMail(messageDetails);
-        res.status(200).json({
-            success: true,
-            message: `Confirmation message has sent to ${email}`,
-        });
-    } catch (err) {
-        console.log('\nForgot password error');
-        console.log('=====================');
-        console.log(err);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-        });
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 
@@ -330,5 +250,4 @@ export {
     getGoogleAuthURL,
     googleAuthCallback,
     facebookAuthSuccess,
-    forgotPassword,
 };

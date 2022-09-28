@@ -13,6 +13,7 @@ const transporter = nodemailer.createTransport({
 async function sendMail(messageDetails) {
     try {
         const { to, subject, text, html } = messageDetails;
+        console.log(text);
         const mailOptions = {
             from: process.env.NODEMAILER_FROM_EMAIL,
             to,
@@ -21,8 +22,8 @@ async function sendMail(messageDetails) {
             html,
         };
         const mailInfo = await transporter.sendMail(mailOptions);
-        console.log('\nConfirmation email has sent successfully');
-        console.log('========================================');
+        console.log('\nEmail has sent successfully');
+        console.log('=============================');
         console.log(mailInfo);
     } catch (err) {
         console.log('\nNodemailer error');

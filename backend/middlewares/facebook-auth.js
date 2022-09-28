@@ -46,53 +46,41 @@ const facebookAuthStrategy = () => {
                         birthday,
                         picture,
                     } = userData;
-                    const user = await userModel
-                        .findOneAndUpdate(
-                            {
-                                $or: [
-                                    { 'email.address' : email },
-                                    { 'facebookAccount.email': email },
-                                    { 'googleAccount.email': email },
-                                    { 'facebookAccount.id': id },
-                                ],
-                            },
-                            {
-                                'facebookAccount.username':
-                                    username ||
-                                    displayName ||
-                                    name ||
-                                    `${firstName} ${lastName}` ||
-                                    email.slice(0, email.indexOf('@')),
-                                'facebookAccount.id': id,
-                                'facebookAccount.email': email,
-                                'facebookAccount.dateOfBirth': birthday,
-                                'facebookAccount.gender': gender,
-                                'facebookAccount.picture': picture.data.url,
-                            },
-                            {
-                                new: true,
-                                upsert: true,
-                            }
-                        )
-                        .select({
-                            username: 1,
-                            email: 1,
-                            phone: 1,
-                            gender: 1,
-                            country: 1,
-                            dateOfBirth: 1,
-                            googleAccount: 1,
-                            facebookAccount: 1,
-                            channelLogo: 1,
-                        });
-                    return done(null, {
-                        token: user.generateJWT(),
-                        user,
-                    });
+                    const user = await userModel.findOneAndUpdate(
+                        {
+                            $or: [
+                                { 'email.address': email },
+                                { 'facebookAccount.email': email },
+                                { 'googleAccount.email': email },
+                                { 'facebookAccount.id': id },
+                            ],
+                        },
+                        {
+                            'facebookAccount.username':
+                                username ||
+                                displayName ||
+                                name ||
+                                `${firstName} ${lastName}` ||
+                                email.slice(0, email.indexOf('@')),
+                            'facebookAccount.id': id,
+                            'facebookAccount.email': email,
+                            'facebookAccount.dateOfBirth': birthday,
+                            'facebookAccount.gender': gender,
+                            'facebookAccount.picture': picture.data.url,
+                        },
+                        {
+                            new: true,
+                            upsert: true,
+                            runValidators: true,
+                        }
+                        
+                    );
+
+                    return done(null, user);
                 } catch (err) {
-                    console.log('\nFacebook authentication error');
-                    console.log('==============================');
-                    console.log(err);
+                    // console.log('\nFacebook authentication error');
+                    // console.log('==============================');
+                    // console.log(err);
                     return done(err, null);
                 }
             }

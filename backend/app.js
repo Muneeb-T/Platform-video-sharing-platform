@@ -5,25 +5,25 @@ import { connectDatabase } from './config/database.js';
 import errorHandler from './middlewares/error-handler.js';
 import authRouter from './routes/auth-routes.js';
 import videoRouter from './routes/video-routes.js';
+import accountRouter from './routes/account-routes.js';
 import channelRouter from './routes/channel-routes.js';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
-import { jwtStrategy, jwtAuthenticate } from './middlewares/jwt-auth.js';
-import { facebookAuthStrategy } from './middlewares/facebook-auth.js';
+import { jwtStrategy } from './middlewares/jwt-auth.js';
 
 config();
 jwtStrategy();
-facebookAuthStrategy();
 
 const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(passport.initialize());
-app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 app.use('/api/auth', authRouter);
-app.use('/api/channel/', jwtAuthenticate, channelRouter);
+app.use('/api/account/', accountRouter);
+app.use('/api/channel/', channelRouter);
 app.use('/api/video/', videoRouter);
 
 app.use(errorHandler);
