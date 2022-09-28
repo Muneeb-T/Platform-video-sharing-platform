@@ -118,13 +118,14 @@ const resetPassword = async (req, res, next) => {
                 message: "Sorry, We couldn't find such user",
             });
         }
-        const { _id: userId } = user;
         const { username } = user;
         const capitalizedUsername = `${username
             .charAt(0)
             .toUpperCase()} ${username.slice(1)}`;
 
-        const resetPasswordToken = await user.generateResetPasswordToken();
+        const resetPasswordToken = user.generateResetPasswordToken();
+        await user.save();
+
         const messageDetails = {
             to: email,
             subject: '[Platfrom] - Account recovery',
@@ -151,20 +152,28 @@ const resetPasswordCallback = async (req, res, next) => {
         const { body, params } = req;
         const { password, 'confirm-password': confirmPassword } = body;
         const { token: resetPasswordToken } = params;
-        if (password === '' || confirmPassword !== password) {
+        console.log(resetPasswordToken);
+        if (password == '' || confirmPassword !== password) {
             return res
                 .status(401)
                 .json({ success: false, message: 'Bad credentials' });
         }
-        const updatePassword = await userModel.findOneAndUpdate(
-            { resetPasswordToken },
-            { password }
-        );
-        if (!updatePassword) {
-            return res
-                .status(404)
-                .json({ success: false, messsage: 'Page not found' });
+
+        const user = await userModel.findOne({
+            resetPasswordToken,
+            resetPasswordExpire: { $gt: Date.now() },
+        });
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: 'Reset Password Token is invalid or has been expired',
+            });
         }
+        user.password = password;
+        user.resetPasswordToken = null;
+        user.resetPasswordTokenExpire = null;
+        await user.save();
+
         res.status(201).json({
             success: true,
             message: 'Password updated successfully',

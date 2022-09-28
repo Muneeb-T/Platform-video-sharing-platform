@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 config();
-const generateResetPasswordHtml = (userId) => {
+const generateResetPasswordHtml = (token, email) => {
     const resetPasswordHtml = `
 <!DOCTYPE html>
 <html lang="en" ⚡4email>
@@ -15,7 +15,7 @@ const generateResetPasswordHtml = (userId) => {
 </head>
 
 <body>
-    <form class="card mt-4" method="post" action="${process.env.ROOT_URL}/api/account/reset-password-callback/${userId}">
+    <form class="card mt-4" method="post" action="${process.env.ROOT_URL}/api/account/reset-password-callback/${token}">
         <div class="card-body">
             <div class="form-group">
                 <label for="new-password">Enter new Password</label>

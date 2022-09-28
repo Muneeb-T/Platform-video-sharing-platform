@@ -13,7 +13,6 @@ const transporter = nodemailer.createTransport({
 async function sendMail(messageDetails) {
     try {
         const { to, subject, text, html } = messageDetails;
-        console.log(text);
         const mailOptions = {
             from: process.env.NODEMAILER_FROM_EMAIL,
             to,

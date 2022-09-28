@@ -19,7 +19,7 @@ config();
 
 router.route('/register').post(register);
 router.route('/login').post(login);
-router.route('/confirm-email/:id').get(verifyEmail);
+router.route('/confirm-email/:token').get(verifyEmail);
 
 router.route('/google-auth').get(getGoogleAuthURL);
 router.route('/google-auth-callback').get(googleAuthCallback);

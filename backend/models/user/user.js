@@ -1,6 +1,7 @@
 // @ts-nocheck
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import countryList from 'country-list-with-dial-code-and-flag';
 import emailValidator from 'email-validator';
@@ -22,6 +23,8 @@ const userSchema = new Schema(
                 type: Boolean,
                 default: false,
             },
+            verificationToken: { type: String, default: null },
+            verificationTokenExpire: { type: Date, default: null },
             address: {
                 type: String,
                 lowercase: true,
@@ -114,8 +117,8 @@ const userSchema = new Schema(
             picture: { type: String },
         },
         isBlocked: { type: Boolean, default: false },
-        resetPasswordToken: { type: String },
-        resetPasswordTokenExpiry: { type: Date },
+        resetPasswordToken: { type: String, default: null },
+        resetPasswordTokenExpire: { type: Date, default: null },
     },
     { timestamps: true }
 );
@@ -153,19 +156,32 @@ userSchema.methods.generateJWT = function () {
     });
 };
 
-userSchema.methods.generateResetPasswordToken = async function () {
+userSchema.methods.generateResetPasswordToken = function () {
     const user = this;
-    const { _id: userId } = user;
-    const salt = bcrypt.genSaltSync(10);
-    const resetPasswordToken = bcrypt.hashSync(userId.toString(), salt);
-    await user.updateOne(
-        {},
-        {
-            resetPasswordToken,
-            resetPasswordTokenExpiry: Date.now() + 15 * 60 * 1000,
-        }
-    );
-    return resetPasswordToken;
+    const randomBytes = crypto.randomBytes(20).toString('hex');
+
+    user.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(randomBytes)
+        .digest('hex');
+
+    user.resetPasswordTokenExpire = Date.now() + 15 * 60 * 1000;
+
+    return user.resetPasswordToken;
+};
+
+userSchema.methods.generateVerificationToken = function () {
+    const user = this;
+    const randomBytes = crypto.randomBytes(20).toString('hex');
+
+    user.email.verificationToken = crypto
+        .createHash('sha256')
+        .update(randomBytes)
+        .digest('hex');
+
+    user.email.verificationTokenExpire = Date.now() + 24 * 60 * 60 * 10000;
+
+    return user.email.verificationToken;
 };
 
 export default mongoose.model('User', userSchema);

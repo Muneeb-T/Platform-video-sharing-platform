@@ -3,7 +3,6 @@ import { config } from 'dotenv';
 import accountModel from '../models/user/user.js';
 import { google } from 'googleapis';
 import { sendMail } from '../utils/send-email.js';
-import bcrypt from 'bcryptjs';
 config();
 
 const register = async (req, res, next) => {
@@ -18,23 +17,13 @@ const register = async (req, res, next) => {
                 .json({ success: false, message: 'Bad credentials' });
         }
 
-        let user = await accountModel.findOne({
-            $or: [
-                { 'googleAccount.email': email },
-                { 'facebookAccount.email': email },
-            ],
-        });
-
-        if (user) {
-            throw new Error({ code: 11000 });
-        }
-
-        user = await accountModel.create({
+        const user = await accountModel.create({
             username: email.slice(0, email.indexOf('@')),
             'email.address': email,
             password,
         });
-
+        const verificationToken = user.generateVerificationToken();
+        await user.save();
         const messageDetails = {
             to: email,
             subject: '[Platfrom] Confirm email address',
@@ -47,7 +36,9 @@ const register = async (req, res, next) => {
                 Thanks for signing up with Platform !
 
                 You must follow this link to activate your account:
-                ${process.env.ROOT_URL}/api/auth/confirm-email/${user._id}
+                ${
+                    process.env.ROOT_URL
+                }/api/auth/confirm-email/${verificationToken}
                 Have fun and don't hesitate to contact us with your feedback`,
         };
         await sendMail(messageDetails);
@@ -58,14 +49,16 @@ const register = async (req, res, next) => {
     } catch (err) {
         // console.log('\nRegister user api error');
         // console.log('========================');
-        console.log(err);
         if (err.code === 11000) {
             return res.status(409).json({
                 success: false,
                 message: 'Already have acccount in this email',
             });
         }
-        next(err);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
     }
 };
 
@@ -122,14 +115,25 @@ const login = async (req, res, next) => {
 
 const verifyEmail = async (req, res, next) => {
     try {
-        const { id: userId } = req.params;
-        const user = await accountModel.findByIdAndUpdate(
-            userId,
-            {
-                'email.verified': true,
-            },
-            { new: true }
-        );
+        const { token: verificationToken } = req.params;
+        const user = await accountModel.findOne({
+            'email.verificationToken': verificationToken,
+            'email.verificationTokenExpire': { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email Token is invalid or has been expired',
+            });
+        }
+
+        user.email.verified = true;
+        user.email.verificationToken = null;
+        user.email.verificationTokenExpire = null;
+
+        await user.save();
+
         res.status(201).json({
             success: true,
             user,
@@ -247,4 +251,3 @@ export {
     googleAuthCallback,
     facebookAuthSuccess,
 };
-
