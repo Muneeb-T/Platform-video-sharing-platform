@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { config } from 'dotenv';
-import channelModel from '../models/user/user.js';
+import accountModel from '../models/user/user.js';
 import { google } from 'googleapis';
 import { sendMail } from '../utils/send-email.js';
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs';
 config();
 
 const register = async (req, res, next) => {
@@ -18,24 +18,22 @@ const register = async (req, res, next) => {
                 .json({ success: false, message: 'Bad credentials' });
         }
 
-        const user = await channelModel.findOneAndUpdate(
-            {
-                $or: [
-                    { 'googleAccount.email': email },
-                    { 'facebookAccount.email': email },
-                ],
-            },
-            {
-                username: email.slice(0, email.indexOf('@')),
-                'email.address': email,
-                password,
-            },
-            {
-                new: true,
-                upsert: true,
-                runValidators: true,
-            }
-        );
+        let user = await accountModel.findOne({
+            $or: [
+                { 'googleAccount.email': email },
+                { 'facebookAccount.email': email },
+            ],
+        });
+
+        if (user) {
+            throw new Error({ code: 11000 });
+        }
+
+        user = await accountModel.create({
+            username: email.slice(0, email.indexOf('@')),
+            'email.address': email,
+            password,
+        });
 
         const messageDetails = {
             to: email,
@@ -72,8 +70,6 @@ const register = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-
-
     try {
         console.log('\nRequest body');
         console.log('============');
@@ -86,7 +82,7 @@ const login = async (req, res, next) => {
                 .json({ success: false, message: 'Bad credentials' });
         }
 
-        let user = await channelModel
+        let user = await accountModel
             .findOne({ 'email.address': email })
             .select('+password');
 
@@ -127,7 +123,7 @@ const login = async (req, res, next) => {
 const verifyEmail = async (req, res, next) => {
     try {
         const { id: userId } = req.params;
-        const user = await channelModel.findByIdAndUpdate(
+        const user = await accountModel.findByIdAndUpdate(
             userId,
             {
                 'email.verified': true,
@@ -179,7 +175,7 @@ const googleAuthCallback = async (req, res, next) => {
         // console.log('\nUser details from google');
         // console.log('========================');
         // console.log(data);
-        const user = await channelModel.findOneAndUpdate(
+        const user = await accountModel.findOneAndUpdate(
             {
                 $or: [
                     { 'email.address': email },
@@ -251,3 +247,4 @@ export {
     googleAuthCallback,
     facebookAuthSuccess,
 };
+

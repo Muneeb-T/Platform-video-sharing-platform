@@ -4,7 +4,6 @@ import cloudinary from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { config } from 'dotenv';
 import path from 'path';
-import mongoose from 'mongoose';
 config();
 
 cloudinary.v2.config({
@@ -14,7 +13,7 @@ cloudinary.v2.config({
 });
 
 const storage = new CloudinaryStorage({
-    cloudinary : cloudinary.v2,
+    cloudinary: cloudinary.v2,
     params: async (req, file) => {
         try {
             return {
@@ -25,7 +24,6 @@ const storage = new CloudinaryStorage({
         } catch (err) {
             console.log(err);
         }
-
     },
 });
 

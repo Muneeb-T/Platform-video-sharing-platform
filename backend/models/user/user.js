@@ -120,35 +120,17 @@ const userSchema = new Schema(
     { timestamps: true }
 );
 
-userSchema.pre(
-    ['findOneAndUpdate', 'updateOne', 'findByIdAndUpdate'],
-    async function (next) {
-        try {
-            const user = this;
-            const updates = user.getUpdate();
-            let { password, phone: phoneNumber } = updates;
-            if (password) {
-                console.log(password);
-                const salt = await bcrypt.genSalt(10);
-                const hash = await bcrypt.hashSync(password, salt);
-                user.updateOne({}, { password: hash });
-                return next();
-            }
-            if (phoneNumber) {
-                const modifiedPhone = phone(phoneNumber, {
-                    country: user.country,
-                });
-                if (modifiedPhone.isValid) {
-                    user.phoneNumber = modifiedPhone.phoneNumber;
-                    return next();
-                }
-                next({ message: 'Enter valid phone number.' });
-            }
-        } catch (err) {
-            next({ message: 'Internal server error' });
-        }
+userSchema.pre('save', async function (next) {
+    const user = this;
+    if (user.isModified('password')) {
+        console.log(user);
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(user.password, salt);
+        user.password = hash;
     }
-);
+});
+
+userSchema.plugin(findOneOrCreate);
 
 userSchema.methods.comparePassword = function (password) {
     return bcrypt.compareSync(password, this.password);
@@ -172,13 +154,18 @@ userSchema.methods.generateJWT = function () {
 };
 
 userSchema.methods.generateResetPasswordToken = async function () {
-    const salt = await bcrypt.genSalt(10);
-    const resetToken = await bcrypt.hash('', salt).toString('hex');
-    this.resetPasswordToken = resetToken;
-    this.resetPasswordTokenExpiry = Date.now() + 15 * 60 * 1000;
-    return resetToken;
+    const user = this;
+    const { _id: userId } = user;
+    const salt = bcrypt.genSaltSync(10);
+    const resetPasswordToken = bcrypt.hashSync(userId.toString(), salt);
+    await user.updateOne(
+        {},
+        {
+            resetPasswordToken,
+            resetPasswordTokenExpiry: Date.now() + 15 * 60 * 1000,
+        }
+    );
+    return resetPasswordToken;
 };
-
-userSchema.plugin(findOneOrCreate);
 
 export default mongoose.model('User', userSchema);

@@ -124,7 +124,7 @@ const resetPassword = async (req, res, next) => {
             .charAt(0)
             .toUpperCase()} ${username.slice(1)}`;
 
-        const resetPasswordToken = user.generateResetPasswordToken();
+        const resetPasswordToken = await user.generateResetPasswordToken();
         const messageDetails = {
             to: email,
             subject: '[Platfrom] - Account recovery',
@@ -150,13 +150,21 @@ const resetPasswordCallback = async (req, res, next) => {
     try {
         const { body, params } = req;
         const { password, 'confirm-password': confirmPassword } = body;
-        const { id: userId } = params;
+        const { token: resetPasswordToken } = params;
         if (password === '' || confirmPassword !== password) {
             return res
                 .status(401)
                 .json({ success: false, message: 'Bad credentials' });
         }
-        await userModel.findByIdAndUpdate(userId, { password });
+        const updatePassword = await userModel.findOneAndUpdate(
+            { resetPasswordToken },
+            { password }
+        );
+        if (!updatePassword) {
+            return res
+                .status(404)
+                .json({ success: false, messsage: 'Page not found' });
+        }
         res.status(201).json({
             success: true,
             message: 'Password updated successfully',

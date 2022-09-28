@@ -29,6 +29,7 @@ async function sendMail(messageDetails) {
         console.log('\nNodemailer error');
         console.log('================');
         console.log(err);
+        throw new Error(err.message);
     }
 }
 

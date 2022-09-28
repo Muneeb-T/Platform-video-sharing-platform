@@ -18,6 +18,6 @@ router
     .route('/block-or-unblock-account/:id')
     .patch(jwtAuthenticate, blockOrUnblockAccount);
 router.route('/reset-password').post(resetPassword);
-router.route('/reset-password-callback/:id').post(resetPasswordCallback);
+router.route('/reset-password-callback/:token').post(resetPasswordCallback);
 
 export default router;
