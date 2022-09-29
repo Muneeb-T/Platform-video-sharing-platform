@@ -10,9 +10,11 @@ import channelRouter from './routes/channel-routes.js';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import { jwtStrategy } from './middlewares/jwt-auth.js';
+import { facebookAuthStrategy } from './middlewares/facebook-auth.js';
 
 config();
 jwtStrategy();
+facebookAuthStrategy();
 
 const PORT = process.env.PORT || 3000;
 const app = express();

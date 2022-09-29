@@ -12,6 +12,7 @@ passport.deserializeUser(function (obj, cb) {
 });
 
 const facebookAuthStrategy = () => {
+
     passport.use(
         new FacebookStrategy(
             {
@@ -73,14 +74,13 @@ const facebookAuthStrategy = () => {
                             upsert: true,
                             runValidators: true,
                         }
-                        
                     );
 
                     return done(null, user);
                 } catch (err) {
-                    // console.log('\nFacebook authentication error');
-                    // console.log('==============================');
-                    // console.log(err);
+                    console.log('\nFacebook authentication error');
+                    console.log('==============================');
+                    console.log(err);
                     return done(err, null);
                 }
             }
@@ -100,7 +100,6 @@ const facebookAuth = passport.authenticate('facebook', {
 });
 
 const facebookAuthCallback = passport.authenticate('facebook', {
-    failureRedirect: '/api/auth/facebook-auth-failed',
     session: false,
 });
 

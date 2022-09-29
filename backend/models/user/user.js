@@ -127,11 +127,24 @@ const userSchema = new Schema(
 
 userSchema.pre('save', async function (next) {
     const user = this;
+    const { phone: phoneNumber, country } = user;
     if (user.isModified('password')) {
         console.log(user);
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(user.password, salt);
         user.password = hash;
+    }
+    if (user.isModified('phone')) {
+        const modifiedPhone = phone(phoneNumber, {
+            country,
+            validateMobilePrefix: true,
+            strictDetection: true,
+        });
+        const { isValid, phoneNumber: modifiedPhoneNumber } = modifiedPhone;
+        if (!isValid) {
+            return next({ message: 'Enter valid phone number' });
+        }
+        user.phone = modifiedPhoneNumber;
     }
 });
 

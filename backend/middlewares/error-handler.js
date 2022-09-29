@@ -22,7 +22,7 @@ function errorHandler(err, req, res, next) {
             message = errors[key].message;
         }
     }
-
+    console.log(err)
     status = status || 500;
     message = status === 500 ? 'Internal server error' : message;
     res.status(status).json({ success: false, message });
