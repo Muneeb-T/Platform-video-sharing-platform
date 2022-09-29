@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import accountModel from '../models/user/user.js';
 import { google } from 'googleapis';
 import { sendMail } from '../utils/send-email.js';
+
 config();
 
 const register = async (req, res, next) => {
@@ -64,9 +65,9 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
     try {
-        console.log('\nRequest body');
-        console.log('============');
-        console.log(req.body);
+        // console.log('\nRequest body');
+        // console.log('============');
+        // console.log(req.body);
 
         const { email, password } = req.body;
         if (email == '' || password == '') {
@@ -79,12 +80,7 @@ const login = async (req, res, next) => {
             .findOne({ 'email.address': email })
             .select('+password');
 
-        if (!user || !user.email.verified)
-            return res
-                .status(401)
-                .json({ success: false, message: 'Invalid email or password' });
-
-        if (!user.comparePassword(password))
+        if (!user || !user.email.verified || !user.comparePassword(password))
             return res
                 .status(401)
                 .json({ success: false, message: 'Invalid email or password' });
@@ -92,17 +88,20 @@ const login = async (req, res, next) => {
         if (user.isBlocked) {
             return res.status(403).json({
                 success: false,
-                message: 'Login failed.Your account has been locked',
+                message: 'Login failed.Your account has been locked.',
             });
         }
 
-        const token = user.generateJWT();
+        const { accessToken, refreshToken } = user.generateJWT();
+        await user.save();
+
         user = user.toObject();
         delete user.password;
 
         res.status(200).json({
             success: true,
-            token,
+            accessToken,
+            refreshToken,
             user,
         });
     } catch (err) {
@@ -131,18 +130,19 @@ const verifyEmail = async (req, res, next) => {
         user.email.verified = true;
         user.email.verificationToken = null;
         user.email.verificationTokenExpire = null;
-
+        const { accessToken, refreshToken } = user.generateJWT();
         await user.save();
 
         res.status(201).json({
             success: true,
             user,
-            token: user.generateJWT(),
+            accessToken,
+            refreshToken,
             message: 'Email verified successfully',
         });
     } catch (err) {
-        console.log('Email verification error');
-        console.log(err);
+        // console.log('Email verification error');
+        // console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -208,9 +208,13 @@ const googleAuthCallback = async (req, res, next) => {
             });
         }
 
+        const { accessToken, refreshToken } = user.generateJWT();
+        await user.save();
+
         res.status(200).json({
             success: true,
-            token: user.generateJWT(),
+            accessToken,
+            refreshToken,
             user,
         });
     } catch (err) {
@@ -230,9 +234,15 @@ const facebookAuthSuccess = async (req, res, next) => {
                 message: 'Login failed.Your account has been locked',
             });
         }
+
+        const { accessToken, refreshToken } = user.generateJWT();
+
+        await user.save();
+
         res.status(200).json({
             success: true,
-            token: user.generateJWT(),
+            accessToken,
+            refreshToken,
             user,
         });
     } catch (err) {
@@ -243,6 +253,32 @@ const facebookAuthSuccess = async (req, res, next) => {
     }
 };
 
+const refreshAuthToken = async (req, res, next) => {
+    try {
+        const { id: userId } = req.user;
+        const user = await accountModel.findOne({ _id: userId });
+        if (!user) {
+            return res
+                .status(404)
+                .json({ success: false, message: 'User not found' });
+        }
+        const { accessToken, refreshToken } = user.generateJWT();
+        await user.save();
+        res.status(201).json({
+            success: true,
+            accessToken,
+            refreshToken,
+            message: 'Access token refreshed successfully',
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    }
+};
+
 export {
     register,
     login,
@@ -250,4 +286,5 @@ export {
     getGoogleAuthURL,
     googleAuthCallback,
     facebookAuthSuccess,
+    refreshAuthToken,
 };

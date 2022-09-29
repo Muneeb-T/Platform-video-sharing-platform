@@ -117,6 +117,8 @@ const userSchema = new Schema(
             picture: { type: String },
         },
         isBlocked: { type: Boolean, default: false },
+        accessToken: { type: String },
+        refreshToken: { type: String },
         resetPasswordToken: { type: String, default: null },
         resetPasswordTokenExpire: { type: Date, default: null },
     },
@@ -140,20 +142,38 @@ userSchema.methods.comparePassword = function (password) {
 };
 
 userSchema.methods.generateJWT = function () {
-    const today = new Date();
-    const expirationDate = new Date(today);
-    expirationDate.setDate(today.getDate() + 60);
+    const user = this;
+    const {
+        _id: id,
+        email,
+        username,
+        role,
+        googleAccount,
+        facebookAccount,
+    } = user;
+
+    const { address: emailAddress } = email;
+    const { email: googleEmail, username: googleUsername } = googleAccount;
+    const { email: facebookEmail, username: facebookUsername } =
+        facebookAccount;
 
     let payload = {
-        id: this._id,
-        email: this.email,
-        username: this.username,
-        role: this.role,
+        id,
+        email: emailAddress || googleEmail || facebookEmail,
+        username: username || googleUsername || facebookUsername,
+        role,
     };
 
-    return jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: parseInt(expirationDate.getTime() / 1000, 10),
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '15m',
     });
+    const refreshToken = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '30d',
+    });
+    user.accessToken = accessToken;
+    user.refreshToken = refreshToken;
+
+    return { accessToken, refreshToken };
 };
 
 userSchema.methods.generateResetPasswordToken = function () {

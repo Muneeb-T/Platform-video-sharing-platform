@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { Strategy as FacebookStrategy } from 'passport-facebook';
-import userModel from '../models/channel/channel.js';
+import userModel from '../models/user/user.js';
 import passport from 'passport';
 
 passport.serializeUser(function (user, cb) {

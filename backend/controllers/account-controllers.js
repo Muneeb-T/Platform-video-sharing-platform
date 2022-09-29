@@ -53,9 +53,9 @@ const getAllUsers = async (req, res, next) => {
             message: 'Fetched all users successfully',
         });
     } catch (err) {
-        console.log('\nGet all users error');
-        console.log('====================');
-        console.log(err);
+        // console.log('\nGet all users error');
+        // console.log('====================');
+        // console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -152,7 +152,7 @@ const resetPasswordCallback = async (req, res, next) => {
         const { body, params } = req;
         const { password, 'confirm-password': confirmPassword } = body;
         const { token: resetPasswordToken } = params;
-        console.log(resetPasswordToken);
+
         if (password == '' || confirmPassword !== password) {
             return res
                 .status(401)
@@ -172,6 +172,7 @@ const resetPasswordCallback = async (req, res, next) => {
         user.password = password;
         user.resetPasswordToken = null;
         user.resetPasswordTokenExpire = null;
+
         await user.save();
 
         res.status(201).json({
@@ -186,4 +187,10 @@ const resetPasswordCallback = async (req, res, next) => {
     }
 };
 
-export { getUser, blockOrUnblockAccount, resetPassword, resetPasswordCallback };
+export {
+    getUser,
+    blockOrUnblockAccount,
+    resetPassword,
+    resetPasswordCallback,
+    getAllUsers,
+};
