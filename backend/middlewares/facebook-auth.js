@@ -12,7 +12,6 @@ passport.deserializeUser(function (obj, cb) {
 });
 
 const facebookAuthStrategy = () => {
-
     passport.use(
         new FacebookStrategy(
             {
@@ -51,12 +50,14 @@ const facebookAuthStrategy = () => {
                         {
                             $or: [
                                 { 'email.address': email },
-                                { 'facebookAccount.email': email },
                                 { 'googleAccount.email': email },
+                                { 'facebookAccount.email': email },
                                 { 'facebookAccount.id': id },
                             ],
                         },
                         {
+                            'email.address': email,
+                            'email.verified': true,
                             'facebookAccount.username':
                                 username ||
                                 displayName ||
@@ -101,6 +102,8 @@ const facebookAuth = passport.authenticate('facebook', {
 
 const facebookAuthCallback = passport.authenticate('facebook', {
     session: false,
+    failureRedirect: '/api/auth/facebook-auth-failed',
+    passReqToCallback: true,
 });
 
 export { facebookAuthStrategy, facebookAuth, facebookAuthCallback };

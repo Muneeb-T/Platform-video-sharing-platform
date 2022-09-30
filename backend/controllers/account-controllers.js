@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { config } from 'dotenv';
 import userModel from '../models/user/user.js';
-import { sendMail } from '../utils/send-email.js';
+import { sendEmail } from '../utils/send-email.js';
 import generateResetPasswordHtml from '../utils/html-pages/reset-password.js';
 
 config();
@@ -90,9 +90,7 @@ const blockOrUnblockAccount = async (req, res, next) => {
 
         res.status(201).json({
             success: false,
-            message: `User ${
-                isBlocked ? 'blocked' : 'unblocked'
-            } successfully'`,
+            message: `User ${isBlocked ? 'blocked' : 'unblocked'} successfully`,
         });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -134,7 +132,7 @@ const resetPassword = async (req, res, next) => {
             We received a request to reset your Platform password.`,
             html: generateResetPasswordHtml(resetPasswordToken),
         };
-        await sendMail(messageDetails);
+        await sendEmail(messageDetails);
         res.status(200).json({
             success: true,
             message: `Confirmation message has sent to ${email}`,

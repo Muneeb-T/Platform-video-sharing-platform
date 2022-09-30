@@ -1,5 +1,5 @@
 // @ts-nocheck
-import express from 'express';
+import express, { Router } from 'express';
 import { config } from 'dotenv';
 import {
     getChannel,
@@ -8,7 +8,7 @@ import {
 import upload from '../middlewares/multer-cloudinary.js';
 import { jwtAuthenticate } from '../middlewares/jwt-auth.js';
 
-const router = express.Router();
+const router = Router();
 
 config();
 

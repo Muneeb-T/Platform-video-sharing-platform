@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer';
 import { config } from 'dotenv';
+import mongoose from 'mongoose';
+import emailSchema from '../models/email/email.js';
 config();
 
 const transporter = nodemailer.createTransport({
@@ -10,7 +12,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-async function sendMail(messageDetails) {
+async function sendEmail(messageDetails, recieverId) {
     try {
         const { to, subject, text, html } = messageDetails;
         const mailOptions = {
@@ -21,6 +23,13 @@ async function sendMail(messageDetails) {
             html,
         };
         const mailInfo = await transporter.sendMail(mailOptions);
+        const { messageId, envelope, response } = mailInfo;
+        await emailSchema.create({
+            sentTo: recieverId,
+            messageId,
+            envelope,
+            response,
+        });
         console.log('\nEmail has sent successfully');
         console.log('=============================');
         console.log(mailInfo);
@@ -32,4 +41,4 @@ async function sendMail(messageDetails) {
     }
 }
 
-export { sendMail };
+export { sendEmail };

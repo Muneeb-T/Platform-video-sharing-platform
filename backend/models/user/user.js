@@ -30,6 +30,7 @@ const userSchema = new Schema(
                 lowercase: true,
                 unique: true,
                 sparse: true,
+                default : null,
                 validate: [
                     {
                         validator: function (email) {

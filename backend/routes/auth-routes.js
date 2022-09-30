@@ -7,6 +7,7 @@ import {
     getGoogleAuthURL,
     googleAuthCallback,
     facebookAuthSuccess,
+    facebookAuthFailure,
     refreshAuthToken,
 } from '../controllers/auth-controller.js';
 import { jwtAuthenticate } from '../middlewares/jwt-auth.js';
@@ -29,11 +30,6 @@ router.route('/facebook-auth').get(facebookAuth);
 router
     .route('/facebook-auth-callback')
     .get(facebookAuthCallback, facebookAuthSuccess);
-router.route('/google-auth-failed').get((req, res) => {
-    console.log('Google authentication failed');
-});
-router.route('/google-auth-success').get((req, res) => {
-    console.log('Google authentication failed');
-});
+router.route('/facebook-auth-failed').get(facebookAuthFailure);
 
 export default router;

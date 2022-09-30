@@ -2,7 +2,7 @@
 import { config } from 'dotenv';
 import accountModel from '../models/user/user.js';
 import { google } from 'googleapis';
-import { sendMail } from '../utils/send-email.js';
+import { sendEmail } from '../utils/send-email.js';
 
 config();
 
@@ -23,8 +23,11 @@ const register = async (req, res, next) => {
             'email.address': email,
             password,
         });
+
         const verificationToken = user.generateVerificationToken();
         await user.save();
+
+        const { _id: userId } = user;
         const messageDetails = {
             to: email,
             subject: '[Platfrom] Confirm email address',
@@ -42,7 +45,7 @@ const register = async (req, res, next) => {
                 }/api/auth/confirm-email/${verificationToken}
                 Have fun and don't hesitate to contact us with your feedback`,
         };
-        await sendMail(messageDetails);
+        await sendEmail(messageDetails, userId);
         res.status(201).json({
             success: true,
             message: `Confirmation message has sent to email address ${email}`,
@@ -77,13 +80,42 @@ const login = async (req, res, next) => {
         }
 
         let user = await accountModel
-            .findOne({ 'email.address': email })
+            .findOne({
+                $or: [
+                    { 'email.address': email },
+                    { 'googleAccount.email': email },
+                    { 'facebookAccount.email': email },
+                ],
+            })
             .select('+password');
 
-        if (!user || !user.email.verified || !user.comparePassword(password))
+        if (
+            !user ||
+            (user && !user.comparePassword(password)) ||
+            (user &&
+                !user.email.verified &&
+                user.email.address &&
+                user.email.verificationToken &&
+                Date.now() > user.email.verificationTokenExpire)
+        ) {
             return res
                 .status(401)
                 .json({ success: false, message: 'Invalid email or password' });
+        }
+
+        if (
+            user &&
+            !user.email.verified &&
+            user.email.address &&
+            user.email.verificationToken &&
+            Date.now() < user.email.verificationTokenExpire
+        ) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    'Please verify your email address.We already have sent you a verification email.',
+            });
+        }
 
         if (user.isBlocked) {
             return res.status(403).json({
@@ -107,7 +139,7 @@ const login = async (req, res, next) => {
     } catch (err) {
         // console.log('\nLogin api error');
         // console.log('===============');
-        console.log(err);
+        // console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -123,7 +155,8 @@ const verifyEmail = async (req, res, next) => {
         if (!user) {
             return res.status(400).json({
                 success: false,
-                message: 'Email Token is invalid or has been expired',
+                message:
+                    'Email verification token is invalid or has been expired',
             });
         }
 
@@ -189,6 +222,8 @@ const googleAuthCallback = async (req, res, next) => {
                 ],
             },
             {
+                'email.address': email,
+                'email.verified': true,
                 'googleAccount.username': name,
                 'googleAccount.id': id,
                 'googleAccount.email': email,
@@ -279,6 +314,20 @@ const refreshAuthToken = async (req, res, next) => {
     }
 };
 
+const facebookAuthFailure = (req, res, next) => {
+    try {
+        console.log('\nFacebook authentication failed');
+        console.log('===============================');
+        console.log(req);
+        res.status(401).json({
+            success: true,
+            message: 'Facebook authentication failed',
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
 export {
     register,
     login,
@@ -287,4 +336,5 @@ export {
     googleAuthCallback,
     facebookAuthSuccess,
     refreshAuthToken,
+    facebookAuthFailure,
 };
