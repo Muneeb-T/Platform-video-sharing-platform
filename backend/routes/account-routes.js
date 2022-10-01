@@ -3,10 +3,13 @@ import express from 'express';
 import { config } from 'dotenv';
 import {
     getUser,
+    getAllUsers,
+    updateUser,
     resetPassword,
     resetPasswordCallback,
-    blockOrUnblockAccount,
-    getAllUsers,
+    blockOrUnblockUser,
+    resetEmail,
+    resetEmailCallback,
 } from '../controllers/account-controllers.js';
 
 import { jwtAuthenticate } from '../middlewares/jwt-auth.js';
@@ -18,8 +21,10 @@ router.route('/get-user/:id').get(jwtAuthenticate, getUser);
 router.route('/get-users').get(jwtAuthenticate, getAllUsers);
 router
     .route('/block-or-unblock-account/:id')
-    .patch(jwtAuthenticate, blockOrUnblockAccount);
-router.route('/update-user/:id').get();
+    .patch(jwtAuthenticate, blockOrUnblockUser);
+router.route('/update-user/:id').post(jwtAuthenticate, updateUser);
+router.route('/reset-email').post(jwtAuthenticate, resetEmail);
+router.route('/reset-email-callback').post(jwtAuthenticate, resetEmailCallback);
 router.route('/reset-password').post(resetPassword);
 router.route('/reset-password-callback/:token').post(resetPasswordCallback);
 

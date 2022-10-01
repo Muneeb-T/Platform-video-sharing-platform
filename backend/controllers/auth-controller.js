@@ -91,7 +91,7 @@ const login = async (req, res, next) => {
 
         if (
             !user ||
-            (user && !user.comparePassword(password)) ||
+            (user && (!user.password || !user.comparePassword(password))) ||
             (user &&
                 !user.email.verified &&
                 user.email.address &&
@@ -149,29 +149,27 @@ const verifyEmail = async (req, res, next) => {
         const { token: verificationToken } = req.params;
         const user = await accountModel.findOne({
             'email.verificationToken': verificationToken,
-            'email.verificationTokenExpire': { $gt: Date.now() },
         });
 
-        if (!user) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    'Email verification token is invalid or has been expired',
+        if (user && user.verifyJwtToken(verificationToken)) {
+            user.email.verified = true;
+            user.email.verificationToken = null;
+            user.email.verificationTokenExpire = null;
+            const { accessToken, refreshToken } = user.generateJWT();
+            await user.save();
+
+            return res.status(201).json({
+                success: true,
+                user,
+                accessToken,
+                refreshToken,
+                message: 'Email verified successfully',
             });
         }
 
-        user.email.verified = true;
-        user.email.verificationToken = null;
-        user.email.verificationTokenExpire = null;
-        const { accessToken, refreshToken } = user.generateJWT();
-        await user.save();
-
-        res.status(201).json({
-            success: true,
-            user,
-            accessToken,
-            refreshToken,
-            message: 'Email verified successfully',
+        res.status(400).json({
+            success: false,
+            message: 'Email verification token is invalid or has been expired',
         });
     } catch (err) {
         // console.log('Email verification error');

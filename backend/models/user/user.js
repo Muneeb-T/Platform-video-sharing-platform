@@ -30,7 +30,7 @@ const userSchema = new Schema(
                 lowercase: true,
                 unique: true,
                 sparse: true,
-                default : null,
+                default: null,
                 validate: [
                     {
                         validator: function (email) {
@@ -39,6 +39,29 @@ const userSchema = new Schema(
                         message: 'Enter valid email address.',
                     },
                 ],
+            },
+            updateRequest: {
+                requested: { type: Boolean, default: false },
+                newEmail: {
+                    type: String,
+                    lowercase: true,
+                    unique: true,
+                    sparse: true,
+                    validate: [
+                        {
+                            validator: function (email) {
+                                if (email === null) {
+                                    return true;
+                                }
+                                return emailValidator.validate(email);
+                            },
+                            message: 'Enter valid email address.',
+                        },
+                    ],
+                },
+                otpExpire: { type: Date, default: null },
+                currentEmailOtp: { type: String, default: null },
+                newEmailOtp: { type: String, default: null },
             },
         },
         role: {
@@ -121,13 +144,13 @@ const userSchema = new Schema(
         accessToken: { type: String },
         refreshToken: { type: String },
         resetPasswordToken: { type: String, default: null },
-        resetPasswordTokenExpire: { type: Date, default: null },
     },
     { timestamps: true }
 );
 
 userSchema.pre('save', async function (next) {
     const user = this;
+
     const { phone: phoneNumber, country } = user;
     if (user.isModified('password')) {
         console.log(user);
@@ -192,29 +215,38 @@ userSchema.methods.generateJWT = function () {
 
 userSchema.methods.generateResetPasswordToken = function () {
     const user = this;
-    const randomBytes = crypto.randomBytes(20).toString('hex');
-
-    user.resetPasswordToken = crypto
-        .createHash('sha256')
-        .update(randomBytes)
-        .digest('hex');
-
-    user.resetPasswordTokenExpire = Date.now() + 15 * 60 * 1000;
+    const { _id: userId, email } = user;
+    const payload = { userId, email: email.address };
+    user.resetPasswordToken = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '15m',
+    });
 
     return user.resetPasswordToken;
 };
 
-userSchema.methods.generateVerificationToken = function () {
+userSchema.methods.verifyJwtToken = function (token) {
     const user = this;
-    const randomBytes = crypto.randomBytes(20).toString('hex');
+    console.log(user);
+    const { _id: userId, email } = user;
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decodedToken);
+    if (
+        decodedToken.userId === userId.toString() &&
+        decodedToken.email === email.address
+    ) {
+        return true;
+    }
+    return false;
+};
 
-    user.email.verificationToken = crypto
-        .createHash('sha256')
-        .update(randomBytes)
-        .digest('hex');
+userSchema.methods.generateVerificationToken = function () {
 
-    user.email.verificationTokenExpire = Date.now() + 24 * 60 * 60 * 10000;
-
+    const user = this;
+    const { _id: userId, email } = user;
+    const payload = { userId, email: email.address };
+    user.email.verificationToken = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '24h',
+    });
     return user.email.verificationToken;
 };
 
