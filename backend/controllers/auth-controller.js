@@ -220,8 +220,6 @@ const googleAuthCallback = async (req, res, next) => {
                 ],
             },
             {
-                'email.address': email,
-                'email.verified': true,
                 'googleAccount.username': name,
                 'googleAccount.id': id,
                 'googleAccount.email': email,
@@ -233,6 +231,12 @@ const googleAuthCallback = async (req, res, next) => {
                 runValidators: true,
             }
         );
+
+        if (!user.email.address) {
+            user.email.address = email;
+            user.email.verified = true;
+            await user.save();
+        }
 
         if (user.isBlocked) {
             return res.status(403).json({

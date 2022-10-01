@@ -56,8 +56,6 @@ const facebookAuthStrategy = () => {
                             ],
                         },
                         {
-                            'email.address': email,
-                            'email.verified': true,
                             'facebookAccount.username':
                                 username ||
                                 displayName ||
@@ -76,6 +74,11 @@ const facebookAuthStrategy = () => {
                             runValidators: true,
                         }
                     );
+                    if (!user.email.address) {
+                        user.email.address = email;
+                        user.email.verified = true;
+                        await user.save();
+                    }
 
                     return done(null, user);
                 } catch (err) {
