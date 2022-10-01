@@ -1,7 +1,6 @@
 // @ts-nocheck
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import countryList from 'country-list-with-dial-code-and-flag';
 import emailValidator from 'email-validator';
@@ -34,6 +33,9 @@ const userSchema = new Schema(
                 validate: [
                     {
                         validator: function (email) {
+                            if (email === null) {
+                                return true;
+                            }
                             return emailValidator.validate(email);
                         },
                         message: 'Enter valid email address.',
