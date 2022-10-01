@@ -1,7 +1,6 @@
 // @ts-nocheck
 import mongoose from 'mongoose';
 function errorHandler(err, req, res, next) {
-    
     let { message } = err;
     let status;
 
@@ -22,7 +21,7 @@ function errorHandler(err, req, res, next) {
             message = errors[key].message;
         }
     }
-    console.log(err)
+    console.log(err);
     status = status || 500;
     message = status === 500 ? 'Internal server error' : message;
     res.status(status).json({ success: false, message });

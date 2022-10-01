@@ -266,7 +266,7 @@ const blockOrUnblockUser = async (req, res) => {
         const { isBlocked } = blockOrUnblock;
 
         res.status(201).json({
-            success: false,
+            success: true,
             message: `User ${isBlocked ? 'blocked' : 'unblocked'} successfully`,
         });
     } catch (err) {
@@ -361,6 +361,42 @@ const resetPasswordCallback = async (req, res) => {
     }
 };
 
+const deleteOrRestoreUser = async (req, res, next) => {
+    try {
+        const { id: requestedUserId } = req.params;
+        const { user: authenticatedUser, body } = req;
+        const { id: authenticatedUserId, role } = authenticatedUser;
+        if (requestedUserId !== authenticatedUserId && role !== 'admin') {
+            return res
+                .status(401)
+                .json({ success: false, message: 'Unautherized access' });
+        }
+
+        const deleteOrRestore = await accountModel.findByIdAndUpdate(
+            requestedUserId,
+            [
+                {
+                    $set: {
+                        isDeleted: {
+                            $eq: [false, '$isDeleted'],
+                        },
+                    },
+                },
+            ],
+            { new: true }
+        );
+
+        const { isDeleted } = deleteOrRestore;
+
+        res.status(201).json({
+            success: true,
+            message: `User ${isDeleted ? 'deleted' : 'restored'} successfully`,
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
 export {
     getUser,
     getAllUsers,
@@ -370,4 +406,5 @@ export {
     resetEmailCallback,
     resetPassword,
     resetPasswordCallback,
+    deleteOrRestoreUser,
 };

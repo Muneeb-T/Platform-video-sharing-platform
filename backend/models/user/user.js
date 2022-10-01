@@ -141,6 +141,7 @@ const userSchema = new Schema(
             picture: { type: String },
         },
         isBlocked: { type: Boolean, default: false },
+        isDeleted: { type: Boolean, default: false },
         accessToken: { type: String },
         refreshToken: { type: String },
         resetPasswordToken: { type: String, default: null },
@@ -240,7 +241,6 @@ userSchema.methods.verifyJwtToken = function (token) {
 };
 
 userSchema.methods.generateVerificationToken = function () {
-
     const user = this;
     const { _id: userId, email } = user;
     const payload = { userId, email: email.address };
