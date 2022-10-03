@@ -8,9 +8,9 @@ config();
 
 const register = async (req, res, next) => {
     try {
-        // console.log('\nRequest body');
-        // console.log('============');
-        // console.log(req.body);
+        console.log('\nRequest body');
+        console.log('============');
+        console.log(req.body);
         const { email, password } = req.body;
         if (email == '' || password == '') {
             return res

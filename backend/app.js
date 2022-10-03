@@ -11,6 +11,7 @@ import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import { jwtStrategy } from './middlewares/jwt-auth.js';
 import { facebookAuthStrategy } from './middlewares/facebook-auth.js';
+import cors from 'cors';
 
 config();
 jwtStrategy();
@@ -23,6 +24,7 @@ app.use(passport.initialize());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use('/api/auth', authRouter);
 app.use('/api/account/', accountRouter);
 app.use('/api/channel/', channelRouter);
