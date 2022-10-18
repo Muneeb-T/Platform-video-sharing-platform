@@ -15,22 +15,7 @@ import EmojiPicker from 'emoji-picker-react';
 import EmojiIcon from '@mui/icons-material/EmojiEmotions';
 import { Menu } from '@headlessui/react';
 import { Link } from 'react-router-dom';
-const comments = [
-    {
-        user: {
-            picture: null,
-            username: 'Ranveer sigh',
-        },
-        commentText: 'Nice video...Amazing',
-    },
-    {
-        user: {
-            picture: null,
-            username: 'John doe',
-        },
-        commentText: 'Great perfomance sir...congratulations.Keep it up',
-    },
-];
+import Comments from '../components/Comments';
 
 function VideoPlayback() {
     const [descriptionReadMore, setDescriptionReadMore] = useState(false);
@@ -222,46 +207,7 @@ function VideoPlayback() {
                         </div>
                     </div>
                     <div>
-                        {comments.map((comment) => {
-                            const { commentText, user: commentedUser } =
-                                comment;
-                            const { picture, username } = commentedUser;
-                            return (
-                                <>
-                                    <div className='flex py-2'>
-                                        <img
-                                            className='h-10 w-10 rounded-full mr-2'
-                                            src={picture || AvatarThumbnail}
-                                            referrerPolicy='no-referrer'
-                                            alt=''
-                                        />
-                                        <div className='text-sm'>
-                                            <div>
-                                                <p className='text-gray-300'>
-                                                    {username}
-                                                </p>
-                                                <p className='text-gray-400'>
-                                                    {commentText}
-                                                </p>
-                                            </div>
-                                            <div className='flex gap-5 items-center'>
-                                                <div className='flex gap-2 text-gray-300 items-center'>
-                                                    <LikeIcon />
-                                                    <p>43k</p>
-                                                </div>
-                                                <div className='flex gap-2 text-gray-300 items-center'>
-                                                    <DislikeIcon />
-                                                    <p>23k</p>
-                                                </div>
-                                                <p className='text-red-600 font-bold'>
-                                                    Reply
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </>
-                            );
-                        })}
+                        <Comments />
                     </div>
                 </div>
                 <div className='w-[100%] lg:w-[35%] overflow-y-scroll scrollbar-hide'>
