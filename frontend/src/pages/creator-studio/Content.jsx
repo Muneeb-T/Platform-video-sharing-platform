@@ -3,6 +3,8 @@ import UploadIcon from '@mui/icons-material/Upload';
 import LiveStreamingIcon from '@mui/icons-material/WifiTethering';
 import Sidebar from '../../components/creator-studio/Sidebar';
 import AvatarThumbnail from '../../assets/images/avatar-thumbnail.png';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import VideoContent from '../../components/creator-studio/Content';
 const user = null;
 function Content() {
     return (
@@ -33,7 +35,7 @@ function Content() {
                         </div>
                         <Sidebar />
                     </div>
-                    <div className='col-span-4 gap-2 overflow-y-scroll scrollbar-hide space-y-2'>
+                    <div className='col-span-4 gap-2 space-y-2 overflow-hidden'>
                         <div className='bg-gray-300 bg-opacity-5 flex justify-between  items-center px-8 py-3'>
                             <p className='text-gray-300 font-bold text-xl'>
                                 Channel content
@@ -57,7 +59,22 @@ function Content() {
                                 </button>
                             </div>
                         </div>
-                        <div className='bg-gray-300 bg-opacity-5 h-full'></div>
+                        <div className='bg-gray-300 bg-opacity-5 h-screen overflow-y-scroll scrollbar-hide  p-5'>
+                            <div className='flex text-gray-300 gap-2'>
+                                <p>Filters</p>
+                                <FilterListIcon />
+                            </div>
+                            <hr className='opacity-20 mt-2' />
+                            <div className='space-y-3 mt-3'>
+                                <VideoContent />
+                                <VideoContent />
+                                <VideoContent />
+                                <VideoContent />
+                                <VideoContent />
+                                <VideoContent />
+                                <VideoContent />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

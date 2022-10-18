@@ -166,11 +166,15 @@ function Dashboard() {
                                 </p>
                                 <div className='text-gray-400 mt-3 space-y-2'>
                                     <p>Total views - 2343233343 (2.3 M)</p>
-                                    <p>Watch time(hours) - 3433423343 (34.3 M)</p>
+                                    <p>
+                                        Watch time(hours) - 3433423343 (34.3 M)
+                                    </p>
                                 </div>
                                 <div className='mt-5'>
-                                    <p className='font-bold text-gray-300'>Top videos</p>
-                                    <VideoGroup2/>
+                                    <p className='font-bold text-gray-300'>
+                                        Top videos
+                                    </p>
+                                    <VideoGroup2 />
                                 </div>
                             </div>
                         </div>
