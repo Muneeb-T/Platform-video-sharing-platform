@@ -7,6 +7,45 @@ import emailValidator from 'email-validator';
 import { phone } from 'phone';
 import findOneOrCreate from 'mongoose-find-one-or-create';
 import moment from 'moment';
+import fileModel from '../file/file.js';
+
+const passwordRegexValidators = [
+    {
+        validator: function (password) {
+            const regex = /^(?=.*?[A-Z])/;
+            return regex.test(password);
+        },
+        message: 'Password must contain atleast one uppercase',
+    },
+    {
+        validator: function (password) {
+            const regex = /(?=.*?[a-z])/;
+            return regex.test(password);
+        },
+        message: 'Password must contain atleast one lowercase',
+    },
+    {
+        validator: function (password) {
+            const regex = /(?=.*?[0-9])/;
+            return regex.test(password);
+        },
+        message: 'Password must contain atleast one digit',
+    },
+    {
+        validator: function (password) {
+            const regex = /(?=.*?[#?!@$%^&*-])/;
+            return regex.test(password);
+        },
+        message: 'Password must contain atleast one special character',
+    },
+    {
+        validator: function (password) {
+            const regex = /.{8,}$/;
+            return regex.test(password);
+        },
+        message: 'Password must contain minimum 8 characters',
+    },
+];
 
 const countries = countryList.map((country) => country.code);
 const { Schema } = mongoose;
@@ -23,7 +62,6 @@ const userSchema = new Schema(
                 default: false,
             },
             verificationToken: { type: String, default: null },
-            verificationTokenExpire: { type: Date, default: null },
             address: {
                 type: String,
                 lowercase: true,
@@ -74,18 +112,11 @@ const userSchema = new Schema(
             },
             default: 'user',
         },
+        profilePicture: { type: fileModel },
         password: {
             type: String,
             select: false,
-            validate: {
-                validator: function (password) {
-                    const regex =
-                        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
-                    return regex.test(password);
-                },
-                message:
-                    'Password must contain - At least one upper case, At least one lower case, At least one digit, At least one special character, Minimum eight characters.',
-            },
+            validate: [...passwordRegexValidators],
             // ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$
             // This regex will enforce these rules:
             // At least one upper case English letter, (?=.*?[A-Z]) *
@@ -141,6 +172,9 @@ const userSchema = new Schema(
             username: { type: String },
             email: { type: String },
             picture: { type: String },
+            gender: { type : String},
+            dateOfBirth : {type: String},
+
         },
         isBlocked: { type: Boolean, default: false },
         isDeleted: { type: Boolean, default: false },
@@ -151,12 +185,11 @@ const userSchema = new Schema(
     { timestamps: true }
 );
 
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', function (next) {
     const user = this;
 
     const { phone: phoneNumber, country } = user;
     if (user.isModified('password')) {
-        console.log(user);
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(user.password, salt);
         user.password = hash;
@@ -173,6 +206,7 @@ userSchema.pre('save', async function (next) {
         }
         user.phone = modifiedPhoneNumber;
     }
+    next();
 });
 
 userSchema.plugin(findOneOrCreate);

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import emailValidator from 'email-validator';
 import linkModel from './link.js';
-import fileModel from './file.js';
+import fileModel from '../file/file.js';
 import findOneOrCreate from 'mongoose-find-one-or-create';
 
 const { Schema } = mongoose;
@@ -46,7 +46,6 @@ const channelSchema = new Schema(
             },
         },
         //branding
-        channelLogo: { type: fileModel },
         banners: [
             {
                 type: fileModel.add({

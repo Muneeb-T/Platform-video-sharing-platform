@@ -82,9 +82,6 @@ const facebookAuthStrategy = () => {
 
                     return done(null, user);
                 } catch (err) {
-                    console.log('\nFacebook authentication error');
-                    console.log('==============================');
-                    console.log(err);
                     return done(err, null);
                 }
             }

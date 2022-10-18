@@ -47,6 +47,7 @@ const updateChannel = async (req, res, next) => {
         // console.log('Channel ID : ', req.params.id);
         // console.log('\nRequest body');
         // console.log('============');
+        console.log(req.files)
 
         const { user, body, params, files } = req;
         const { id: channelId } = params;

@@ -37,7 +37,7 @@ async function sendEmail(messageDetails, recieverId) {
         console.log('\nNodemailer error');
         console.log('================');
         console.log(err);
-        throw new Error(err.message);
+        throw new Error(err);
     }
 }
 

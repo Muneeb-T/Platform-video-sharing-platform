@@ -3,14 +3,16 @@ import { config } from 'dotenv';
 import accountModel from '../models/user/user.js';
 import { google } from 'googleapis';
 import { sendEmail } from '../utils/send-email.js';
+import mongoose from 'mongoose';
 
 config();
 
 const register = async (req, res, next) => {
+    let user;
     try {
-        console.log('\nRequest body');
-        console.log('============');
-        console.log(req.body);
+        // console.log('\nRequest body');
+        // console.log('============');
+        // console.log(req.body);
         const { email, password } = req.body;
         if (email == '' || password == '') {
             return res
@@ -18,7 +20,7 @@ const register = async (req, res, next) => {
                 .json({ success: false, message: 'Bad credentials' });
         }
 
-        const user = await accountModel.create({
+        user = await accountModel.create({
             username: email.slice(0, email.indexOf('@')),
             'email.address': email,
             password,
@@ -36,33 +38,32 @@ const register = async (req, res, next) => {
                     user.username.charAt(0).toUpperCase() +
                     user.username.slice(1)
                 } !
-
                 Thanks for signing up with Platform !
-
                 You must follow this link to activate your account:
                 ${
-                    process.env.ROOT_URL
-                }/api/auth/confirm-email/${verificationToken}
+                    process.env.FRONTEND_HOST_NAME
+                }/register/confirm-email/${verificationToken}
                 Have fun and don't hesitate to contact us with your feedback`,
         };
         await sendEmail(messageDetails, userId);
         res.status(201).json({
             success: true,
+            user,
             message: `Confirmation message has sent to email address ${email}`,
         });
     } catch (err) {
         // console.log('\nRegister user api error');
         // console.log('========================');
+        if (user) {
+            user.remove();
+        }
         if (err.code === 11000) {
             return res.status(409).json({
                 success: false,
                 message: 'Already have acccount in this email',
             });
         }
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-        });
+        next(err);
     }
 };
 
@@ -91,12 +92,7 @@ const login = async (req, res, next) => {
 
         if (
             !user ||
-            (user && (!user.password || !user.comparePassword(password))) ||
-            (user &&
-                !user.email.verified &&
-                user.email.address &&
-                user.email.verificationToken &&
-                Date.now() > user.email.verificationTokenExpire)
+            (user && (!user.password || !user.comparePassword(password)))
         ) {
             return res
                 .status(401)
@@ -107,8 +103,7 @@ const login = async (req, res, next) => {
             user &&
             !user.email.verified &&
             user.email.address &&
-            user.email.verificationToken &&
-            Date.now() < user.email.verificationTokenExpire
+            user.email.verificationToken
         ) {
             return res.status(401).json({
                 success: false,
@@ -135,6 +130,7 @@ const login = async (req, res, next) => {
             accessToken,
             refreshToken,
             user,
+            message: 'You have successfully logged in.',
         });
     } catch (err) {
         // console.log('\nLogin api error');
@@ -157,7 +153,7 @@ const verifyEmail = async (req, res, next) => {
             user.email.verificationTokenExpire = null;
             const { accessToken, refreshToken } = user.generateJWT();
             await user.save();
-
+            console.log(user);
             return res.status(201).json({
                 success: true,
                 user,
@@ -167,6 +163,7 @@ const verifyEmail = async (req, res, next) => {
             });
         }
 
+        console.log('Invalid token');
         res.status(400).json({
             success: false,
             message: 'Email verification token is invalid or has been expired',
@@ -182,7 +179,7 @@ const verifyEmail = async (req, res, next) => {
 const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `${process.env.ROOT_URL}/api/auth/google-auth-callback`
+    `${process.env.FRONTEND_HOST_NAME}/google-auth`
 );
 
 const getGoogleAuthURL = async (req, res, next) => {
@@ -201,6 +198,8 @@ const getGoogleAuthURL = async (req, res, next) => {
 const googleAuthCallback = async (req, res, next) => {
     try {
         const { code } = req.query;
+
+        console.log(req.query);
 
         const { tokens } = await oauth2Client.getToken(code);
         oauth2Client.setCredentials({ access_token: tokens.access_token });
@@ -232,6 +231,9 @@ const googleAuthCallback = async (req, res, next) => {
             }
         );
 
+        if (!user.username) {
+            user.username = user.googleAccount.username;
+        }
         if (!user.email.address) {
             user.email.address = email;
             user.email.verified = true;
@@ -258,6 +260,92 @@ const googleAuthCallback = async (req, res, next) => {
         // console.log('\nGoogle authentication error');
         // console.log('===========================');
         // console.log(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+const facebookAuth = async (req, res, next) => {
+    try {
+        const userData = req.body;
+        console.log('\nFacebook authenitcation success');
+        console.log('================================');
+        console.log(userData);
+        const {
+            id,
+            username,
+            displayName,
+            first_name: firstName,
+            last_name: lastName,
+            name,
+            email,
+            gender,
+            birthday,
+            picture,
+        } = userData;
+
+        console.log(userData);
+        const user = await accountModel.findOneAndUpdate(
+            {
+                $or: [
+                    { 'email.address': email },
+                    { 'googleAccount.email': email },
+                    { 'facebookAccount.email': email },
+                    { 'facebookAccount.id': id },
+                ],
+            },
+            {
+                'facebookAccount.username':
+                    username ||
+                    displayName ||
+                    name ||
+                    `${firstName} ${lastName}` ||
+                    email.slice(0, email.indexOf('@')),
+                'facebookAccount.id': id,
+                'facebookAccount.email': email,
+                'facebookAccount.dateOfBirth': birthday,
+                'facebookAccount.gender': gender,
+                'facebookAccount.picture': picture.data.url,
+            },
+            {
+                new: true,
+                upsert: true,
+                runValidators: true,
+            }
+        );
+
+        if (!user.username) {
+            user.username =
+                username ||
+                displayName ||
+                name ||
+                `${firstName} ${lastName}` ||
+                email.slice(0, email.indexOf('@'));
+        }
+
+        if (!user.email.address) {
+            user.email.address = email;
+            user.email.verified = true;
+            await user.save();
+        }
+
+        if (user.isBlocked) {
+            return res.status(403).json({
+                success: false,
+                message: 'Login failed.Your account has been locked',
+            });
+        }
+
+        const { accessToken, refreshToken } = user.generateJWT();
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            accessToken,
+            refreshToken,
+            user,
+        });
+    } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -339,4 +427,5 @@ export {
     facebookAuthSuccess,
     refreshAuthToken,
     facebookAuthFailure,
+    facebookAuth,
 };

@@ -44,7 +44,7 @@ const getAllUsers = async (req, res) => {
         const { role } = req.user;
         if (role !== 'admin') {
             return res
-                .status(404)
+                .status(401)
                 .json({ success: false, message: 'Page not found' });
         }
         const users = await accountModel.find();
@@ -82,7 +82,7 @@ const resetEmail = async (req, res) => {
         }
 
         const user = await accountModel.findById(authenticatedUser);
-
+        //hghjhg oto ==ojkjkl
         user.email.updateRequest = {
             requested: true,
             newEmail,
@@ -276,13 +276,13 @@ const blockOrUnblockUser = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     try {
+        console.log(req.body)
         const { email } = req.body;
         if (email == '') {
             return res
                 .status(401)
                 .json({ success: false, message: 'Bad credentials' });
         }
-
         const user = await accountModel
             .findOne({ 'email.address': email })
             .select({ username: 1, email: 1 });
@@ -324,20 +324,28 @@ const resetPassword = async (req, res) => {
 
 const resetPasswordCallback = async (req, res) => {
     try {
+        console.log(req.body);
+        console.log(req.params);
         const { body, params } = req;
-        const { password, 'confirm-password': confirmPassword } = body;
+        const { newPassword, confirmPassword } = body;
         const { token: resetPasswordToken } = params;
 
-        if (password == '' || confirmPassword != password) {
+        if (newPassword == '' || confirmPassword == '') {
             return res
                 .status(401)
                 .json({ success: false, message: 'Bad credentials' });
         }
 
+        if (confirmPassword !== newPassword) {
+            return res
+                .status(401)
+                .json({ success: false, message: 'Password and confirm password must be same' });
+        }
+
         const user = await accountModel.findOne({ resetPasswordToken });
 
         if (user && user.verifyJwtToken(resetPasswordToken)) {
-            user.password = password;
+            user.password = newPassword;
             user.resetPasswordToken = null;
             user.resetPasswordTokenExpire = null;
 
