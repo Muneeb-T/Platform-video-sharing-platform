@@ -69,7 +69,7 @@ export const googleAuth = createAsyncThunk(
             const response = await authService.googleAuth(code);
             const { success, message } = response;
             if (!success) return thunkAPI.rejectWithValue(message);
-            return message;
+            return response;
         } catch (err) {
             const message = err.response.data.message || 'Something went wrong';
             return thunkAPI.rejectWithValue(message);

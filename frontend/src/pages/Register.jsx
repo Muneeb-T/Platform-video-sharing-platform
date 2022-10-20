@@ -60,8 +60,9 @@ function Register() {
         }
     };
 
-    const { isLoading, isError, isSuccess, message, user } =
-        useSelector((state) => state.auth);
+    const { isLoading, isError, isSuccess, message, user } = useSelector(
+        (state) => state.auth
+    );
 
     useEffect(() => {
         if (isError) {

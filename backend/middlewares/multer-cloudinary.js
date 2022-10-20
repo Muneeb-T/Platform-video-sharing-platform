@@ -16,6 +16,8 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary.v2,
     params: async (req, file) => {
         try {
+            console.log("hello")
+            console.log(req.file)
             return {
                 folder: 'Platform',
                 format: path.extname(file.originalname).substring(1),

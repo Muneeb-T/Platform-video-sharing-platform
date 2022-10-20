@@ -7,7 +7,7 @@ const initialState = {
     user: null,
     isSuccess: false,
     isError: false,
-    message : ''
+    message: '',
 };
 
 // Register user
@@ -45,7 +45,9 @@ export const resetPasswordCallback = createAsyncThunk(
     'ACCOUNT/RESET_PASSWORD_CALLBACK',
     async (resetPasswordData, thunkAPI) => {
         try {
-            const response = await accountService.resetPasswordCallback(resetPasswordData);
+            const response = await accountService.resetPasswordCallback(
+                resetPasswordData
+            );
             const { success, message } = response;
             if (!success) return thunkAPI.rejectWithValue(message);
             return message;
@@ -56,15 +58,15 @@ export const resetPasswordCallback = createAsyncThunk(
     }
 );
 
-export const authSlice = createSlice({
-    name: 'auth',
+export const accountSlice = createSlice({
+    name: 'account',
     initialState,
     reducers: {
         reset: (state) => {
             state.isLoading = false;
             state.isSuccess = false;
             state.isError = false;
-            state.message = ''
+            state.message = '';
         },
     },
     extraReducers: (builder) => {
@@ -111,5 +113,5 @@ export const authSlice = createSlice({
     },
 });
 
-export const { reset } = authSlice.actions;
-export default authSlice.reducer;
+export const { reset } = accountSlice.actions;
+export default accountSlice.reducer;

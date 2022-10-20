@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import UploadIcon from '@mui/icons-material/Upload';
 import LiveStreamingIcon from '@mui/icons-material/WifiTethering';
 import Sidebar from '../../components/creator-studio/Sidebar';
@@ -11,6 +11,14 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import AverageDurationIcon from '@mui/icons-material/AvTimer';
 import Comments from '../../components/Comments';
 import VideoGroup2 from '../../components/VideoGroup-3';
+
+import { setShowVideoUploadModal } from '../../redux/features/video/videoSlice';
+import { useSelector, useDispatch } from 'react-redux';
+//video upload
+
+import VideoUploadModal from './VideoUploadModal';
+//
+
 const user = null;
 function Dashboard() {
     const playerRef = useRef(null);
@@ -27,6 +35,15 @@ function Dashboard() {
             },
         ],
     };
+
+    const { showVideoUploadModal, isVideoDetailsSaved } = useSelector(
+        (state) => state.video
+    );
+    const dispatch = useDispatch();
+
+    if (isVideoDetailsSaved) {
+        dispatch(setShowVideoUploadModal(false));
+    }
 
     const handlePlayerReady = (player) => {
         playerRef.current = player;
@@ -75,6 +92,9 @@ function Dashboard() {
                             </p>
                             <div className='flex gap-3'>
                                 <button
+                                    onClick={() =>
+                                        dispatch(setShowVideoUploadModal(true))
+                                    }
                                     type='button'
                                     className='p-1 shrink-0 rounded-full bg-gray-700  text-gray-300 hover:text-white'>
                                     <span className='sr-only'>
@@ -85,9 +105,7 @@ function Dashboard() {
                                 <button
                                     type='button'
                                     className='p-1 shrink-0 rounded-full bg-gray-700 text-gray-300 hover:text-white'>
-                                    <span className='sr-only'>
-                                        Upload video
-                                    </span>
+                                    <span className='sr-only'>Live stream</span>
                                     <LiveStreamingIcon aria-hidden='true' />
                                 </button>
                             </div>
@@ -181,6 +199,8 @@ function Dashboard() {
                     </div>
                 </div>
             </div>
+
+            {showVideoUploadModal ? <VideoUploadModal /> : null}
         </>
     );
 }

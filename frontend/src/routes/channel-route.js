@@ -9,25 +9,37 @@ import Comments from '../pages/creator-studio/Comments';
 import Monitization from '../pages/creator-studio/Monitization';
 import CustomizeChannel from '../pages/creator-studio/CustomizeChannel';
 import Copyright from '@mui/icons-material/Copyright';
+import UploadToast from '../components/creator-studio/UploadToast';
+import { useSelector } from 'react-redux';
 function ChannelRoutes() {
+    const { uploadingOnProcess, showVideoUploadModal } = useSelector(
+        (state) => state.video
+    );
     return (
-        <Routes>
-            <Route path='creator-studio'>
-                <Route index element={<Dashboard />}/>
-                <Route path='content' element={<Content />} />
-                <Route path='analytics' element={<Analytics />} />
-                <Route path='playlist' element={<Playlist />} />
-                <Route path='comments' element={<Comments />} />
-                <Route path='monitization' element={<Monitization />} />
-                <Route
-                    path='customize-channel'
-                    element={<CustomizeChannel />}
-                />
-                <Route path='copyright' element={<Copyright />} />
-            </Route>
+        <>
+            <Routes>
+                <Route path='creator-studio'>
+                    <Route index element={<Dashboard />} />
+                    <Route path='content' element={<Content />} />
+                    <Route path='analytics' element={<Analytics />} />
+                    <Route path='playlist' element={<Playlist />} />
+                    <Route path='comments' element={<Comments />} />
+                    <Route path='monitization' element={<Monitization />} />
+                    <Route
+                        path='customize-channel'
+                        element={<CustomizeChannel />}
+                    />
+                    <Route path='copyright' element={<Copyright />} />
+                </Route>
 
-            <Route path='*' element={<PageNotFound />} />
-        </Routes>
+                <Route path='*' element={<PageNotFound />} />
+            </Routes>
+            {uploadingOnProcess && !showVideoUploadModal && (
+                <div className='absolute bottom-20 position-fixed right-10 w-[30%]'>
+                    <UploadToast />
+                </div>
+            )}
+        </>
     );
 }
 

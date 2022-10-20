@@ -29,6 +29,7 @@ router.get('/google-auth', getGoogleAuthURL);
 router.get('/google-auth-callback', googleAuthCallback);
 router.post('/facebook-auth', facebookAuth);
 
+
 // router
 //     .route('/facebook-auth-callback')
 //     .get(facebookAuthCallback, facebookAuthSuccess);
