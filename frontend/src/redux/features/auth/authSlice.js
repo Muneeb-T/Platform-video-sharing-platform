@@ -36,7 +36,7 @@ export const login = createAsyncThunk(
     async (credentials, thunkAPI) => {
         try {
             const response = await authService.login(credentials);
-
+            
             const { success, message } = response;
             if (!success) return thunkAPI.rejectWithValue(message);
             return response;
@@ -82,6 +82,22 @@ export const verifyAccount = createAsyncThunk(
     async (token, thunkAPI) => {
         try {
             const response = await authService.verifyAccount(token);
+            const { success, message } = response;
+            if (!success) return thunkAPI.rejectWithValue(message);
+            return response;
+        } catch (err) {
+            const message = err.response.data.message || 'Something went wrong';
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const refreshToken = createAsyncThunk(
+    'AUTH/REFRESH_TOKEN',
+    async (_, thunkAPI) => {
+        try {
+            const refreshToken = thunkAPI.getState().auth.refreshToken;
+            const response = await authService.refreshToken(refreshToken);
             const { success, message } = response;
             if (!success) return thunkAPI.rejectWithValue(message);
             return response;
@@ -188,6 +204,11 @@ export const authSlice = createSlice({
                 state.isError = true;
                 state.isSuccess = false;
                 state.message = action.payload;
+            })
+            .addCase(refreshToken.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.accessToken = action.payload.accessToken;
+                state.refreshToken = action.payload.refreshToken;
             });
     },
 });

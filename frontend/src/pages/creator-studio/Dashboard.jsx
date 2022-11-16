@@ -1,27 +1,104 @@
-import React, { useRef, useState } from 'react';
-import UploadIcon from '@mui/icons-material/Upload';
-import LiveStreamingIcon from '@mui/icons-material/WifiTethering';
+import React, { useRef, useEffect } from 'react';
 import Sidebar from '../../components/creator-studio/Sidebar';
-import AvatarThumbnail from '../../assets/images/avatar-thumbnail.png';
 import VideoJS from '../../components/VideoPlayer';
-import video from '../../assets/videos/video.mp4';
 import ViewsIcon from '@mui/icons-material/Visibility';
 import ThumbUpIcon from '@mui/icons-material/ThumbUpAlt';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import AverageDurationIcon from '@mui/icons-material/AvTimer';
 import Comments from '../../components/Comments';
-import VideoGroup2 from '../../components/VideoGroup-3';
+import VideoGroup3 from '../../components/VideoGroup-4';
 
-import { setShowVideoUploadModal } from '../../redux/features/video/videoSlice';
+import {
+    getLatestVideo,
+    getTopVideos,
+    setShowVideoUploadModal,
+} from '../../redux/features/video/videoSlice';
+
 import { useSelector, useDispatch } from 'react-redux';
 //video upload
 
-import VideoUploadModal from './VideoUploadModal';
+import { toast } from 'react-toastify';
+import TopBar from '../../components/creator-studio/Topbar';
+import { useNavigate, useParams } from 'react-router-dom';
+import Spinner from '../../components/Spinner';
+import { getChannel, channelAnalytics } from '../../redux/features/channel/channelSlice';
 //
 
-const user = null;
 function Dashboard() {
+    const { id: channelId } = useParams();
+    const {
+        isGetLatestVideoLoading,
+        getLatestVideoMessage,
+        latestVideo,
+        isGetLatestVideoSuccess,
+        isGetLatestVideoError,
+        isVideoUploadError,
+        videoUploadMessage,
+        isVideoDetailsSaveSuccess,
+        uploadingOnProcess,
+        getTopVideosSuccess,
+        getTopVideosLoading,
+        getTopVideosMessage,
+        getTopVideosError,
+        topVideos,
+    } = useSelector((state) => state.video);
+
+    let {
+        title,
+        views,
+        likes,
+        dislikes,
+        averageViewDuration,
+        comments,
+        _id: latestVideoId,
+    } = latestVideo;
+
+    if (averageViewDuration) {
+        averageViewDuration = new Date(averageViewDuration).toISOString().slice(11, 19);
+    }
+    const {
+        isGetChannelSuccess,
+        channel,
+        message,
+        isGetChannelLoading,
+        isGetChannelError,
+        isChannelAnalyticsError,
+        isChannelAnalyticsSuccess,
+        isChannelAnalyticsMessage,
+        isChannelAnalyticsLoading,
+        analytics,
+    } = useSelector((state) => state.channel);
+
+    let { totalViews, totalWatchTime } = analytics || {};
+    if (totalWatchTime) {
+        console.log(totalWatchTime);
+        totalWatchTime = new Date(totalWatchTime).toISOString().slice(11, 19);
+    }
+
+    const dispatch = useDispatch();
     const playerRef = useRef(null);
+
+    useEffect(() => {
+        dispatch(getChannel(channelId));
+        dispatch(getLatestVideo({ channelId, latest: true }));
+        dispatch(getTopVideos({ channelId, top: 5 }));
+        dispatch(
+            channelAnalytics({
+                channelId,
+                totalViews: true,
+                totalWatchTime: true,
+            })
+        );
+    }, []);
+
+    const navigate = useNavigate();
+    const { user, accessToken } = useSelector((state) => state.auth);
+    useEffect(() => {
+        if (!user || !accessToken) {
+            toast.error('Please login to your account.');
+            navigate('/login');
+        }
+    }, [user, accessToken]);
 
     const videoJsOptions = {
         autoplay: true,
@@ -30,20 +107,11 @@ function Dashboard() {
         fluid: true,
         sources: [
             {
-                src: video,
+                src: latestVideo?.video?.url,
                 type: 'video/mp4',
             },
         ],
     };
-
-    const { showVideoUploadModal, isVideoDetailsSaved } = useSelector(
-        (state) => state.video
-    );
-    const dispatch = useDispatch();
-
-    if (isVideoDetailsSaved) {
-        dispatch(setShowVideoUploadModal(false));
-    }
 
     const handlePlayerReady = (player) => {
         playerRef.current = player;
@@ -57,150 +125,138 @@ function Dashboard() {
         //     videojs.log('player will dispose');
         // });
     };
+
+    if (
+        isGetLatestVideoLoading ||
+        isGetChannelLoading ||
+        getTopVideosLoading ||
+        isChannelAnalyticsLoading
+    ) {
+        return <Spinner />;
+    }
+
     return (
         <>
-            <div className='mx-auto bg-gray-900'>
-                <div className='grid grid-cols-5 gap-2 pt-20 container mx-auto'>
-                    <div className='bg-gray-300 bg-opacity-5 h-screen'>
-                        <div className='flex items-center justify-center p-5 gap-2 border-b-2 border-opacity-10 border-gray-100 scrollbar-hide overflow-y-scroll'>
-                            <img
-                                className='h-20 w-20 rounded-full'
-                                src={
-                                    user
-                                        ? user.profilePicture
-                                            ? user.profilePicture.path
-                                            : user.googleAccount
-                                            ? user.googleAccount.picture
-                                            : user.facebookAccount
-                                            ? user.facebookAccount.picture
-                                            : AvatarThumbnail
-                                        : AvatarThumbnail
-                                }
-                                referrerPolicy='no-referrer'
-                                alt=''
-                            />
-                            <p className='text-2xl font-bold text-gray-300'>
-                                Muneeb T
-                            </p>
-                        </div>
-                        <Sidebar />
-                    </div>
+            <div className='mx-auto bg-gray-900 pt-20'>
+                <div className='grid grid-cols-5 gap-2 container mx-auto'>
+                    <Sidebar />
                     <div className='col-span-4 gap-2 space-y-2'>
-                        <div className='bg-gray-300 bg-opacity-5 flex justify-between items-center px-8 py-3'>
-                            <p className='text-gray-300 font-bold text-xl'>
-                                Channel dashboard
-                            </p>
-                            <div className='flex gap-3'>
-                                <button
-                                    onClick={() =>
-                                        dispatch(setShowVideoUploadModal(true))
-                                    }
-                                    type='button'
-                                    className='p-1 shrink-0 rounded-full bg-gray-700  text-gray-300 hover:text-white'>
-                                    <span className='sr-only'>
-                                        Upload video
-                                    </span>
-                                    <UploadIcon aria-hidden='true' />
-                                </button>
-                                <button
-                                    type='button'
-                                    className='p-1 shrink-0 rounded-full bg-gray-700 text-gray-300 hover:text-white'>
-                                    <span className='sr-only'>Live stream</span>
-                                    <LiveStreamingIcon aria-hidden='true' />
-                                </button>
-                            </div>
-                        </div>
-                        <div className='grid grid-cols-2 gap-2 h-screen'>
-                            <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-5 space-y-3 scrollbar-hide overflow-y-scroll'>
-                                <VideoJS
-                                    options={videoJsOptions}
-                                    onReady={handlePlayerReady}
-                                />
-                                <p className='text-gray-300 text-md'>
-                                    Latest video perfomance
-                                </p>
-                                <div className='space-y-2'>
-                                    <div className='flex gap-2 items-center text-sm text-gray-300'>
-                                        <ViewsIcon sx={{ fontSize: 'large' }} />
-                                        <div className='flex w-full justify-between'>
-                                            <p>Views</p>
-                                            <p>3M</p>
-                                        </div>
-                                    </div>
-                                    <div className='flex gap-2 items-center text-sm text-gray-300'>
-                                        <ThumbUpIcon
-                                            sx={{ fontSize: 'large' }}
+                        <TopBar title='Channel Dashboard' />
+                        <div className='grid grid-cols-2 gap-2'>
+                            <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-5 space-y-3 h-screen'>
+                                {Object.keys(latestVideo).length ? (
+                                    <>
+                                        <VideoJS
+                                            options={videoJsOptions}
+                                            onReady={handlePlayerReady}
                                         />
-                                        <div className='flex w-full justify-between'>
-                                            <p>Likes</p>
-                                            <p>3M</p>
-                                        </div>
-                                    </div>
-                                    <div className='flex gap-2 items-center text-sm text-gray-300'>
-                                        <ThumbDownIcon
-                                            sx={{ fontSize: 'large' }}
-                                        />
-                                        <div className='flex w-full justify-between'>
-                                            <p>Dislikes</p>
-                                            <p>3M</p>
-                                        </div>
-                                    </div>
-                                    <div className='flex gap-2 items-center text-sm text-gray-300'>
-                                        <AverageDurationIcon
-                                            sx={{ fontSize: 'large' }}
-                                        />
-                                        <div className='flex w-full justify-between'>
-                                            <p>Average view duration</p>
-                                            <p>3M</p>
-                                        </div>
-                                    </div>
-                                    <hr className='opacity-20' />
-                                    <div className='flex justify-between items-center'>
-                                        <p className='text-gray-300'>
-                                            Top comments
+                                        <p className='text-gray-300 line-clamp-1'>{title}</p>
+                                        <p className='text-gray-400 text-sm'>
+                                            Latest video perfomance
                                         </p>
-                                        <button className='text-red-600 text-sm font-bold'>
-                                            View all (230)
-                                        </button>
+                                        <div className='space-y-2'>
+                                            <div className='flex gap-2 items-center text-sm text-gray-300'>
+                                                <ViewsIcon sx={{ fontSize: 'large' }} />
+                                                <div className='flex w-full justify-between'>
+                                                    <p>Views</p>
+                                                    <p>{views?.length || 0}</p>
+                                                </div>
+                                            </div>
+                                            <div className='flex gap-2 items-center text-sm text-gray-300'>
+                                                <ThumbUpIcon sx={{ fontSize: 'large' }} />
+                                                <div className='flex w-full justify-between'>
+                                                    <p>Likes</p>
+                                                    <p>{likes || 0}</p>
+                                                </div>
+                                            </div>
+                                            <div className='flex gap-2 items-center text-sm text-gray-300'>
+                                                <ThumbDownIcon sx={{ fontSize: 'large' }} />
+                                                <div className='flex w-full justify-between'>
+                                                    <p>Dislikes</p>
+                                                    <p>{dislikes || 0}</p>
+                                                </div>
+                                            </div>
+                                            <div className='flex gap-2 items-center text-sm text-gray-300'>
+                                                <AverageDurationIcon sx={{ fontSize: 'large' }} />
+                                                <div className='flex w-full justify-between'>
+                                                    <p>Average view duration</p>
+                                                    <p>{averageViewDuration || '00:00:00'}</p>
+                                                </div>
+                                            </div>
+                                            <hr className='opacity-20' />
+                                            <div className='flex justify-between items-center'>
+                                                <p className='text-gray-300'>Top comments</p>
+                                                <button className='text-red-600 text-sm font-bold'>
+                                                    View all ({comments?.length})
+                                                </button>
+                                            </div>
+                                            <Comments comments={comments} videoId={latestVideoId} />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className='container p-20 flex items-center justify-center'>
+                                        <div className='text-center'>
+                                            <p className='text-3xl text-red-500 font-bold'>
+                                                You have no uploads
+                                            </p>
+                                            <p className='text-gray-500'>
+                                                There are no contents in your channel.
+                                            </p>
+                                            <button
+                                                className='rounded-md text-gray-300 border border-red-500 px-3 py-2 font-bold mt-3'
+                                                onClick={() =>
+                                                    dispatch(setShowVideoUploadModal(true))
+                                                }>
+                                                Upload your first video
+                                            </button>
+                                        </div>
                                     </div>
-                                    <Comments />
-                                </div>
+                                )}
                             </div>
-                            <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-8 scrollbar-hide overflow-y-scroll'>
-                                <div className='flex items-center justify-between'>
+
+                            <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-8'>
+                                <div className='flex items-center justify-between '>
                                     <p className='text-2xl text-gray-300 font-bold'>
                                         Channel analytics
                                     </p>
-                                    <button className='text-red-600 font-bold'>
-                                        Explore
-                                    </button>
+                                    <button className='text-red-600 font-bold'>Explore</button>
                                 </div>
                                 <hr className='opacity-20 mt-2' />
-                                <p className='text-4xl font-bold text-red-500 mt-6'>
-                                    5845483{' '}
-                                    <span className='text-gray-300 text-xl'>
-                                        Subscribers
-                                    </span>
+                                <p className='text-3xl font-bold text-red-500 mt-3'>
+                                    {channel?.followers || 0}{' '}
+                                    <span className='text-gray-300 text-xl'>Followers</span>
                                 </p>
-                                <div className='text-gray-400 mt-3 space-y-2'>
-                                    <p>Total views - 2343233343 (2.3 M)</p>
+                                <div className='text-gray-400 mt-3'>
+                                    <p>Total views - {analytics?.totalViews || 0}</p>
                                     <p>
-                                        Watch time(hours) - 3433423343 (34.3 M)
+                                        Total Watch time (hh:mm:ss) - {totalWatchTime || '00:00:00'}
                                     </p>
                                 </div>
-                                <div className='mt-5'>
-                                    <p className='font-bold text-gray-300'>
-                                        Top videos
-                                    </p>
-                                    <VideoGroup2 />
+                                <div className='mt-5 mb-20'>
+                                    <p className='font-bold text-gray-300'>Top videos</p>
+                                    {topVideos.length ? (
+                                        <div>
+                                            <VideoGroup3 videos={topVideos} />
+                                        </div>
+                                    ) : (
+                                        <div className='container p-10 mx-auto flex items-center justify-center bg-gray-600 bg-opacity-20'>
+                                            <div className='text-center'>
+                                                <p className='text-3xl text-red-500 font-bold'>
+                                                    Oops!
+                                                </p>
+                                                <p className='text-gray-500'>
+                                                    We couldn't find anything in your channel.
+                                                    Please upload your content.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {showVideoUploadModal ? <VideoUploadModal /> : null}
         </>
     );
 }

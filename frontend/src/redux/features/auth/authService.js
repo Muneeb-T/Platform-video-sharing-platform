@@ -29,12 +29,18 @@ const googleAuth = async function (code) {
     return data;
 };
 
+const refreshToken = async function (refreshToken) {
+    const { data } = await api.get(`${API_URL}/refresh-token/`);
+    return data;
+};
+
 const authService = {
     register,
     login,
     verifyAccount,
     facebookAuth,
     googleAuth,
+    refreshToken,
 };
 
 export default authService;

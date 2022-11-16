@@ -32,8 +32,8 @@ function UserRoutes() {
                 </Route>
             </Route>
             <Route path='/videos'>
-                <Route path=':search' element={<SearchResults />} />
-                <Route path='video/:id' element={<VideoPlayback />} />
+                <Route index element={<SearchResults />} />
+                <Route path=':id' element={<VideoPlayback />} />
             </Route>
             <Route path='*' element={<PageNotFound />} />
         </Routes>

@@ -13,10 +13,6 @@ import {
 } from '../controllers/auth-controller.js';
 import { jwtAuthenticate } from '../middlewares/jwt-auth.js';
 import { config } from 'dotenv';
-// import {
-//     facebookAuth,
-//     facebookAuthCallback,
-// } from '../middlewares/facebook-auth.js';
 
 const router = express.Router();
 config();

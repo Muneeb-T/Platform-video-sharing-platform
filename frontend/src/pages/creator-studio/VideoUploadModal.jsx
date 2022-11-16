@@ -8,6 +8,7 @@ import {
     reset,
     uploadVideo,
     setVideoUrl,
+    setVideoFilename,
     setUploadingOnProcess,
     setShowVideoUploadModal,
 } from '../../redux/features/video/videoSlice';
@@ -26,20 +27,6 @@ function VideoUploadModal() {
         uploadingOnProcess,
     } = useSelector((state) => state.video);
 
-    useEffect(() => {
-        if (uploadingOnProcess) {
-            dispatch(reset());
-        }
-        if (isVideoUploadError) {
-            toast.error(videoUploadMessage);
-            dispatch(setUploadingOnProcess(false));
-            dispatch(reset());
-        }
-        return () => {
-            dispatch(reset());
-        };
-    }, [uploadingOnProcess, isVideoUploadError]);
-
     const inputVideoOnDrop = (e) => {
         const allowedTypes = new Set([e.target.accept]);
         if (!allowedTypes.has(e.target.files[0].type)) {
@@ -50,31 +37,29 @@ function VideoUploadModal() {
 
     const inputVideoOnChange = (e) => {
         let file = e.target.files[0];
+        let fileName = e.target.files[0].name;
         file = URL.createObjectURL(file);
         const formData = new FormData();
         formData.append('file', e.target.files[0]);
         formData.append('upload_preset', 'videos');
         formData.append('cloud_name', 'drjndmchy');
         dispatch(setVideoUrl(file));
+        dispatch(setVideoFilename(fileName));
         dispatch(uploadVideo(formData));
         dispatch(setUploadingOnProcess(true));
     };
 
     return (
         <>
-            <div className='fixed inset-0 z-50 overflow-y-auto'>
+            <div className='fixed inset-0 z-50 overflow-y-auto scrollbar-hide'>
                 <div className='flex items-center min-h-screen px-4 py-8'>
                     <div className='relative w-full  p-10 max-w-5xl mx-auto bg-gray-900 bg-opacity-90 rounded-md shadow-lg space-y-5'>
                         <>
                             <div className='flex text-gray-300 justify-between'>
-                                <p className='font-bold text-lg'>
-                                    Upload video
-                                </p>
+                                <p className='font-bold text-lg'>Upload video</p>
                                 <CloseIcon
                                     className='cursor-pointer'
-                                    onClick={() =>
-                                        dispatch(setShowVideoUploadModal(false))
-                                    }
+                                    onClick={() => dispatch(setShowVideoUploadModal(false))}
                                 />
                             </div>
                             <hr className='opacity-20' />
@@ -84,11 +69,9 @@ function VideoUploadModal() {
                                         <VideoDetailsForm />
                                         {isVideoUploadLoading ? (
                                             <>
-                                                <div className='h-10 flex rounded-sm w-full absolute -bottom-10 right-0'>
+                                                <div className='h-10 flex items-center gap-3 rounded-sm w-full absolute -bottom-10 right-0'>
                                                     <ProgressBar
-                                                        videoUploadProgress={
-                                                            videoUploadProgress
-                                                        }
+                                                        videoUploadProgress={videoUploadProgress}
                                                     />
                                                 </div>
                                             </>
@@ -100,8 +83,7 @@ function VideoUploadModal() {
                                                         <DoneIcon />
                                                     </div>
                                                     <p className='text-gray-300'>
-                                                        Video uploaded
-                                                        successfully
+                                                        Video uploaded successfully
                                                     </p>
                                                 </div>
                                             </>
@@ -145,8 +127,7 @@ function VideoUploadModal() {
                                                         <span className='font-semibold'>
                                                             Click to upload
                                                         </span>{' '}
-                                                        or drag and drop your
-                                                        video
+                                                        or drag and drop your video
                                                     </p>
                                                 </div>
                                                 <input
@@ -154,9 +135,7 @@ function VideoUploadModal() {
                                                     type='file'
                                                     className='hidden'
                                                     onDrop={inputVideoOnDrop}
-                                                    onChange={
-                                                        inputVideoOnChange
-                                                    }
+                                                    onChange={inputVideoOnChange}
                                                     accept='video/*'
                                                 />
                                             </label>

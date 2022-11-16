@@ -1,9 +1,13 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import VideoGroup2 from '../components/VideoGroup-2';
+import { useSelector, useDispatch } from 'react-redux';
+import { getVideos, resetVideos } from '../redux/features/video/videoSlice';
+import Spinner from '../components/Spinner';
+
 const categories = [
     { id: '1', name: 'Movies' },
     { id: '2', name: 'News & politics' },
@@ -16,8 +20,23 @@ function classNames(...classes) {
 }
 
 function SearchResults() {
+    const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
+    const params = Object.fromEntries([...searchParams]);
+    const { videos, getVideosLoading } = useSelector((state) => state.video);
+    useEffect(() => {
+        dispatch(getVideos(params));
+        return () => {
+            dispatch(resetVideos());
+        };
+    }, [searchParams]);
+
+    if (getVideosLoading) {
+        return <Spinner />;
+    }
+
     return (
-        <div className='container mx-auto h-max bg-gray-900 py-20 px-5'>
+        <div className='container min-h-screen mx-auto h-max bg-gray-900 py-20 px-2'>
             <div className='flex space-between'>
                 <div className='flex flex-1 space-x-3 items-center scrollbar-hide overflow-x-scroll'>
                     {categories.map((category, index) => {
@@ -95,7 +114,7 @@ function SearchResults() {
                                         </a>
                                     )}
                                 </Menu.Item>
-                                <form method='POST' action='#'>
+                                <form>
                                     <Menu.Item>
                                         {({ active }) => (
                                             <button
@@ -117,7 +136,33 @@ function SearchResults() {
                 </Menu>
             </div>
             <div className='mt-4'>
-                <VideoGroup2 />
+                {getVideosLoading && (
+                    <div className='flex items-center justify-center h-screen text-gray-300'>
+                        <div
+                            className='spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full'
+                            role='status'></div>
+                    </div>
+                )}
+                {videos?.length > 0 ? (
+                    <VideoGroup2 videos={videos} />
+                ) : (
+                    <>
+                        <div className='container p-5 mx-auto mt-28 flex items-center justify-center'>
+                            <div className='text-center'>
+                                <p className='text-gray-500 text-6xl sm:text-7xl font-bold'>
+                                    !Oops
+                                </p>
+                                <p className='text-3xl sm:text-5xl text-red-500 font-bold'>
+                                    No results found
+                                </p>
+                                <p className='text-gray-500'>
+                                    Sorry.Nothing found for the keyword you have
+                                    searched.
+                                </p>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

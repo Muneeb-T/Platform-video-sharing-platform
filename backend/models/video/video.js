@@ -1,45 +1,12 @@
 // @ts-nocheck
 import mongoose from 'mongoose';
-import fileModel from '../file/file.js';
+import imageFileModel from '../file/image-file.js';
+import videoFileModel from '../file/video-file.js';
+import commentModel from '../comment/comment.js';
 const { Schema } = mongoose;
 const videoSchema = new Schema(
     {
-        video: {
-            asset_id: { type: String },
-            public_id: { type: String },
-            version: { type: Number },
-            version_id: { type: String },
-            signature: { type: String },
-            width: { type: Number },
-            height: { type: Number },
-            format: { type: String },
-            resource_type: { type: String },
-            tags: [{ type: String }],
-            pages: { type: Number },
-            bytes: { type: Number },
-            type: { type: String },
-            etag: { type: String },
-            placeholder: { type: Boolean },
-            url: { type: String },
-            secure_url: { type: String },
-            folder: { type: String },
-            access_mode: { type: String },
-            audio: { type: Object },
-            video: {
-                pix_format: { type: String },
-                codec: { type: String },
-                level: { type: Number },
-                profile: { type: String },
-                bit_rate: { type: String },
-                time_base: { type: String },
-            },
-            frame_rate: { type: Number },
-            bit_rate: { type: Number },
-            duration: { type: Number },
-            rotation: { type: Number },
-            original_filename: { type: String },
-            nb_frames: { type: Number },
-        },
+        video: { type: videoFileModel },
         visibility: {
             type: String,
             default: 'private',
@@ -53,33 +20,39 @@ const videoSchema = new Schema(
         tags: [{ type: String }],
         category: { type: String },
         language: { type: String },
-        thumbnail: {
-            access_mode: { type: String },
-            asset_id: { type: String },
-            bytes: { type: Number },
-            created_at: { type: String },
-            etag: { type: String },
-            folder: { type: String },
-            format: { type: String },
-            height: { type: String },
-            original_filename: { type: String },
-            placeholder: { type: Boolean },
-            public_id: { type: String },
-            resource_type: { type: String },
-            secure_url: { type: String },
-            signature: { type: String },
-            tags: [{ type: String }],
-            type: { type: String },
-            url: { type: String },
-            version: { type: Number },
-            version_id: { type: String },
-            width: { type: Number },
+        thumbnail: { type: imageFileModel },
+        uploadedBy: {
+            type: mongoose.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
+        channel: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Channel',
+            required: true,
         },
         schedule: {
             premiere: { type: Boolean },
-            date: { type: String },
-            time: { type: String },
+            dateTime: { type: Date, default: null },
         },
+        likedBy: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+        dislikedBy: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+        views: {
+            type: [
+                {
+                    authenticated: { type: Boolean, default: false },
+                    viewId: { type: mongoose.Types.ObjectId },
+                    viewer: {
+                        type: mongoose.Types.ObjectId,
+                        ref: 'User',
+                        default: null,
+                    },
+                    duration: { type: Number, default: 0 },
+                },
+            ],
+            default: [],
+        },
+        comments: { type: [commentModel] },
     },
     { timestamps: true }
 );

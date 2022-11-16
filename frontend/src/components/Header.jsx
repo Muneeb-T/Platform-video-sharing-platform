@@ -24,6 +24,7 @@ import SpeechRecognition, {
 import { Link, useNavigate } from 'react-router-dom';
 import ErrorIcon from '@mui/icons-material/Error';
 import CloseIcon from '@mui/icons-material/Close';
+import { Field, Form, Formik } from 'formik';
 
 const speechlyAppId = process.env.REACT_APP_SPEECHLY_APP_ID;
 const SpeechlySpeechRecognition =
@@ -41,13 +42,10 @@ export default function Header() {
     const [displayVerifyNotification, setDisplayVerifyNotification] =
         useState(true);
 
-
     const { user } = useSelector((state) => state.auth);
 
     const onClickLogout = () => {
         dispatch(logout());
-        toast.error('Logged out successfully');
-        navigate('/');
     };
 
     const { transcript, listening, browserSupportsSpeechRecognition } =
@@ -67,74 +65,87 @@ export default function Header() {
                     <>
                         <div className='mx-auto max-w-7xl px-6 sm:px-6 lg:px-8'>
                             <div className='relative flex h-16 items-center justify-between'>
-
-                                    <Link
-                                        to='/'
-                                        className='flex flex-0 sm:flex-1 items-center'>
-                                        <div>
-                                            <img
-                                                className='mx-auto h-8 sm:h-10 mr-2 w-auto'
-                                                src={LogoIcon}
-                                                alt='Platform logo'
-                                            />
-                                        </div>
-                                        <h2 className='text-white hidden sm:block font-medium text-2xl sm:text-3xl'>
-                                            Platform
-                                        </h2>
-                                    </Link>
-                            
+                                <Link
+                                    to='/'
+                                    className='flex flex-0 sm:flex-1 items-center'>
+                                    <div>
+                                        <img
+                                            className='mx-auto h-8 sm:h-10 mr-2 w-auto'
+                                            src={LogoIcon}
+                                            alt='Platform logo'
+                                        />
+                                    </div>
+                                    <h2 className='text-white hidden sm:block font-medium text-2xl sm:text-3xl'>
+                                        Platform
+                                    </h2>
+                                </Link>
 
                                 <div className='flex flex-1'>
-                                    <div className='input-group w-full mr-2 text-gray-300 flex items-center'>
-                                        <input
-                                            className='shadow-none bg-transparent border-0 border-b w-full border-gray-400 text-sm appearance-none  py-1  focus:outline-none focus:shadow-outline'
-                                            type='text'
-                                            value={transcript}
-                                            placeholder='Search Videos, Channels, Movies ...'
-                                            style={{
-                                                textTransform: 'capitalize',
-                                            }}
-                                        />
-                                        <button>
-                                            <SearchIcon
-                                                className='h-4 w-4 ml-3'
-                                                aria-hidden='true'
-                                            />
-                                        </button>
-                                    </div>
+                                    <Formik
+                                        enableReinitialize
+                                        initialValues={{
+                                            search:
+                                                transcript.toLowerCase() || '',
+                                        }}
+                                        onSubmit={(values) => {
+                                            const { search } = values;
+                                            if (search.length !== 0)
+                                                navigate(
+                                                    `/videos?search=${search}`
+                                                );
+                                        }}>
+                                        {() => {
+                                            return (
+                                                <Form className='input-group w-full mr-2 text-gray-300 flex items-center' aria-autocomplete='none'>
+                                                    <Field
+                                                        className='shadow-none bg-transparent border-0 border-b w-full border-gray-400 text-sm appearance-none  py-1  focus:outline-none'
+                                                        type='text'
+                                                        name='search'
+                                                        autoComplete='off'
+                                                        placeholder='Search Videos, Channels, Movies ...'
+                                                    />
+                                                    <button>
+                                                        <SearchIcon
+                                                            className='h-4 w-4 ml-3'
+                                                            aria-hidden='true'
+                                                        />
+                                                    </button>
+                                                </Form>
+                                            );
+                                        }}
+                                    </Formik>
                                 </div>
+
                                 <div className='flex flex-2 inset-y-0 right-0 justify-end items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0'>
+                                    <button
+                                        type='button'
+                                        className='p-1 shrink-0 relative rounded-full bg-gray-700 sm:mr-6 mr-2 text-gray-300 hover:text-white flex items-center justify-center'
+                                        onTouchStart={startListening}
+                                        onMouseDown={startListening}
+                                        onTouchEnd={
+                                            SpeechRecognition.stopListening
+                                        }
+                                        onMouseUp={
+                                            SpeechRecognition.stopListening
+                                        }>
+                                        <span className='sr-only'>
+                                            Voice typing
+                                        </span>
+                                        <MicIcon aria-hidden='true' />
+                                        {listening && (
+                                            <span class='animate-ping absolute   inline-flex h-full w-full rounded-full bg-red-400 opacity-75'></span>
+                                        )}
+                                    </button>
 
-                                   
-                                            <button
-                                                type='button'
-                                                className='p-1 shrink-0 relative rounded-full bg-gray-700 sm:mr-6 mr-2 text-gray-300 hover:text-white flex items-center justify-center'
-                                                onTouchStart={startListening}
-                                                onMouseDown={startListening}
-                                                onTouchEnd={
-                                                    SpeechRecognition.stopListening
-                                                }
-                                                onMouseUp={
-                                                    SpeechRecognition.stopListening
-                                                }>
-                                                <span className='sr-only'>
-                                                    Voice typing
-                                                </span>
-                                                <MicIcon aria-hidden='true' />
-                                                {listening && (
-                                                    <span class='animate-ping absolute   inline-flex h-full w-full rounded-full bg-red-400 opacity-75'></span>
-                                                )}
-                                            </button>
+                                    <button
+                                        type='button'
+                                        className='p-1 shrink-0 rounded-full bg-gray-700 sm:mr-6 text-gray-300 hover:text-white'>
+                                        <span className='sr-only'>
+                                            View notifications
+                                        </span>
+                                        <NotificationsIcon aria-hidden='true' />
+                                    </button>
 
-                                            <button
-                                                type='button'
-                                                className='p-1 shrink-0 rounded-full bg-gray-700 sm:mr-6 text-gray-300 hover:text-white'>
-                                                <span className='sr-only'>
-                                                    View notifications
-                                                </span>
-                                                <NotificationsIcon aria-hidden='true' />
-                                            </button>
-                             
                                     <Menu
                                         as='div'
                                         className='relative shrink-0'>
@@ -146,21 +157,13 @@ export default function Header() {
                                                 <img
                                                     className='h-7 w-7 rounded-full'
                                                     src={
-                                                        user
-                                                            ? user.profilePicture
-                                                                ? user
-                                                                      .profilePicture
-                                                                      .path
-                                                                : user.googleAccount
-                                                                ? user
-                                                                      .googleAccount
-                                                                      .picture
-                                                                : user.facebookAccount
-                                                                ? user
-                                                                      .facebookAccount
-                                                                      .picture
-                                                                : AvatarThumbnail
-                                                            : AvatarThumbnail
+                                                        user?.profilePicture
+                                                            ?.url ||
+                                                        user?.googleAccount
+                                                            ?.picture ||
+                                                        user?.facebookAccount
+                                                            ?.picture ||
+                                                        AvatarThumbnail
                                                     }
                                                     referrerPolicy='no-referrer'
                                                     alt=''
@@ -183,19 +186,16 @@ export default function Header() {
                                                                 <img
                                                                     className='h-10 w-10 rounded-full mr-2'
                                                                     src={
-                                                                        user.profilePicture
-                                                                            ? user
-                                                                                  .profilePicture
-                                                                                  .path
-                                                                            : user.googleAccount
-                                                                            ? user
-                                                                                  .googleAccount
-                                                                                  .picture
-                                                                            : user.facebookAccount
-                                                                            ? user
-                                                                                  .facebookAccount
-                                                                                  .picture
-                                                                            : AvatarThumbnail
+                                                                        user
+                                                                            ?.profilePicture
+                                                                            ?.url ||
+                                                                        user
+                                                                            ?.googleAccount
+                                                                            ?.picture ||
+                                                                        user
+                                                                            ?.facebookAccount
+                                                                            ?.picture ||
+                                                                        AvatarThumbnail
                                                                     }
                                                                     referrerPolicy='no-referrer'
                                                                     alt=''
@@ -247,7 +247,8 @@ export default function Header() {
 
                                                 <Menu.Item>
                                                     {({ active }) => (
-                                                        <Link>
+                                                        <Link
+                                                            to={`/channel/${user?._id}`}>
                                                             <p
                                                                 className={classNames(
                                                                     active
@@ -263,7 +264,8 @@ export default function Header() {
                                                 </Menu.Item>
                                                 <Menu.Item>
                                                     {({ active }) => (
-                                                        <Link to='/channel/creator-studio'>
+                                                        <Link
+                                                            to={`/channel/${user?._id}/creator-studio`}>
                                                             <p
                                                                 className={classNames(
                                                                     active

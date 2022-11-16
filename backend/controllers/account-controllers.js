@@ -24,7 +24,7 @@ const getUser = async (req, res) => {
                 .json({ success: false, message: 'Page not found' });
         }
 
-        const user = await accountModel.findById(requestedUserId);
+        const user = await accountModel.findById(requestedUserId).populate('channel');
 
         res.status(200).json({
             success: true,

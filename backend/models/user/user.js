@@ -7,8 +7,7 @@ import emailValidator from 'email-validator';
 import { phone } from 'phone';
 import findOneOrCreate from 'mongoose-find-one-or-create';
 import moment from 'moment';
-import fileModel from '../file/file.js';
-
+import imageFileModel from '../file/image-file.js';
 
 const passwordRegexValidators = [
     {
@@ -113,7 +112,7 @@ const userSchema = new Schema(
             },
             default: 'user',
         },
-        profilePicture: { type: fileModel },
+        profilePicture: { type: imageFileModel },
         password: {
             type: String,
             select: false,
@@ -173,15 +172,16 @@ const userSchema = new Schema(
             username: { type: String },
             email: { type: String },
             picture: { type: String },
-            gender: { type : String},
-            dateOfBirth : {type: String},
-
+            gender: { type: String },
+            dateOfBirth: { type: String },
         },
         isBlocked: { type: Boolean, default: false },
         isDeleted: { type: Boolean, default: false },
         accessToken: { type: String },
         refreshToken: { type: String },
         resetPasswordToken: { type: String, default: null },
+        channel: { type: mongoose.Types.ObjectId, ref: 'Channel' },
+        following: [{ type: mongoose.Types.ObjectId, ref: 'Channel' }],
     },
     { timestamps: true }
 );

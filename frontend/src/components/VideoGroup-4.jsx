@@ -5,7 +5,7 @@ import LikeIcon from '@mui/icons-material/ThumbUp';
 import DislikeIcon from '@mui/icons-material/ThumbDown';
 import moment from 'moment';
 
-function VideoGroup3({ videos }) {
+function VideoGroup4({ videos }) {
     return (
         <div className='space-y-4 sm:space-y-0'>
             {videos?.map((video) => {
@@ -36,24 +36,20 @@ function VideoGroup3({ videos }) {
                             <p className='text-gray-200 line-clamp-1'>
                                 {title}
                             </p>
-                            <div className='flex items-center gap-3'>
-                                <img
-                                    className='w-7 h-7 rounded-full'
-                                    src={
-                                        uploadedBy?.profilePicture?.url ||
-                                        uploadedBy?.googleAccount?.picture ||
-                                        uploadedBy?.facebookAccount?.picture ||
-                                        AvatarThumbnail
-                                    }
-                                    alt='Rounded avatar'
-                                />
-                                <p className='text-sm text-gray-400'>
-                                    {uploadedBy?.username}
-                                </p>
-                            </div>
+
                             <p className='text-xs text-gray-400 sm:block hidden lg:hidden line-clamp-3'>
                                 {description}
                             </p>
+                            <div className='space-x-3 py-2 text-xs flex'>
+                                <div className='flex space-x-2 text-gray-300 items-center'>
+                                    <LikeIcon sx={{ fontSize: 'medium' }} />
+                                    <p className='text-sm'>{likes || 0}</p>
+                                </div>
+                                <div className='flex space-x-2 text-gray-300 items-center'>
+                                    <DislikeIcon sx={{ fontSize: 'medium' }} />
+                                    <p className='text-sm'>{dislikes || 0}</p>
+                                </div>
+                            </div>
                             <div className='flex gap-2 items-center text-gray-400'>
                                 <div className='flex text-xs'>
                                     <p>{views || 0} Views</p>
@@ -69,4 +65,4 @@ function VideoGroup3({ videos }) {
     );
 }
 
-export default VideoGroup3;
+export default VideoGroup4;

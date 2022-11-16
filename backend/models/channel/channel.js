@@ -1,13 +1,14 @@
 import mongoose from 'mongoose';
 import emailValidator from 'email-validator';
 import linkModel from './link.js';
-import fileModel from '../file/file.js';
+import imageFileModel from '../file/image-file.js';
+import videoFileModel from '../file/video-file.js';
 import findOneOrCreate from 'mongoose-find-one-or-create';
 
 const { Schema } = mongoose;
 const channelSchema = new Schema(
     {
-        user: { type: mongoose.Types.ObjectId, ref: 'User' },
+        owner: { type: mongoose.Types.ObjectId, ref: 'User' },
         description: {
             type: String,
             maxLength: [
@@ -17,6 +18,7 @@ const channelSchema = new Schema(
         },
         links: {
             type: [linkModel],
+            default: [],
         },
         linksOnBanner: {
             type: Number,
@@ -46,20 +48,16 @@ const channelSchema = new Schema(
             },
         },
         //branding
-        banners: [
-            {
-                type: fileModel.add({
-                    size: {
-                        type: String,
-                        enum: {
-                            values: ['small', 'medium', 'large'],
-                            message: 'Invalid size',
-                        },
-                    },
-                }),
-            },
-        ],
-        watermark: { type: fileModel },
+        banner: { type: imageFileModel },
+        watermark: { type: imageFileModel },
+        followers: {
+            type: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+            default: [],
+        },
+        videos: {
+            type: [{ type: mongoose.Types.ObjectId, ref: 'Video' }],
+            default: [],
+        },
     },
     { timestamps: true }
 );

@@ -9,7 +9,7 @@ import RightIcon from '@mui/icons-material/ChevronRight';
 import { Link } from 'react-router-dom';
 function HeroSection() {
     return (
-        <div>
+        <div className='mb-10'>
             <div
                 id='hero-carousel'
                 className='carousel slide relative'
@@ -44,12 +44,12 @@ function HeroSection() {
                                         text='Play trailer'
                                     />
                                     <div className='relative flex items-center'>
-                                        <div className='flex drop-shadow-sm gap-3 pb-10 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-gray-700 overflow-y-hidden'>
+                                        <div className='flex drop-shadow-sm gap-3 pb-10 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-700 overflow-y-hidden'>
                                             <Link className='w-[240px] h-[135px] shrink-0 mt-6'>
                                                 <VideoThumbnail
                                                     className='drop-shadow-md'
                                                     image={_2thumbnail}
-                                                    length='00:04:03'
+                                                    length='00403'
                                                 />
                                                 <p className='text-gray-100 line-clamp-1'>
                                                     Black Panther | Trailer | HD
@@ -59,7 +59,7 @@ function HeroSection() {
                                                 <VideoThumbnail
                                                     className='drop-shadow-md'
                                                     image={_1thumbnail}
-                                                    length='00:02:14'
+                                                    length='00214'
                                                 />
                                                 <p className='text-gray-100 line-clamp-1'>
                                                     Black Panther | Trailer | HD
@@ -69,17 +69,17 @@ function HeroSection() {
                                                 <VideoThumbnail
                                                     className='drop-shadow-md'
                                                     image={_2thumbnail}
-                                                    length='00:04:03'
+                                                    length='00403'
                                                 />
                                                 <p className='text-gray-100 line-clamp-1'>
-                                                    Black Panther | Trailer | HD 
+                                                    Black Panther | Trailer | HD
                                                 </p>
                                             </Link>
                                             <Link className='w-[240px] h-[135px] shrink-0 mt-6'>
                                                 <VideoThumbnail
                                                     className='drop-shadow-md'
                                                     image={_1thumbnail}
-                                                    length='00:02:14'
+                                                    length='000214'
                                                 />
                                                 <p className='text-gray-100'>
                                                     Black Panther | Trailer | HD

@@ -88,7 +88,8 @@ const login = async (req, res, next) => {
                     { 'facebookAccount.email': email },
                 ],
             })
-            .select('+password');
+            .select('+password')
+            .populate('channel');
 
         if (
             !user ||
@@ -120,18 +121,22 @@ const login = async (req, res, next) => {
         }
 
         const { accessToken, refreshToken } = user.generateJWT();
+
         await user.save();
 
         user = user.toObject();
         delete user.password;
 
-        res.status(200).json({
-            success: true,
-            accessToken,
-            refreshToken,
-            user,
-            message: 'You have successfully logged in.',
-        });
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+        })
+            .status(200)
+            .json({
+                success: true,
+                accessToken,
+                user,
+                message: 'You have successfully logged in.',
+            });
     } catch (err) {
         // console.log('\nLogin api error');
         // console.log('===============');
@@ -153,17 +158,20 @@ const verifyEmail = async (req, res, next) => {
             user.email.verificationTokenExpire = null;
             const { accessToken, refreshToken } = user.generateJWT();
             await user.save();
-            console.log(user);
-            return res.status(201).json({
-                success: true,
-                user,
-                accessToken,
-                refreshToken,
-                message: 'Email verified successfully',
-            });
+
+            return res
+                .cookie('refreshToken', refreshToken, {
+                    httpOnly: true,
+                })
+                .status(201)
+                .json({
+                    success: true,
+                    user,
+                    accessToken,
+                    message: 'Email verified successfully',
+                });
         }
 
-        console.log('Invalid token');
         res.status(400).json({
             success: false,
             message: 'Email verification token is invalid or has been expired',
@@ -209,27 +217,29 @@ const googleAuthCallback = async (req, res, next) => {
         // console.log('\nUser details from google');
         // console.log('========================');
         // console.log(data);
-        const user = await accountModel.findOneAndUpdate(
-            {
-                $or: [
-                    { 'email.address': email },
-                    { 'googleAccount.email': email },
-                    { 'googleAccount.id': id },
-                    { 'facebookAccount.email': email },
-                ],
-            },
-            {
-                'googleAccount.username': name,
-                'googleAccount.id': id,
-                'googleAccount.email': email,
-                'googleAccount.picture': picture,
-            },
-            {
-                new: true,
-                upsert: true,
-                runValidators: true,
-            }
-        );
+        const user = await accountModel
+            .findOneAndUpdate(
+                {
+                    $or: [
+                        { 'email.address': email },
+                        { 'googleAccount.email': email },
+                        { 'googleAccount.id': id },
+                        { 'facebookAccount.email': email },
+                    ],
+                },
+                {
+                    'googleAccount.username': name,
+                    'googleAccount.id': id,
+                    'googleAccount.email': email,
+                    'googleAccount.picture': picture,
+                },
+                {
+                    new: true,
+                    upsert: true,
+                    runValidators: true,
+                }
+            )
+            .populate('channel');
 
         if (!user.username) {
             user.username = user.googleAccount.username;
@@ -249,13 +259,15 @@ const googleAuthCallback = async (req, res, next) => {
 
         const { accessToken, refreshToken } = user.generateJWT();
         await user.save();
-
-        res.status(200).json({
-            success: true,
-            accessToken,
-            refreshToken,
-            user,
-        });
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+        })
+            .status(200)
+            .json({
+                success: true,
+                user,
+                accessToken,
+            });
     } catch (err) {
         // console.log('\nGoogle authentication error');
         // console.log('===========================');
@@ -284,34 +296,36 @@ const facebookAuth = async (req, res, next) => {
         } = userData;
 
         console.log(userData);
-        const user = await accountModel.findOneAndUpdate(
-            {
-                $or: [
-                    { 'email.address': email },
-                    { 'googleAccount.email': email },
-                    { 'facebookAccount.email': email },
-                    { 'facebookAccount.id': id },
-                ],
-            },
-            {
-                'facebookAccount.username':
-                    username ||
-                    displayName ||
-                    name ||
-                    `${firstName} ${lastName}` ||
-                    email.slice(0, email.indexOf('@')),
-                'facebookAccount.id': id,
-                'facebookAccount.email': email,
-                'facebookAccount.dateOfBirth': birthday,
-                'facebookAccount.gender': gender,
-                'facebookAccount.picture': picture.data.url,
-            },
-            {
-                new: true,
-                upsert: true,
-                runValidators: true,
-            }
-        );
+        const user = await accountModel
+            .findOneAndUpdate(
+                {
+                    $or: [
+                        { 'email.address': email },
+                        { 'googleAccount.email': email },
+                        { 'facebookAccount.email': email },
+                        { 'facebookAccount.id': id },
+                    ],
+                },
+                {
+                    'facebookAccount.username':
+                        username ||
+                        displayName ||
+                        name ||
+                        `${firstName} ${lastName}` ||
+                        email.slice(0, email.indexOf('@')),
+                    'facebookAccount.id': id,
+                    'facebookAccount.email': email,
+                    'facebookAccount.dateOfBirth': birthday,
+                    'facebookAccount.gender': gender,
+                    'facebookAccount.picture': picture.data.url,
+                },
+                {
+                    new: true,
+                    upsert: true,
+                    runValidators: true,
+                }
+            )
+            .populate('channel');
 
         if (!user.username) {
             user.username =
@@ -339,12 +353,15 @@ const facebookAuth = async (req, res, next) => {
 
         await user.save();
 
-        res.status(200).json({
-            success: true,
-            accessToken,
-            refreshToken,
-            user,
-        });
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+        })
+            .status(200)
+            .json({
+                success: true,
+                accessToken,
+                user,
+            });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -352,7 +369,7 @@ const facebookAuth = async (req, res, next) => {
 
 const facebookAuthSuccess = async (req, res, next) => {
     try {
-        const { user } = req;
+        let { user } = req;
         if (user.isBlocked) {
             return res.status(403).json({
                 success: false,
@@ -363,13 +380,17 @@ const facebookAuthSuccess = async (req, res, next) => {
         const { accessToken, refreshToken } = user.generateJWT();
 
         await user.save();
+        user = user.populate('channel');
 
-        res.status(200).json({
-            success: true,
-            accessToken,
-            refreshToken,
-            user,
-        });
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+        })
+            .status(200)
+            .json({
+                success: true,
+                accessToken,
+                user,
+            });
     } catch (err) {
         // console.log('\nFacebook authentication success api error');
         // console.log('=========================================');
@@ -389,12 +410,16 @@ const refreshAuthToken = async (req, res, next) => {
         }
         const { accessToken, refreshToken } = user.generateJWT();
         await user.save();
-        res.status(201).json({
-            success: true,
-            accessToken,
-            refreshToken,
-            message: 'Access token refreshed successfully',
-        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+        })
+            .status(201)
+            .json({
+                success: true,
+                accessToken,
+                message: 'Access token refreshed successfully',
+            });
     } catch (err) {
         console.log(err);
         res.status(500).json({
