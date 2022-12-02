@@ -33,6 +33,7 @@ function Dashboard() {
         isGetLatestVideoSuccess,
         isGetLatestVideoError,
         isVideoUploadError,
+        isVideoUploadSuccess,
         videoUploadMessage,
         isVideoDetailsSaveSuccess,
         uploadingOnProcess,
@@ -79,7 +80,7 @@ function Dashboard() {
     const playerRef = useRef(null);
 
     useEffect(() => {
-        dispatch(getChannel(channelId));
+        dispatch(getChannel({ userId: channelId }));
         dispatch(getLatestVideo({ channelId, latest: true }));
         dispatch(getTopVideos({ channelId, top: 5 }));
         dispatch(
@@ -89,7 +90,7 @@ function Dashboard() {
                 totalWatchTime: true,
             })
         );
-    }, []);
+    }, [isVideoDetailsSaveSuccess]);
 
     const navigate = useNavigate();
     const { user, accessToken } = useSelector((state) => state.auth);
@@ -101,7 +102,7 @@ function Dashboard() {
     }, [user, accessToken]);
 
     const videoJsOptions = {
-        autoplay: true,
+        autoplay: false,
         controls: true,
         responsive: true,
         fluid: true,
@@ -135,6 +136,11 @@ function Dashboard() {
         return <Spinner />;
     }
 
+    if (isGetChannelError && !channel) {
+        toast.error('You have no channel.Create a channel and explore Platform.');
+        navigate(`/channel/${user._id}`);
+    }
+
     return (
         <>
             <div className='mx-auto bg-gray-900 pt-20'>
@@ -144,7 +150,7 @@ function Dashboard() {
                         <TopBar title='Channel Dashboard' />
                         <div className='grid grid-cols-2 gap-2'>
                             <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-5 space-y-3 h-screen'>
-                                {Object.keys(latestVideo).length ? (
+                                {Object.keys(latestVideo)?.length ? (
                                     <>
                                         <VideoJS
                                             options={videoJsOptions}
@@ -159,7 +165,7 @@ function Dashboard() {
                                                 <ViewsIcon sx={{ fontSize: 'large' }} />
                                                 <div className='flex w-full justify-between'>
                                                     <p>Views</p>
-                                                    <p>{views?.length || 0}</p>
+                                                    <p>{views || 0}</p>
                                                 </div>
                                             </div>
                                             <div className='flex gap-2 items-center text-sm text-gray-300'>

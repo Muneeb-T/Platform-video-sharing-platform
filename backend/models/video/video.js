@@ -52,6 +52,7 @@ const videoSchema = new Schema(
             ],
             default: [],
         },
+        deleted: { type: Boolean, default: false },
         comments: { type: [commentModel] },
     },
     { timestamps: true }

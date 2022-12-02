@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import VideoGroup2 from '../components/VideoGroup-2';
@@ -43,18 +42,14 @@ function SearchResults() {
                         return (
                             <>
                                 <Link className='shrink-0'>
-                                    <p className='text-gray-300'>
-                                        {category.name}
-                                    </p>
+                                    <p className='text-gray-300'>{category.name}</p>
                                 </Link>
                                 <p className='mx-3 text-gray-500'>|</p>
                             </>
                         );
                     })}
                 </div>
-                <Menu
-                    as='div'
-                    className='relative flex-none inline-block text-left'>
+                <Menu as='div' className='relative flex-none inline-block text-left'>
                     <div>
                         <Menu.Button className='flex space-x-5 items-center w-full justify-center text-gray-300 px-4 py-2 text-sm text-md font-bold'>
                             <FilterListIcon />
@@ -156,8 +151,7 @@ function SearchResults() {
                                     No results found
                                 </p>
                                 <p className='text-gray-500'>
-                                    Sorry.Nothing found for the keyword you have
-                                    searched.
+                                    Sorry.Nothing found for the keyword you have searched.
                                 </p>
                             </div>
                         </div>

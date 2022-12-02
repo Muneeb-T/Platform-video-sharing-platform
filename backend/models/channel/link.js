@@ -7,10 +7,9 @@ const linkSchema = new Schema({
         type: String,
         maxLength: 30,
     },
-    link: {
+    url: {
         type: String,
-        
     },
 });
 
-export default linkSchema
+export default linkSchema;

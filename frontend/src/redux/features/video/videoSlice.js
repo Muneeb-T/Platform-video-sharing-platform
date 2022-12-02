@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import mongoose from 'mongoose';
 import videoService from './videoService';
 
 // Get user from localStorage
@@ -62,6 +63,11 @@ const initialState = {
     likeOrDislikeCommentLoading: false,
     likeOrDislikeCommentSuccess: false,
     likeOrDislikeCommentError: false,
+    selectedVideos: [],
+    deleteVideosLoading: false,
+    deleteVideosSuccess: false,
+    deleteVideosError: false,
+    deleteVideosMessage: '',
 };
 
 // Register user
@@ -134,7 +140,7 @@ export const updateVideo = createAsyncThunk('VIDEO/UPDATE_VIDEO', async (updatio
         const accessToken = thunkAPI.getState().auth.accessToken;
         const response = await videoService.updateVideo(updations, accessToken);
         const { success, message } = response;
-        console.log(response);
+
         if (!success) return thunkAPI.rejectWithValue(message);
         return message;
     } catch (err) {
@@ -201,27 +207,13 @@ export const likeOrDislikeVideo = createAsyncThunk(
 export const saveComment = createAsyncThunk('VIDEO/SAVE_COMMENT', async (comment, thunkAPI) => {
     try {
         const accessToken = thunkAPI.getState().auth.accessToken;
+        comment.id = mongoose.Types.ObjectId();
         const response = await videoService.saveComment(comment, accessToken);
-        const { success, message, newCommentId } = response;
+        const { success, message } = response;
         if (!success) return thunkAPI.rejectWithValue(message);
-        const { userData } = comment;
-        console.log('Comment reply details');
-        console.log(response);
-        const commentData = {
-            userId: userData,
-            comment: comment?.comment?.comment,
-            commentId: comment?.comment?.reply ? comment?.comment?.reply : null,
-            likes: 0,
-            dislikes: 0,
-            liked: false,
-            disliked: false,
-            replies: [],
-        };
-        if (newCommentId) {
-            commentData._id = newCommentId;
-        }
-        response.comment = commentData;
-        return response;
+        const { user } = thunkAPI.getState().auth;
+        comment.userId = user;
+        return comment;
     } catch (err) {
         console.log(err);
         const message = err.response.data.message || 'Something went wrong';
@@ -256,32 +248,29 @@ export const saveViewData = createAsyncThunk('VIDEO/SAVE_VIEW_DATA', async (view
     }
 });
 
+export const deleteVideos = createAsyncThunk('VIDEO/DELETE_VIDEOS', async (videos, thunkAPI) => {
+    try {
+        const accessToken = thunkAPI.getState().auth.accessToken;
+        const response = await videoService.deleteVideos(videos, accessToken);
+        const { success, message } = response;
+        if (!success) return thunkAPI.rejectWithValue(message);
+        return { videos, message };
+    } catch (err) {
+        console.log(err);
+        const message = err.response.data.message || 'Something went wrong';
+        return thunkAPI.rejectWithValue(message);
+    }
+});
+
 export const likeOrDislikeComment = createAsyncThunk(
     'VIDEO/LIKE_OR_DISLIKE_COMMENT',
     async (likeOrDislike, thunkAPI) => {
         try {
-            console.log('request in slice');
-            console.log(likeOrDislike);
-
             const accessToken = thunkAPI.getState().auth.accessToken;
             const response = await videoService.likeOrDislikeComment(likeOrDislike, accessToken);
             const { success, message } = response;
             if (!success) return thunkAPI.rejectWithValue(message);
-
-            console.log('reponse in slice');
-            console.log(response);
-            const { likedBy, dislikedBy, commentId, reply } = likeOrDislike;
-            response.commentId = commentId;
-            if (likedBy) {
-                response.likedBy = likedBy;
-            }
-            if (dislikedBy) {
-                response.dislikedBy = dislikedBy;
-            }
-            if (reply) {
-                response.replyId = reply;
-            }
-            return response;
+            return likeOrDislike;
         } catch (err) {
             console.log(err);
             const message = err.response.data.message || 'Something went wrong';
@@ -383,7 +372,7 @@ export const videoSlice = createSlice({
             state.uploadedThumbnail = action.payload;
         },
         setChannelFollowed: (state, action) => {
-            const { followed } = state.playbackVideo.channel;
+            const { followed } = state.playbackVideo?.channel;
             state.playbackVideo.channel.followed = !followed;
             if (followed) {
                 state.playbackVideo.channel.followers -= 1;
@@ -399,6 +388,19 @@ export const videoSlice = createSlice({
         },
         resetPlaybackVideo: (state) => {
             state.playbackVideo = null;
+        },
+        setSelectedVideos: (state, action) => {
+            const selectedVideos = state.selectedVideos;
+            const videoId = action.payload;
+            const videoIndex = selectedVideos.findIndex((element) => element === videoId);
+            if (videoIndex === -1) {
+                state.selectedVideos = [...selectedVideos, videoId];
+            } else {
+                state.selectedVideos = selectedVideos.filter((element) => element !== videoId);
+            }
+        },
+        resetSelectedVideos: (state, action) => {
+            state.selectedVideos = [];
         },
     },
     extraReducers: (builder) => {
@@ -427,6 +429,8 @@ export const videoSlice = createSlice({
             })
             .addCase(saveVideoDetails.fulfilled, (state, action) => {
                 state.showVideoUploadModal = false;
+                state.videoUploadForm = {};
+                state.uploadedThumbnail = '';
                 state.videoDetailsSaveMessage = action.payload.message;
                 state.isVideoDetailsSaveSuccess = true;
                 state.uploadingOnProcess = false;
@@ -573,20 +577,25 @@ export const videoSlice = createSlice({
                 state.commentSaveLoading = true;
             })
             .addCase(saveComment.fulfilled, (state, action) => {
-                state.commentSaveSuccess = true;
-                const { commentReplyDetails } = action.payload;
-                if (commentReplyDetails) {
+                const { id, userId, text, reply } = action.payload;
+                if (reply) {
+                    const { commentId } = reply;
                     const commentIndex = state.playbackVideo.comments.findIndex(
-                        (comment) => comment._id === action.payload.comment.commentId
+                        (comment) => comment.id === commentId
                     );
-                    state.playbackVideo.comments[commentIndex].replies.push(action.payload.comment);
+                    state.playbackVideo.comments[commentIndex].replies.push(action.payload);
                 } else {
-                    state.playbackVideo.comments = [
-                        action.payload.comment,
-                        ...state.playbackVideo.comments,
-                    ];
+                    state.playbackVideo?.comments?.unshift({
+                        id,
+                        userId,
+                        text,
+                        replies: [],
+                        createdAt: new Date(),
+                        liked: false,
+                        disliked: false,
+                    });
                 }
-                state.commentSaveMessage = action.payload;
+
                 state.commentSaveLoading = false;
             })
             .addCase(saveComment.rejected, (state, action) => {
@@ -604,88 +613,129 @@ export const videoSlice = createSlice({
                 state.likeOrDislikeCommentLoading = true;
             })
             .addCase(likeOrDislikeComment.fulfilled, (state, action) => {
-                state.likeOrDislikeCommentSuccess = true;
-                const { likedBy, dislikedBy, commentId, replyId } = action.payload;
-                const commentIndex = state.playbackVideo.comments.findIndex((comment) => comment._id === commentId);
-                if (replyId) {
-                    let replyIndex = state.playbackVideo.comments[commentIndex].findIndex(
-                        (reply) => reply._id === replyId
-                    );
-                    if (likedBy) {
-                        if (state.playbackVideo.comments[commentIndex].replies[replyIndex].liked) {
-                            state.playbackVideo.comments[commentIndex].replies[
-                                replyIndex
-                            ].likes -= 1;
+                const { commentId, like, dislike, reply } = action.payload;
+                const commentIndex = state.playbackVideo?.comments.findIndex(
+                    (comment) => comment.id == commentId
+                );
+                if (reply) {
+                    let { replyId } = reply;
+                    const replyIndex = state.playbackVideo?.comments[
+                        commentIndex
+                    ].replies.findIndex((reply) => reply.id == replyId);
+                    if (like) {
+                        const liked =
+                            state.playbackVideo?.comments[commentIndex]?.replies[replyIndex]?.liked;
+                        if (liked) {
                             state.playbackVideo.comments[commentIndex].replies[
                                 replyIndex
                             ].liked = false;
+                            state.playbackVideo.comments[commentIndex].replies[
+                                replyIndex
+                            ].likes -= 1;
                         } else {
-                            state.playbackVideo.comments[commentIndex].replies[
-                                replyIndex
-                            ].likes += 1;
-                            state.playbackVideo.comments[commentIndex].replies[
-                                replyIndex
-                            ].liked = true;
-                            if (
-                                state.playbackVideo.comments[commentIndex].replies[replyIndex]
-                                    .disliked
-                            ) {
-                                state.playbackVideo.comments[commentIndex].replies[
-                                    replyIndex
-                                ].dislikes -= 1;
+                            const disliked =
+                                state.playbackVideo?.comments[commentIndex]?.replies[replyIndex]
+                                    ?.disliked;
+                            if (disliked) {
                                 state.playbackVideo.comments[commentIndex].replies[
                                     replyIndex
                                 ].disliked = false;
+                                state.playbackVideo.comments[commentIndex].replies[
+                                    replyIndex
+                                ].dislikes -= 1;
                             }
+                            state.playbackVideo.comments[commentIndex].replies[
+                                replyIndex
+                            ].liked = true;
+                            state.playbackVideo.comments[commentIndex].replies[
+                                replyIndex
+                            ].likes += 1;
                         }
                     }
-                    if (dislikedBy) {
-                        if (state.playbackVideo.comments[commentIndex].disliked) {
-                            state.playbackVideo.comments[commentIndex].dislikes -= 1;
-                            state.playbackVideo.comments[commentIndex].disliked = false;
+                    if (dislike) {
+                        const disliked =
+                            state.playbackVideo?.comments[commentIndex]?.replies[replyIndex]
+                                ?.disliked;
+                        if (disliked) {
+                            state.playbackVideo.comments[commentIndex].replies[
+                                replyIndex
+                            ].disliked = false;
+                            state.playbackVideo.comments[commentIndex].replies[
+                                replyIndex
+                            ].dislikes -= 1;
                         } else {
-                            state.playbackVideo.comments[commentIndex].dislikes += 1;
-                            state.playbackVideo.comments[commentIndex].disliked = true;
-                            if (state.playbackVideo.comments[commentIndex].liked) {
-                                state.playbackVideo.comments[commentIndex].likes -= 1;
-                                state.playbackVideo.comments[commentIndex].liked = false;
+                            const liked =
+                                state.playbackVideo?.comments[commentIndex]?.replies[replyIndex]
+                                    ?.liked;
+                            if (liked) {
+                                state.playbackVideo.comments[commentIndex].replies[
+                                    replyIndex
+                                ].liked = false;
+                                state.playbackVideo.comments[commentIndex].replies[
+                                    replyIndex
+                                ].likes -= 1;
                             }
+                            state.playbackVideo.comments[commentIndex].replies[
+                                replyIndex
+                            ].dislikes += 1;
+                            state.playbackVideo.comments[commentIndex].replies[
+                                replyIndex
+                            ].disliked = true;
                         }
                     }
                 } else {
-                    if (likedBy) {
-                        if (state.playbackVideo.comments[commentIndex].liked) {
-                            state.playbackVideo.comments[commentIndex].likes -= 1;
+                    if (like) {
+                        const liked = state.playbackVideo?.comments[commentIndex]?.liked;
+                        if (liked) {
                             state.playbackVideo.comments[commentIndex].liked = false;
+                            state.playbackVideo.comments[commentIndex].likes -= 1;
                         } else {
-                            state.playbackVideo.comments[commentIndex].likes += 1;
-                            state.playbackVideo.comments[commentIndex].liked = true;
-                            if (state.playbackVideo.comments[commentIndex].disliked) {
-                                state.playbackVideo.comments[commentIndex].dislikes -= 1;
+                            const disliked = state.playbackVideo?.comments[commentIndex]?.disliked;
+                            if (disliked) {
                                 state.playbackVideo.comments[commentIndex].disliked = false;
+                                state.playbackVideo.comments[commentIndex].dislikes -= 1;
                             }
+                            state.playbackVideo.comments[commentIndex].liked = true;
+                            state.playbackVideo.comments[commentIndex].likes += 1;
                         }
                     }
-                    if (dislikedBy) {
-                        if (state.playbackVideo.comments[commentIndex].disliked) {
-                            state.playbackVideo.comments[commentIndex].dislikes -= 1;
+                    if (dislike) {
+                        const disliked = state.playbackVideo?.comments[commentIndex]?.disliked;
+                        if (disliked) {
                             state.playbackVideo.comments[commentIndex].disliked = false;
+                            state.playbackVideo.comments[commentIndex].dislikes -= 1;
                         } else {
+                            const liked = state.playbackVideo?.comments[commentIndex]?.liked;
+                            if (liked) {
+                                state.playbackVideo.comments[commentIndex].liked = false;
+                                state.playbackVideo.comments[commentIndex].likes -= 1;
+                            }
                             state.playbackVideo.comments[commentIndex].dislikes += 1;
                             state.playbackVideo.comments[commentIndex].disliked = true;
-                            if (state.playbackVideo.comments[commentIndex].liked) {
-                                state.playbackVideo.comments[commentIndex].likes -= 1;
-                                state.playbackVideo.comments[commentIndex].liked = false;
-                            }
                         }
                     }
                 }
-
                 state.likeOrDislikeCommentLoading = false;
             })
             .addCase(likeOrDislikeComment.rejected, (state, action) => {
                 state.likeOrDislikeCommentError = true;
                 state.likeOrDislikeLoading = false;
+            })
+            .addCase(deleteVideos.pending, (state, action) => {
+                state.deleteVideosLoading = true;
+            })
+            .addCase(deleteVideos.fulfilled, (state, action) => {
+                const { videos, message } = action.payload;
+                state.deleteVideosLoading = false;
+                state.videos = state.videos.filter((video) => !videos.includes(video._id));
+                state.selectedVideos = [];
+                state.deleteVideosSuccess = false;
+                state.deleteVideosError = false;
+                state.deleteVideosMessage = message;
+            })
+            .addCase(deleteVideos.rejected, (state, action) => {
+                const { message } = action.payload;
+                state.deleteVideosMessage = message;
             });
     },
 });
@@ -704,6 +754,8 @@ export const {
     resetPlaybackVideo,
     setChannelFollowed,
     setWatchTime,
+    setSelectedVideos,
+    resetSelectedVideos,
 } = videoSlice.actions;
 
 export default videoSlice.reducer;

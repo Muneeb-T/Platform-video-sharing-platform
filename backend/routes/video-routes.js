@@ -6,6 +6,7 @@ import {
     updateVideoDetailsNotProtected,
     getVideos,
     getVideo,
+    deleteVideos,
 } from '../controllers/video-controllers.js';
 const router = express.Router();
 
@@ -16,4 +17,5 @@ router
     .patch(updateVideoDetailsNotProtected);
 router.get('/videos', jwtAuthenticate2, getVideos);
 router.get('/video', getVideo);
+router.patch('/delete-videos', jwtAuthenticate, deleteVideos);
 export default router;

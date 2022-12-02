@@ -21,23 +21,24 @@ const initialState = {
     channelForm: null,
     message: '',
     analytics: null,
+    updateChannelLoading: false,
+    updateChannelSuccess: false,
+    updateChannelError: false,
+    updateChannelMessage: '',
 };
 
-export const getChannel = createAsyncThunk(
-    'CHANNEL/GET_CHANNEL',
-    async (userId, thunkAPI) => {
-        try {
-            const response = await channelService.getChannel(userId);
-            const { success, message } = response;
-            if (!success) return thunkAPI.rejectWithValue(message);
-            return response;
-        } catch (err) {
-            const message =
-                err?.response?.data?.message || 'Something went wrong';
-            return thunkAPI.rejectWithValue(message);
-        }
+export const getChannel = createAsyncThunk('CHANNEL/GET_CHANNEL', async (channel, thunkAPI) => {
+    try {
+        const accessToken = thunkAPI.getState().auth.accessToken;
+        const response = await channelService.getChannel(channel, accessToken);
+        const { success, message } = response;
+        if (!success) return thunkAPI.rejectWithValue(message);
+        return response;
+    } catch (err) {
+        const message = err?.response?.data?.message || 'Something went wrong';
+        return thunkAPI.rejectWithValue(message);
     }
-);
+});
 
 export const createChannel = createAsyncThunk(
     'CHANNEL/CREATE_CHANNEL',
@@ -45,17 +46,13 @@ export const createChannel = createAsyncThunk(
         try {
             const accessToken = thunkAPI.getState().auth.accessToken;
             console.log(accessToken);
-            const response = await channelService.createChannel(
-                channelDetails,
-                accessToken
-            );
+            const response = await channelService.createChannel(channelDetails, accessToken);
             const { success, message } = response;
             if (!success) return thunkAPI.rejectWithValue(message);
             return response;
         } catch (err) {
             console.log(err);
-            const message =
-                err?.response?.data?.message || 'Something went wrong';
+            const message = err?.response?.data?.message || 'Something went wrong';
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -66,44 +63,75 @@ export const followChannel = createAsyncThunk(
     async (channelAndUser, thunkAPI) => {
         try {
             const accessToken = thunkAPI.getState().auth.accessToken;
-            const response = await channelService.followChannel(
-                channelAndUser,
-                accessToken
-            );
+            const response = await channelService.followChannel(channelAndUser, accessToken);
             const { success, message } = response;
             if (!success) return thunkAPI.rejectWithValue(message);
 
             return response;
         } catch (err) {
             console.log(err);
-            const message =
-                err?.response?.data?.message || 'Something went wrong';
+            const message = err?.response?.data?.message || 'Something went wrong';
             return thunkAPI.rejectWithValue(message);
         }
     }
 );
 
-export const channelAnalytics = createAsyncThunk(
-    'CHANNEL/ANALYTICS',
-    async (params, thunkAPI) => {
-        try {
-            const accessToken = thunkAPI.getState().auth.accessToken;
-            const response = await channelService.channelAnalytics(
-                params,
-                accessToken
-            );
-            const { success, message } = response;
-            console.log(response);
-            if (!success) return thunkAPI.rejectWithValue(message);
-            return response;
-        } catch (err) {
-            console.log(err);
-            const message =
-                err?.response?.data?.message || 'Something went wrong';
-            return thunkAPI.rejectWithValue(message);
-        }
+export const channelAnalytics = createAsyncThunk('CHANNEL/ANALYTICS', async (params, thunkAPI) => {
+    try {
+        const accessToken = thunkAPI.getState().auth.accessToken;
+        const response = await channelService.channelAnalytics(params, accessToken);
+        const { success, message } = response;
+        console.log(response);
+        if (!success) return thunkAPI.rejectWithValue(message);
+        return response;
+    } catch (err) {
+        console.log(err);
+        const message = err?.response?.data?.message || 'Something went wrong';
+        return thunkAPI.rejectWithValue(message);
     }
-);
+});
+
+export const updateChannel = createAsyncThunk('CHANNEL/UPDATE', async (update, thunkAPI) => {
+    try {
+        console.log(update);
+        const accessToken = thunkAPI.getState().auth.accessToken;
+        const response = await channelService.updateChannel(update, accessToken);
+        const { success, message } = response;
+        if (!success) return thunkAPI.rejectWithValue(message);
+        return message;
+    } catch (err) {
+        console.log(err);
+        const message = err?.response?.data?.message || 'Something went wrong';
+        return thunkAPI.rejectWithValue(message);
+    }
+});
+
+export const likeChannel = createAsyncThunk('CHANNEL/LIKE', async (details, thunkAPI) => {
+    try {
+        const accessToken = thunkAPI.getState().auth.accessToken;
+        const response = await channelService.likeChannel(details, accessToken);
+        const { success, message } = response;
+        if (!success) return thunkAPI.rejectWithValue(message);
+        return message;
+    } catch (err) {
+        console.log(err);
+        const message = err?.response?.data?.message || 'Something went wrong';
+        return thunkAPI.rejectWithValue(message);
+    }
+});
+export const dislikeChannel = createAsyncThunk('CHANNEL/DISLIKE', async (details, thunkAPI) => {
+    try {
+        const accessToken = thunkAPI.getState().auth.accessToken;
+        const response = await channelService.dislikeChannel(details, accessToken);
+        const { success, message } = response;
+        if (!success) return thunkAPI.rejectWithValue(message);
+        return message;
+    } catch (err) {
+        console.log(err);
+        const message = err?.response?.data?.message || 'Something went wrong';
+        return thunkAPI.rejectWithValue(message);
+    }
+});
 
 export const channelSlice = createSlice({
     name: 'channel',
@@ -128,6 +156,10 @@ export const channelSlice = createSlice({
             state.isChannelAnalyticsLoading = false;
             state.isChannelAnalyticsMessage = '';
             state.isChannelAnalyticsSuccess = false;
+            state.updateChannelLoading = false;
+            state.updateChannelSuccess = false;
+            state.updateChannelError = false;
+            state.updateChannelMessage = '';
         },
         setBanner: (state, action) => {
             state.channelBannerUrl = action.payload;
@@ -177,6 +209,11 @@ export const channelSlice = createSlice({
             })
             .addCase(followChannel.fulfilled, (state, action) => {
                 state.isFollowChannelSuccess = true;
+                if (state.channel) {
+                    state.channel.followed = !state.channel?.followed;
+                    state.channel.followers += state.channel?.followed ? 1 : -1;
+                }
+
                 state.message = action.payload.message;
                 state.isFollowChannelLoading = false;
             })
@@ -198,10 +235,38 @@ export const channelSlice = createSlice({
                 state.isChannelAnalyticsError = true;
                 state.isChannelAnalyticsMessage = action.payload;
                 state.isChannelAnalyticsLoading = false;
+            })
+            .addCase(updateChannel.pending, (state, action) => {
+                state.updateChannelLoading = true;
+            })
+            .addCase(updateChannel.fulfilled, (state, action) => {
+                state.updateChannelLoading = false;
+                state.updateChannelSuccess = true;
+                state.updateChannelMessage = action.playload;
+            })
+            .addCase(updateChannel.rejected, (state, action) => {
+                state.updateChannelLoading = false;
+                state.updateChannelError = true;
+                state.updateChannelMessage = action.payload;
+            })
+            .addCase(likeChannel.fulfilled, (state, action) => {
+                const { liked, disliked } = state.channel;
+                state.channel.liked = !liked;
+                state.channel.likes += !liked ? 1 : -1;
+                state.channel.disliked = false;
+                state.channel.dislikes -= disliked ? 1 : 0;
+                state.channel.message = action.payload;
+            })
+            .addCase(dislikeChannel.fulfilled, (state, action) => {
+                const { liked, disliked } = state.channel;
+                state.channel.disliked = !disliked;
+                state.channel.dislikes += !disliked ? 1 : -1;
+                state.channel.liked = false;
+                state.channel.likes -= liked ? 1 : 0;
+                state.channel.message = action.payload;
             });
     },
 });
 
-export const { reset, setBanner, setChannelLogo, setChannelForm } =
-    channelSlice.actions;
+export const { reset, setBanner, setChannelLogo, setChannelForm } = channelSlice.actions;
 export default channelSlice.reducer;

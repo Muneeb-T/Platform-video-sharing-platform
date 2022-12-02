@@ -15,6 +15,7 @@ import { Menu } from '@headlessui/react';
 import { Link, useParams } from 'react-router-dom';
 import Comments from '../components/Comments';
 import DoneIcon from '@mui/icons-material/Done';
+import mongoose from 'mongoose';
 import {
     reset as videoReset,
     getVideo,
@@ -52,7 +53,6 @@ function VideoPlayback() {
         commentSaveError,
     } = useSelector((state) => state.video);
 
-   
     const { isFollowChannelSuccess, isFollowChannelError, isFollowChannelLoading } = useSelector(
         (state) => state.channel
     );
@@ -74,6 +74,7 @@ function VideoPlayback() {
         viewed,
         thumbnail,
         comments,
+        relatedVideos,
     } = playbackVideo || {};
 
     authenticatedViewId = playbackVideo?.authenticatedViewId;
@@ -110,7 +111,7 @@ function VideoPlayback() {
     }, [isFollowChannelSuccess, isFollowChannelError, likeOrDislikeError]);
 
     useEffect(() => {
-        dispatch(getVideo({ video: videoId, user: user?._id || null }));
+        dispatch(getVideo({ video: videoId, user: user?._id || null, related: true }));
         return () => {
             clearInterval(timer);
             timer = null;
@@ -129,7 +130,7 @@ function VideoPlayback() {
             authenticatedViewId = null;
             dispatch(resetPlaybackVideo());
         };
-    }, []);
+    }, [videoId]);
 
     const onPlayVideo = function () {
         if (!viewed) {
@@ -161,9 +162,9 @@ function VideoPlayback() {
         <div className='container mx-auto'>
             <div className='block lg:flex pt-20  px-2 space-x-0 lg:space-x-2 lg:max-h-screen'>
                 <div className='w-[100%] lg:w-[65%] space-y-1 overflow-y-scroll scrollbar-hide'>
-                    <div>
+                    <div className='relative'>
                         <video
-                            className={`w-full  min-h-[${video?.height}px] max-h-[${video?.height}px]`}
+                            className='w-full bg-cover'
                             controls
                             autoPlay={true}
                             onPlay={onPlayVideo}
@@ -173,6 +174,12 @@ function VideoPlayback() {
                             Sorry, your browser doesn't support embedded videos, but don't worry,
                             you can
                         </video>
+                        {channel?.watermark && (
+                            <img
+                                src={channel?.watermark?.url}
+                                className='h-10 w-10 absolute right-5 top-5 opacity-60'
+                            />
+                        )}
                     </div>
                     <div className='py-1 flex'>
                         <div className='w-[70%]'>
@@ -334,10 +341,14 @@ function VideoPlayback() {
                     </div>
                     <hr className='opacity-30' />
                     <Formik
-                        initialValues={{ comment: '', userId: user?._id }}
+                        initialValues={{
+                            videoId,
+                            userId: user?._id,
+                            text: '',
+                        }}
                         onSubmit={(values, { resetForm }) => {
-                            dispatch(saveComment({ videoId, comment: values, userData: user }));
-                            resetForm({ comment: '' });
+                            dispatch(saveComment(values));
+                            resetForm({});
                         }}>
                         {({ values }) => (
                             <Form>
@@ -352,14 +363,14 @@ function VideoPlayback() {
                                                 AvatarThumbnail
                                             }
                                             referrerPolicy='no-referrer'
-                                            alt='User profile picture'
+                                            alt='User profile'
                                         />
 
                                         <Field
                                             type='text'
-                                            name='comment'
+                                            name='text'
                                             disabled={commentSaveLoading}
-                                            value={values.comment}
+                                            value={values.text}
                                             autoComplete='off'
                                             className='shadow-none text-gray-300 p-2 bg-transparent border-0 border-b w-full border-gray-700 text-sm appearance-none  focus:outline-none focus:shadow-outline'
                                             placeholder='Add your comment...'
@@ -388,9 +399,9 @@ function VideoPlayback() {
                                         </Menu>
                                         <button
                                             type='submit'
-                                            disabled={values.comment?.length === 0}
+                                            disabled={values.text?.length === 0}
                                             className={`h-10 w-10 shrink-0 rounded-full bg-gray-700 ${
-                                                values.comment.length !== 0
+                                                values.text.length !== 0
                                                     ? 'text-white'
                                                     : 'text-gray-400'
                                             }`}>
@@ -412,15 +423,17 @@ function VideoPlayback() {
                     <>
                         {comments?.length ? (
                             <div className='py-5'>
-                                <Comments comments={comments} videoId={videoId} />
+                                <Comments comments={comments} videoId={videoId} user={user} />
                             </div>
                         ) : (
-                            <p className='text-red-600 py-10'>No comments yet. Add your comment</p>
+                            <p className='text-red-600 py-6 text-sm font-bold'>
+                                No comments yet. Add your comment
+                            </p>
                         )}
                     </>
                 </div>
                 <div className='w-[100%] lg:w-[35%] overflow-y-scroll scrollbar-hide'>
-                    <VideoGroup3 />
+                    <VideoGroup3 videos={relatedVideos} />
                 </div>
             </div>
         </div>

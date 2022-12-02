@@ -19,9 +19,7 @@ const getUser = async (req, res) => {
         const { id: authenticatedUserId, role } = authenticatedUser;
 
         if (requestedUserId !== authenticatedUserId && role !== 'admin') {
-            return res
-                .status(404)
-                .json({ success: false, message: 'Page not found' });
+            return res.status(404).json({ success: false, message: 'Page not found' });
         }
 
         const user = await accountModel.findById(requestedUserId).populate('channel');
@@ -34,7 +32,7 @@ const getUser = async (req, res) => {
     } catch (err) {
         // console.log('\nGet user error');
         // console.log('===============');
-        // console.log(err);
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -43,9 +41,7 @@ const getAllUsers = async (req, res) => {
     try {
         const { role } = req.user;
         if (role !== 'admin') {
-            return res
-                .status(401)
-                .json({ success: false, message: 'Page not found' });
+            return res.status(401).json({ success: false, message: 'Page not found' });
         }
         const users = await accountModel.find();
         res.status(200).json({
@@ -56,7 +52,7 @@ const getAllUsers = async (req, res) => {
     } catch (err) {
         // console.log('\nGet all users error');
         // console.log('====================');
-        // console.log(err);
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -69,9 +65,7 @@ const resetEmail = async (req, res) => {
         const { address: currentEmail } = emailObject;
 
         if (newEmail == '' || password == '') {
-            return res
-                .status(401)
-                .json({ success: false, message: 'Bad credentials' });
+            return res.status(401).json({ success: false, message: 'Bad credentials' });
         }
 
         if (newEmail === currentEmail) {
@@ -110,10 +104,10 @@ const resetEmail = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message:
-                'OTP verification code has been for both emails sent successfully',
+            message: 'OTP verification code has been for both emails sent successfully',
         });
     } catch (err) {
+        console.log(err)
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -121,23 +115,17 @@ const resetEmail = async (req, res) => {
 const resetEmailCallback = async (req, res) => {
     try {
         const { user: requestedUser, body } = req;
-        const {
-            newEmailOtp: requestedNewEmailOtp,
-            currentEmailOtp: requestedCurrentEmailOtp,
-        } = body;
+        const { newEmailOtp: requestedNewEmailOtp, currentEmailOtp: requestedCurrentEmailOtp } =
+            body;
         const { id: userId } = requestedUser;
 
         if (requestedNewEmailOtp == '' || requestedCurrentEmailOtp == '') {
-            return res
-                .status(401)
-                .json({ success: false, message: 'Bad credentials' });
+            return res.status(401).json({ success: false, message: 'Bad credentials' });
         }
 
         const user = await accountModel.findById(userId);
         if (!user) {
-            return res
-                .status(404)
-                .json({ success: false, message: 'No such user found' });
+            return res.status(404).json({ success: false, message: 'No such user found' });
         }
         const { email } = user;
         const { updateRequest } = email;
@@ -207,18 +195,12 @@ const updateUser = async (req, res) => {
         const { id: authenticatedUserId, role } = authenticatedUser;
         const { username, gender, dateOfBirth, country } = body;
         if (requestedUserId !== authenticatedUserId && role !== 'admin') {
-            return res
-                .status(401)
-                .json({ success: false, message: 'Unautherized access' });
+            return res.status(401).json({ success: false, message: 'Unautherized access' });
         }
-        const user = await accountModel
-            .findById(requestedUserId)
-            .select('-password');
+        const user = await accountModel.findById(requestedUserId).select('-password');
 
         if (!user) {
-            return res
-                .status(404)
-                .json({ success: false, message: 'Invalid user' });
+            return res.status(404).json({ success: false, message: 'Invalid user' });
         }
 
         if (username) user.username = username;
@@ -233,6 +215,7 @@ const updateUser = async (req, res) => {
             message: 'User updated successfully',
         });
     } catch (err) {
+        console.log(err)
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -244,9 +227,7 @@ const blockOrUnblockUser = async (req, res) => {
         const { role } = user;
 
         if (role !== 'admin') {
-            return res
-                .status(404)
-                .json({ success: false, message: 'Unautherized access' });
+            return res.status(404).json({ success: false, message: 'Unautherized access' });
         }
 
         const blockOrUnblock = await accountModel.findByIdAndUpdate(
@@ -270,18 +251,17 @@ const blockOrUnblockUser = async (req, res) => {
             message: `User ${isBlocked ? 'blocked' : 'unblocked'} successfully`,
         });
     } catch (err) {
+        console.log(err)
         res.status(500).json({ success: false, message: err.message });
     }
 };
 
 const resetPassword = async (req, res) => {
     try {
-        console.log(req.body)
+        console.log(req.body);
         const { email } = req.body;
         if (email == '') {
-            return res
-                .status(401)
-                .json({ success: false, message: 'Bad credentials' });
+            return res.status(401).json({ success: false, message: 'Bad credentials' });
         }
         const user = await accountModel
             .findOne({ 'email.address': email })
@@ -294,9 +274,7 @@ const resetPassword = async (req, res) => {
             });
         }
         const { username } = user;
-        const capitalizedUsername = `${username
-            .charAt(0)
-            .toUpperCase()} ${username.slice(1)}`;
+        const capitalizedUsername = `${username.charAt(0).toUpperCase()} ${username.slice(1)}`;
 
         const resetPasswordToken = user.generateResetPasswordToken();
         await user.save();
@@ -317,7 +295,7 @@ const resetPassword = async (req, res) => {
     } catch (err) {
         // console.log('\nReset password error');
         // console.log('=====================');
-        // console.log(err);
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -331,9 +309,7 @@ const resetPasswordCallback = async (req, res) => {
         const { token: resetPasswordToken } = params;
 
         if (newPassword == '' || confirmPassword == '') {
-            return res
-                .status(401)
-                .json({ success: false, message: 'Bad credentials' });
+            return res.status(401).json({ success: false, message: 'Bad credentials' });
         }
 
         if (confirmPassword !== newPassword) {
@@ -364,7 +340,7 @@ const resetPasswordCallback = async (req, res) => {
     } catch (err) {
         // console.log('\nReset password error');
         // console.log('=====================');
-        // console.log(err);
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -375,9 +351,7 @@ const deleteOrRestoreUser = async (req, res, next) => {
         const { user: authenticatedUser, body } = req;
         const { id: authenticatedUserId, role } = authenticatedUser;
         if (requestedUserId !== authenticatedUserId && role !== 'admin') {
-            return res
-                .status(401)
-                .json({ success: false, message: 'Unautherized access' });
+            return res.status(401).json({ success: false, message: 'Unautherized access' });
         }
 
         const deleteOrRestore = await accountModel.findByIdAndUpdate(
@@ -401,6 +375,7 @@ const deleteOrRestoreUser = async (req, res, next) => {
             message: `User ${isDeleted ? 'deleted' : 'restored'} successfully`,
         });
     } catch (err) {
+        console.log(err)
         res.status(500).json({ success: false, message: err.message });
     }
 };

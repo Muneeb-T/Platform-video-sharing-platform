@@ -12,7 +12,7 @@ import Copyright from '@mui/icons-material/Copyright';
 import UploadToast from '../components/creator-studio/UploadToast';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import ChannelHome from '../pages/channel/ChannelHome';
+import Channel from '../pages/channel/Channel';
 import VideoDetails from '../pages/creator-studio/VideoDetails';
 function ChannelRoutes() {
     const { uploadingOnProcess, showVideoUploadModal } = useSelector((state) => state.video);
@@ -20,7 +20,7 @@ function ChannelRoutes() {
         <>
             <Routes>
                 <Route path='/:id'>
-                    <Route index element={<ChannelHome />} />
+                    <Route index element={<Channel />} />
                     <Route path='creator-studio'>
                         <Route index element={<Dashboard />} />
                         <Route path='content'>

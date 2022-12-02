@@ -7,9 +7,7 @@ function VideoThumbnail(props) {
         <div className='relative hover:scale-95 duration-75'>
             <HoverVideoPlayer
                 videoSrc={videoUrl}
-                pausedOverlay={
-                    <img className='h-full w-full relative' src={image} />
-                }
+                pausedOverlay={<img className='h-full w-full relative' src={image} />}
                 loadingOverlay={
                     <div className='flex items-center w-full h-full justify-center'>
                         <div
@@ -17,7 +15,7 @@ function VideoThumbnail(props) {
                             role='status'></div>
                     </div>
                 }
-                className='w-full'
+                className='w-full m-0 p-0 space-y'
             />
 
             <p className='text-gray-200 opacity-80 drop-shadow-md absolute bottom-3 text-sm right-2 bg-gray-700 px-3 bg-opacity-50 z-30'>

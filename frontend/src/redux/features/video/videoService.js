@@ -1,5 +1,6 @@
 import api from '../../../api';
 import axios from 'axios';
+import mongoose from 'mongoose';
 import moment from 'moment';
 
 const API_URL = '/video';
@@ -118,16 +119,23 @@ const setViews = async function (views) {
 
 const saveComment = async function (comment, accessToken) {
     const { videoId, ...otherDetails } = comment;
-    const { data } = await api.put(`${API_URL}/update-video-details/${videoId}`, otherDetails, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const { data } = await api.put(
+        `${API_URL}/update-video-details/${videoId}`,
+        { comment: otherDetails },
+        {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        }
+    );
     return data;
 };
 
 const saveViewData = async function (view) {
     const { video, ...otherDetails } = view;
+
     console.log(otherDetails);
-    const { data } = await api.patch(`${API_URL}/update-video-details/${video}`, otherDetails);
+    const { data } = await api.patch(`${API_URL}/update-video-details/${video}`, {
+        ...otherDetails,
+    });
     return data;
 };
 
@@ -151,6 +159,14 @@ const likeOrDislikeComment = async function (likeOrDislike, accessToken) {
     return data;
 };
 
+const deleteVideos = async function (videos, accessToken) {
+    const { data } = await api.patch(`${API_URL}/delete-videos`, videos, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    return data;
+};
+
 const videoService = {
     uploadVideo,
     saveVideoDetails,
@@ -163,6 +179,7 @@ const videoService = {
     saveComment,
     saveViewData,
     likeOrDislikeComment,
+    deleteVideos,
 };
 
 export default videoService;

@@ -1,14 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import channelBannerThumbnail from '../../assets/images/Transparent grid.png';
 import AvatarThumbnail from '../../assets/images/avatar-thumbnail.png';
+import DoneIcon from '@mui/icons-material/Done';
 import LikeIcon from '@mui/icons-material/ThumbUp';
 import DislikeIcon from '@mui/icons-material/ThumbDown';
 import FollowIcon from '@mui/icons-material/PersonAdd';
 import ShareIcon from '@mui/icons-material/Share';
 import ReportIcon from '@mui/icons-material/Report';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import VideoJS from '../../components/VideoPlayer';
-import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import GenreTitle from '../../components/GenreTitle';
 import VideoGroup from '../../components/VideoGroup-1';
@@ -20,17 +19,24 @@ import {
     setChannelLogo,
     reset,
     createChannel,
+    followChannel,
+    likeChannel,
+    dislikeChannel,
 } from '../../redux/features/channel/channelSlice';
 import EditIcon from '@mui/icons-material/Edit';
 import { ErrorMessage, Form, Field, Formik } from 'formik';
 import Spinner from '../../components/Spinner';
-let videos = null;
-
-const categories = [
+import ShareModal from '../../components/ShareModal';
+import { setShowShareModal } from '../../redux/features/common/commonSlice';
+import Home from './tab-contents/Home';
+import Videos from './tab-contents/Videos';
+import Community from './tab-contents/Community';
+import About from './tab-contents/About';
+const tabs = [
     { id: '1', name: 'Home' },
     { id: '2', name: 'Videos' },
     { id: '3', name: 'Community' },
-    { id: '3', name: 'About' },
+    { id: '4', name: 'About' },
 ];
 
 const genres = [
@@ -42,21 +48,43 @@ const genres = [
 function ChannelHome() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [tab, setTab] = useState('1');
+    const { showShareModal } = useSelector((state) => state.common);
     const { user, accessToken } = useSelector((state) => state.auth);
     const { _id: authenticatedUserId } = user || {};
     const {
         channel,
         isCreateChannelLoading,
         isGetChannelLoading,
+        isFollowChannelLoading,
+        isFollowChannelSuccess,
+        isFollowChannelError,
         channelForm,
         channelLogoUrl,
         channelBannerUrl,
     } = useSelector((state) => state.channel);
 
+    let channelLogo, channelBanner;
+    if (channel) {
+        channelLogo =
+            channelLogoUrl ||
+            channel?.owner?.profilePicture?.secure_url ||
+            channel?.owner?.googleAccount?.picture ||
+            channel?.owner?.facebookAccount?.picture;
+        channelBanner = channelBannerUrl || channel?.banner?.url;
+    }
     const { id: requestedUserId } = useParams();
-
+    const { requestedVideos } = channel || {};
     useEffect(() => {
-        dispatch(getChannel(requestedUserId));
+        dispatch(
+            getChannel({
+                userId: requestedUserId,
+                params: {
+                    videos: { categories: ['popular', 'uploads'] },
+                    playlists: true,
+                },
+            })
+        );
         return () => {
             dispatch(reset());
         };
@@ -75,31 +103,16 @@ function ChannelHome() {
         dispatch(setChannelForm({ key, value }));
     };
 
-    const playerRef = useRef(null);
-    const videoJsOptions = {
-        autoplay: true,
-        controls: true,
-        responsive: true,
-        fluid: true,
-        sources: [
-            {
-                src: '',
-                type: 'video/mp4',
-            },
-        ],
+    const followOnClick = () => {
+        dispatch(followChannel({ user: user?._id, follow: channel?._id }));
     };
 
-    const handlePlayerReady = (player) => {
-        playerRef.current = player;
+    const handleLikeChannel = () => {
+        dispatch(likeChannel({ channelId: channel?._id, like: user?._id }));
+    };
 
-        // // You can handle player events here, for example:
-        // player.on('waiting', () => {
-        //     videojs.log('player is waiting');
-        // });
-
-        // player.on('dispose', () => {
-        //     videojs.log('player will dispose');
-        // });
+    const handleDislikeChannel = () => {
+        dispatch(dislikeChannel({ channelId: channel?._id, dislike: user?._id }));
     };
 
     if (isGetChannelLoading || isCreateChannelLoading) {
@@ -115,7 +128,7 @@ function ChannelHome() {
                         channelLogo: channelLogoUrl || channel?.channelLogo || null,
                         channelName:
                             channelForm?.channelName ||
-                            channel?.user?.username ||
+                            channel?.owner?.username ||
                             user.username ||
                             '',
                         userId: authenticatedUserId,
@@ -128,29 +141,35 @@ function ChannelHome() {
                     }}>
                     {(form) => (
                         <Form onChange={channelFormOnChange}>
-                            {/* <div className='relative'>
-                                <Field />
-                                <div className='text-red-500 absolute text-[13px]'>
-                                    <ErrorMessage />
-                                </div>
-                            </div>
-                            <div className='relative'>
-                                <Field />
-                                <div className='text-red-500 absolute text-[13px] drop-shadow-md'>
-                                    <ErrorMessage />
-                                </div>
-                            </div> */}
-
                             <div className='container mx-auto min-h-screen'>
-                                <div className='pt-20  h-42'>
+                                <div className='pt-20'>
                                     <div className='relative'>
+                                        {channel && (
+                                            <>
+                                                <div className='absolute right-5 top-5 flex gap-3'>
+                                                    <Link to={`creator-studio/customize-channel`}>
+                                                        <button
+                                                            type='button'
+                                                            className='py-2 px-4 bg-gray-600 bg-opacity-30 font-extrabold text-gray-300 hover:bg-opacity-50'>
+                                                            Customize channel
+                                                        </button>
+                                                    </Link>
+                                                    <Link to={`creator-studio`}>
+                                                        <button
+                                                            type='button'
+                                                            className='py-2 px-4 bg-gray-600 bg-opacity-30 font-extrabold text-gray-300 hover:bg-opacity-50'>
+                                                            Creator studio
+                                                        </button>
+                                                    </Link>
+                                                </div>
+                                            </>
+                                        )}
+
                                         <img
-                                            src={
-                                                channelBannerUrl ||
-                                                channel?.banner?.url ||
-                                                channelBannerThumbnail
-                                            }
-                                            className='w-full hover:opacity-80 h-full'
+                                            src={channelBanner || channelBannerThumbnail}
+                                            className={`w-full ${
+                                                !channel && 'hover:opacity-80'
+                                            } h-40`}
                                             alt='channel banner'
                                         />
                                         {!channel && (
@@ -182,22 +201,13 @@ function ChannelHome() {
                                                         <span className='relative bg-cover bg-gray-500'>
                                                             <img
                                                                 className='rounded-full h-full shadow-md hover:opacity-80'
-                                                                src={
-                                                                    channelLogoUrl ||
-                                                                    user?.profilePicture
-                                                                        ?.secure_url ||
-                                                                    user?.googleAccount?.picture ||
-                                                                    user?.facebookAccount
-                                                                        ?.picture ||
-                                                                    AvatarThumbnail
-                                                                }
+                                                                src={channelLogo || AvatarThumbnail}
                                                                 referrerPolicy='no-referrer'
                                                                 alt=''
                                                             />
                                                         </span>
                                                         {!channel && (
                                                             <>
-                                                                {' '}
                                                                 <input
                                                                     type='file'
                                                                     name='channelLogo'
@@ -219,7 +229,9 @@ function ChannelHome() {
                                                                         );
                                                                     }}
                                                                 />
-                                                                <button className='text-gray-300 absolute -right-2 -bottom-2 bg-gray-600 bg-opacity-90 shadow rounded-full h-8 w-8'>
+                                                                <button
+                                                                    type='button'
+                                                                    className='text-gray-300 absolute -right-2 -bottom-2 bg-gray-600 bg-opacity-90 shadow rounded-full h-8 w-8'>
                                                                     <EditIcon
                                                                         sx={{
                                                                             fontSize: 'medium',
@@ -237,7 +249,9 @@ function ChannelHome() {
                                                             channel?.user?.username ||
                                                             user.username}
                                                     </p>
-                                                    {channel && <p>342K Followers</p>}
+                                                    {channel && (
+                                                        <p>{channel?.followers || 0} Followers</p>
+                                                    )}
                                                 </div>
                                             </div>
                                             {channel && (
@@ -245,16 +259,40 @@ function ChannelHome() {
                                                     <div className='flex items-center'>
                                                         <div className='flex items-center space-x-3'>
                                                             <div className='flex space-x-2 text-gray-300'>
-                                                                <LikeIcon />
-                                                                <p className='text-sm'>234k</p>
+                                                                <LikeIcon
+                                                                    className={`${
+                                                                        channel?.liked &&
+                                                                        'text-blue-700'
+                                                                    } cursor-pointer`}
+                                                                    onClick={handleLikeChannel}
+                                                                />
+                                                                <p className='text-sm'>
+                                                                    {channel?.likes}
+                                                                </p>
                                                             </div>
                                                             <div className='flex space-x-2 text-gray-300'>
-                                                                <DislikeIcon />
+                                                                <DislikeIcon
+                                                                    className={`${
+                                                                        channel?.disliked &&
+                                                                        'text-red-600'
+                                                                    } cursor-pointer`}
+                                                                    onClick={handleDislikeChannel}
+                                                                />
 
-                                                                <p className='text-sm'>13k</p>
+                                                                <p className='text-sm'>
+                                                                    {channel?.dislikes}
+                                                                </p>
                                                             </div>
+
                                                             <div className='flex gap-3 text-sm text-gray-400 justify-end pr-3'>
-                                                                <button className='flex items-center space-x-2'>
+                                                                <button
+                                                                    type='button'
+                                                                    className='flex items-center space-x-2'
+                                                                    onClick={(e) =>
+                                                                        dispatch(
+                                                                            setShowShareModal(true)
+                                                                        )
+                                                                    }>
                                                                     <ShareIcon className='text-gray-300' />
                                                                     <div className='hidden sm:block'>
                                                                         Share
@@ -271,86 +309,50 @@ function ChannelHome() {
                                     {channel ? (
                                         <>
                                             <div className='flex my-2'>
-                                                {categories.map((category, index) => {
-                                                    return (
-                                                        <>
-                                                            <Link className='shrink-0'>
-                                                                <p className='text-gray-300'>
-                                                                    {category.name}
-                                                                </p>
-                                                            </Link>
-                                                            <p className='mx-3 text-gray-500'>|</p>
-                                                        </>
-                                                    );
-                                                })}
-                                            </div>
-                                            <div className='grid grid-cols-3 gap-3'>
-                                                <div>
-                                                    <VideoJS
-                                                        options={videoJsOptions}
-                                                        onReady={handlePlayerReady}
-                                                    />
-                                                </div>
-                                                <div className='col-span-2 space-y-5 my-auto'>
-                                                    <p className='text-xl text-gray-300 line-clamp-1'>
-                                                        Travel around the world of the
-                                                        andfkdfjkdsljf d
-                                                    </p>
-                                                    <p className='text-gray-500 text-sm line-clamp-4'>
-                                                        dfkjdsfk fddkf dkj fdjk fdk kjafd;lk fjdlkfj
-                                                        dl kfjdlk fj df jdkfldjfkljd lfkjd lkfdjl
-                                                        fjdlkfj dlkfj dlkfjd lfkjdlfk jdkfldjfkljd d
-                                                        fdjfkd jfkld jfdf d dfdsfds fdf jdslkf jdfj
-                                                        dkfj dklfj dlkjf dkljf dsklfj
-                                                        dslkfjdslkjfdskljf dslkjfdsklf dkjf
-                                                        kdjflkjdslkfjdslfjdsdasf dsf ds fd fdsf df
-                                                        dfdj kfkjd fjdkf djfldksjf lajf;dsjfl;dskjf
-                                                        ldsjfdslfj dslkfj dslkfj dslkfjds lfjdslf
-                                                        jdsklf jdsk fjdslk fjdsl df jkdfk dsf jdlkfj
-                                                        dslfj dlsjfl dskjf ldskj fldjsflds
-                                                    </p>
-
-                                                    <div className='flex gap-5 text-sm text-gray-400'>
-                                                        <div className='flex space-x-2 text-gray-300'>
-                                                            <LikeIcon />
-                                                            <p className='text-sm'>234k</p>
-                                                        </div>
-                                                        <div className='flex space-x-2 text-gray-300'>
-                                                            <DislikeIcon />
-
-                                                            <p className='text-sm'>13k</p>
-                                                        </div>
-                                                        <button className='flex items-center space-x-2'>
-                                                            <ShareIcon className='text-gray-300' />
-                                                            <div className='hidden sm:block'>
-                                                                Share
-                                                            </div>
-                                                        </button>
-                                                    </div>
-                                                    <div className='flex text-xs sm:text-sm text-gray-500'>
-                                                        <p>225k Views</p>
-                                                        <p className='mx-3 text-gray-600'>|</p>
-                                                        <p>
-                                                            {moment('02-02-2001').from(new Date())}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className='container mx-auto p-3'>
-                                                <div className='space-y-5 overflow-hidden'>
-                                                    {genres.map((genre, index) => {
-                                                        const { title } = genre;
+                                                <>
+                                                    {tabs.map((individualTab, index) => {
                                                         return (
                                                             <>
-                                                                <GenreTitle title={title} />
-                                                                <div className='flex gap-3'>
-                                                                    <VideoGroup genre={title} />
-                                                                </div>
+                                                                <Link
+                                                                    key={individualTab.id}
+                                                                    className='shrink-0'
+                                                                    onClick={() =>
+                                                                        setTab(individualTab.id)
+                                                                    }>
+                                                                    <p
+                                                                        className={`text-gray-300 ${
+                                                                            individualTab.id === tab
+                                                                                ? 'text-red-500'
+                                                                                : 'text-gray-300'
+                                                                        }`}>
+                                                                        {individualTab?.name}
+                                                                    </p>
+                                                                </Link>
+                                                                <p className='mx-3 text-gray-500'>
+                                                                    |
+                                                                </p>
                                                             </>
                                                         );
                                                     })}
-                                                </div>
+                                                </>
                                             </div>
+                                            <hr className='opacity-20 mb-2' />
+                                            {tab === '1' && (
+                                                <Home
+                                                    isFollowChannelLoading={isFollowChannelLoading}
+                                                    channel={channel}
+                                                    requestedVideos={requestedVideos}
+                                                />
+                                            )}
+                                            {tab === '2' && <Videos owner={channel?.owner?._id} />}
+                                            {tab === '3' && <Community />}
+                                            {tab === '4' && (
+                                                <About
+                                                    description={channel?.description}
+                                                    contact={channel?.contact}
+                                                    links={channel?.links}
+                                                />
+                                            )}
                                         </>
                                     ) : (
                                         <>
@@ -456,6 +458,15 @@ function ChannelHome() {
                         </Form>
                     )}
                 </Formik>
+                <>
+                    {showShareModal && (
+                        <ShareModal
+                            url={`${process.env.REACT_APP_ROOT_URI}/channel/${channel?._id}`}
+                            title={`Platform - ${channel?.owner?.username}`}
+                            subject={`Platform-${channel?.owner?.username}`}
+                        />
+                    )}
+                </>
             </>
         );
     }
@@ -465,43 +476,51 @@ function ChannelHome() {
             <div className='container mx-auto min-h-screen'>
                 <div className='pt-20'>
                     <div className='relative'>
-                        <img src={channelBannerUrl} className='w-full' alt='channel banner' />
+                        <img
+                            src={channelBanner || channelBannerThumbnail}
+                            className='w-full h-40'
+                            alt='channel banner'
+                        />
                         <div className='flex justify-between bg-gray-800 bg-opacity-50 absolute w-full px-10 bottom-0 h-[50%] p-3'>
                             <div className='flex gap-5 h-full'>
                                 <img
                                     className='rounded-full h-full shadow-md'
-                                    src={
-                                        user
-                                            ? user.profilePicture
-                                                ? user.profilePicture.secure_url
-                                                : user.googleAccount
-                                                ? user.googleAccount.picture
-                                                : user.facebookAccount
-                                                ? user.facebookAccount.picture
-                                                : AvatarThumbnail
-                                            : AvatarThumbnail
-                                    }
+                                    src={channelLogo || AvatarThumbnail}
                                     referrerPolicy='no-referrer'
                                     alt=''
                                 />
                                 <div className='text-gray-300 my-auto'>
-                                    <p className='text-2xl font-bold'>ChannelName</p>
-                                    <p>342K Followers</p>
+                                    <p className='text-2xl font-bold'>
+                                        {channel?.owner?.username || ''}
+                                    </p>
+                                    <p>{channel?.followers || 0} Followers</p>
                                 </div>
                             </div>
                             <div className='flex items-center'>
                                 <div className='flex items-center space-x-3'>
                                     <div className='flex space-x-2 text-gray-300'>
-                                        <LikeIcon />
-                                        <p className='text-sm'>234k</p>
+                                        <LikeIcon
+                                            className={`${
+                                                channel?.liked && 'text-blue-700'
+                                            } cursor-pointer`}
+                                            onClick={handleLikeChannel}
+                                        />
+                                        <p className='text-sm'>{channel?.likes}</p>
                                     </div>
                                     <div className='flex space-x-2 text-gray-300'>
-                                        <DislikeIcon />
+                                        <DislikeIcon
+                                            className={`${
+                                                channel?.disliked && 'text-red-600'
+                                            } cursor-pointer`}
+                                            onClick={handleDislikeChannel}
+                                        />
 
-                                        <p className='text-sm'>13k</p>
+                                        <p className='text-sm'>{channel?.dislikes}</p>
                                     </div>
                                     <div className='flex gap-3 text-sm text-gray-400 justify-end pr-3'>
-                                        <button className='flex items-center space-x-2'>
+                                        <button
+                                            className='flex items-center space-x-2'
+                                            onClick={(e) => dispatch(setShowShareModal(true))}>
                                             <ShareIcon className='text-gray-300' />
                                             <div className='hidden sm:block'>Share</div>
                                         </button>
@@ -510,83 +529,104 @@ function ChannelHome() {
                                             <div className='hidden sm:block'>Report</div>
                                         </button>
                                     </div>
-                                    <button className='bg-gray-300 rounded-sm px-5 py-1 gap-2 flex items-center text-sm'>
-                                        <FollowIcon />
-                                        Follow
+
+                                    <button
+                                        disabled={isFollowChannelLoading}
+                                        className={`${
+                                            channel?.followed ? 'bg-red-500' : 'bg-gray-300'
+                                        }  h-[50%] rounded-sm py-1 gap-1 ${
+                                            channel?.followed ? 'text-gray-300' : 'text-gray-700'
+                                        } font-bold flex items-center justify-center text-sm w-28 hover:scale-95 ${
+                                            isFollowChannelLoading && 'bg-opacity-80'
+                                        }`}
+                                        onClick={followOnClick}>
+                                        {isFollowChannelLoading && (
+                                            <div
+                                                className='spinner-border animate-spin inline-block w-3 h-3 border-2 rounded-full'
+                                                role='status'></div>
+                                        )}
+                                        {channel?.followed ? (
+                                            <>
+                                                {!isFollowChannelLoading && (
+                                                    <DoneIcon
+                                                        sx={{
+                                                            fontSize: 'medium',
+                                                            fontWeight: 'bold',
+                                                        }}
+                                                    />
+                                                )}
+                                                Followed
+                                            </>
+                                        ) : (
+                                            <>
+                                                {!isFollowChannelLoading && (
+                                                    <FollowIcon
+                                                        sx={{
+                                                            fontSize: 'medium',
+                                                            fontWeight: 'bold',
+                                                        }}
+                                                    />
+                                                )}
+                                                Follow
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className='flex my-2'>
-                        {categories.map((category, index) => {
-                            return (
-                                <>
-                                    <Link className='shrink-0'>
-                                        <p className='text-gray-300'>{category.name}</p>
-                                    </Link>
-                                    <p className='mx-3 text-gray-500'>|</p>
-                                </>
-                            );
-                        })}
-                    </div>
-                    <div className='grid grid-cols-3 gap-3'>
-                        <div>
-                            <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
-                        </div>
-                        <div className='col-span-2 space-y-5 my-auto'>
-                            <p className='text-xl text-gray-300 line-clamp-1'>
-                                Travel around the world of the andfkdfjkdsljf d
-                            </p>
-                            <p className='text-gray-500 text-sm line-clamp-4'>
-                                dfkjdsfk fddkf dkj fdjk fdk kjafd;lk fjdlkfj dl kfjdlk fj df
-                                jdkfldjfkljd lfkjd lkfdjl fjdlkfj dlkfj dlkfjd lfkjdlfk jdkfldjfkljd
-                                d fdjfkd jfkld jfdf d dfdsfds fdf jdslkf jdfj dkfj dklfj dlkjf dkljf
-                                dsklfj dslkfjdslkjfdskljf dslkjfdsklf dkjf kdjflkjdslkfjdslfjdsdasf
-                                dsf ds fd fdsf df dfdj kfkjd fjdkf djfldksjf lajf;dsjfl;dskjf
-                                ldsjfdslfj dslkfj dslkfj dslkfjds lfjdslf jdsklf jdsk fjdslk fjdsl
-                                df jkdfk dsf jdlkfj dslfj dlsjfl dskjf ldskj fldjsflds
-                            </p>
-
-                            <div className='flex gap-5 text-sm text-gray-400'>
-                                <div className='flex space-x-2 text-gray-300'>
-                                    <LikeIcon />
-                                    <p className='text-sm'>234k</p>
-                                </div>
-                                <div className='flex space-x-2 text-gray-300'>
-                                    <DislikeIcon />
-
-                                    <p className='text-sm'>13k</p>
-                                </div>
-                                <button className='flex items-center space-x-2'>
-                                    <ShareIcon className='text-gray-300' />
-                                    <div className='hidden sm:block'>Share</div>
-                                </button>
-                            </div>
-                            <div className='flex text-xs sm:text-sm text-gray-500'>
-                                <p>225k Views</p>
-                                <p className='mx-3 text-gray-600'>|</p>
-                                <p>{moment('02-02-2001').from(new Date())}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className='container mx-auto p-3'>
-                        <div className='space-y-5 overflow-hidden'>
-                            {genres.map((genre, index) => {
-                                const { title } = genre;
+                        <>
+                            {tabs.map((individualTab, index) => {
                                 return (
                                     <>
-                                        <GenreTitle title={title} />
-                                        <div className='flex gap-3'>
-                                            <VideoGroup genre={title} />
-                                        </div>
+                                        <Link
+                                            className='shrink-0'
+                                            onClick={() => setTab(individualTab.id)}
+                                            key={individualTab.id}>
+                                            <p
+                                                className={`text-gray-300 ${
+                                                    individualTab.id === tab
+                                                        ? 'text-red-500'
+                                                        : 'text-gray-300'
+                                                }`}>
+                                                {individualTab?.name}
+                                            </p>
+                                        </Link>
+                                        <p className='mx-3 text-gray-500'>|</p>
                                     </>
                                 );
                             })}
-                        </div>
+                        </>
                     </div>
+                    <hr className='opacity-20 mb-2' />
+                    {tab === '1' && (
+                        <Home
+                            isFollowChannelLoading={isFollowChannelLoading}
+                            channel={channel}
+                            requestedVideos={requestedVideos}
+                        />
+                    )}
+                    {tab === '2' && <Videos owner={channel?.owner?._id} />}
+                    {tab === '3' && <Community />}
+                    {tab === '4' && (
+                        <About
+                            description={channel?.description}
+                            contact={channel?.contact}
+                            links={channel?.links}
+                        />
+                    )}
                 </div>
             </div>
+            <>
+                {showShareModal && (
+                    <ShareModal
+                        url={`${process.env.REACT_APP_ROOT_URI}/channel/${channel?._id}`}
+                        title={`Platform - ${channel?.owner?.username}`}
+                        subject={`Platform-${channel?.owner?.username}`}
+                    />
+                )}
+            </>
         </>
     );
 }

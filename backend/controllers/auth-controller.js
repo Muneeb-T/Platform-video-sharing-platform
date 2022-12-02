@@ -52,6 +52,7 @@ const register = async (req, res, next) => {
             message: `Confirmation message has sent to email address ${email}`,
         });
     } catch (err) {
+        console.log(err)
         // console.log('\nRegister user api error');
         // console.log('========================');
         if (user) {
@@ -140,7 +141,7 @@ const login = async (req, res, next) => {
     } catch (err) {
         // console.log('\nLogin api error');
         // console.log('===============');
-        // console.log(err);
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -178,7 +179,7 @@ const verifyEmail = async (req, res, next) => {
         });
     } catch (err) {
         // console.log('Email verification error');
-        // console.log(err);
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -271,7 +272,7 @@ const googleAuthCallback = async (req, res, next) => {
     } catch (err) {
         // console.log('\nGoogle authentication error');
         // console.log('===========================');
-        // console.log(err);
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -363,6 +364,7 @@ const facebookAuth = async (req, res, next) => {
                 user,
             });
     } catch (err) {
+        console.log(err)
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -394,7 +396,7 @@ const facebookAuthSuccess = async (req, res, next) => {
     } catch (err) {
         // console.log('\nFacebook authentication success api error');
         // console.log('=========================================');
-        // console.log(err);
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -439,6 +441,7 @@ const facebookAuthFailure = (req, res, next) => {
             message: 'Facebook authentication failed',
         });
     } catch (err) {
+        console.log(err)
         res.status(500).json({ success: false, message: err.message });
     }
 };

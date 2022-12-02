@@ -4,11 +4,12 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 const replySchema = new Schema(
     {
+        id: { type: mongoose.Types.ObjectId },
         userId: {
             type: mongoose.Types.ObjectId,
             ref: 'User',
         },
-        comment: { type: String },
+        text: { type: String },
         likedBy: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
         dislikedBy: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
     },
@@ -16,11 +17,12 @@ const replySchema = new Schema(
 );
 const commentSchema = new Schema(
     {
+        id: { type: mongoose.Types.ObjectId },
         userId: {
             type: mongoose.Types.ObjectId,
             ref: 'User',
         },
-        comment: { type: String },
+        text: { type: String },
         likedBy: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
         dislikedBy: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
         replies: { type: [replySchema], default: [] },

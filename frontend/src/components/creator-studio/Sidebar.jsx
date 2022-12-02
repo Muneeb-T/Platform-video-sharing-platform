@@ -17,23 +17,26 @@ import AvatarThumbnail from '../../assets/images/avatar-thumbnail.png';
 function Sidebar() {
     const { user } = useSelector((state) => state.auth);
     const { id: channelId } = useParams();
+    const { channel } = useSelector((state) => state.channel);
     const baseNavigation = `/channel/${channelId}/creator-studio`;
     return (
         <>
             <div className='bg-gray-300 bg-opacity-5'>
-                <div className='flex items-center justify-center p-5 gap-2 border-b-2 border-opacity-10 border-gray-100'>
+                <div className='text-center p-5 gap-2 border-b-2 border-opacity-10 border-gray-100'>
                     <img
-                        className='h-20 w-20 rounded-full'
+                        className='h-20 w-20 mx-auto rounded-full'
                         src={
-                            user?.profilePicture?.url ||
-                            user?.googleAccount?.picture ||
-                            user?.facebookAccount?.picture ||
+                            channel?.owner?.profilePicture?.url ||
+                            channel?.owner?.googleAccount?.picture ||
+                            channel?.owner?.facebookAccount?.picture ||
                             AvatarThumbnail
                         }
                         referrerPolicy='no-referrer'
                         alt=''
                     />
-                    <p className='text-2xl font-bold text-gray-300'>Muneeb T</p>
+                    <p className='text-xl font-bold text-gray-300'>
+                        {channel?.owner?.username || user?.username}
+                    </p>
                 </div>
                 <div>
                     <ul className='flex flex-col space-y-1 text-gray-300 font-bold'>

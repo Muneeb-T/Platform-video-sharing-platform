@@ -9,18 +9,25 @@ import { getChannel, channelAnalytics } from '../../redux/features/channel/chann
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import Spinner from '../../components/Spinner';
 function Analytics() {
     const { id: channelId } = useParams();
     const dispatch = useDispatch();
     const navigate = useDispatch();
     const { user, accessToken } = useSelector((state) => state.auth);
-    const { channel, analytics } = useSelector((state) => state.channel);
-    let { totalWatchTime } = analytics;
+    const {
+        channel,
+        analytics,
+        isVideoDetailsSaveSuccess,
+        isGetChannelLoading,
+        isChannelAnalyticsLoading,
+    } = useSelector((state) => state.channel);
+    let { totalWatchTime } = analytics || {};
     if (totalWatchTime) {
         totalWatchTime = new Date(totalWatchTime).toISOString().slice(11, 19);
     }
     useEffect(() => {
-        dispatch(getChannel(channelId));
+        dispatch(getChannel({ userId: channelId }));
         dispatch(
             channelAnalytics({
                 channelId,
@@ -28,7 +35,7 @@ function Analytics() {
                 totalWatchTime: true,
             })
         );
-    }, []);
+    }, [isVideoDetailsSaveSuccess]);
 
     useEffect(() => {
         if (!user || !accessToken) {
@@ -36,6 +43,10 @@ function Analytics() {
             navigate('/login');
         }
     }, [user, accessToken]);
+
+    if (isGetChannelLoading || isChannelAnalyticsLoading) {
+        return <Spinner />;
+    }
     return (
         <>
             <div className='container mx-auto bg-gray-900'>

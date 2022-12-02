@@ -11,10 +11,7 @@ const channelSchema = new Schema(
         owner: { type: mongoose.Types.ObjectId, ref: 'User' },
         description: {
             type: String,
-            maxLength: [
-                1000,
-                'Description exceeds the limit (1000 characters only).',
-            ],
+            maxLength: [1000, 'Description exceeds the limit (1000 characters only).'],
         },
         links: {
             type: [linkModel],
@@ -22,14 +19,8 @@ const channelSchema = new Schema(
         },
         linksOnBanner: {
             type: Number,
-            max: [
-                5,
-                'Number of links for displaying on banner exceeds the limit (5 links only).',
-            ],
-            min: [
-                0,
-                'Number of links for displaying on banner must be between 0 and 5.',
-            ],
+            max: [5, 'Number of links for displaying on banner exceeds the limit (5 links only).'],
+            min: [0, 'Number of links for displaying on banner must be between 0 and 5.'],
         },
         contact: {
             phoneNumber: {
@@ -38,12 +29,6 @@ const channelSchema = new Schema(
             },
             email: {
                 type: String,
-                validate: {
-                    validator: function (email) {
-                        return emailValidator.validate(email);
-                    },
-                    message: 'Enter valid email address.',
-                },
                 index: false,
             },
         },
@@ -58,6 +43,18 @@ const channelSchema = new Schema(
             type: [{ type: mongoose.Types.ObjectId, ref: 'Video' }],
             default: [],
         },
+        featuredVideo: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Video',
+            default: null,
+        },
+        channelTrailer: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Video',
+            default: null,
+        },
+        likedBy: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+        dislikedBy: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
     },
     { timestamps: true }
 );

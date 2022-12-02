@@ -69,7 +69,7 @@ function VideoDetailsForm() {
     }, []);
 
     const videoJsOptions = {
-        autoplay: true,
+        autoplay: false,
         controls: true,
         responsive: true,
         fluid: true,
@@ -121,7 +121,7 @@ function VideoDetailsForm() {
                     userId: user?._id,
                     channel: channel?._id || user?.channel?._id,
                     title: videoUploadForm.title || '',
-                    thumbnail: null,
+                    thumbnail: generatedThumbnail || null,
                     description: videoUploadForm?.description || '',
                     tags: [],
                     category: videoUploadForm?.category || 'Entertainment',
@@ -188,8 +188,8 @@ function VideoDetailsForm() {
                                                 className='text-gray-300'>
                                                 Thumbnail
                                                 <span className='text-gray-500 text-xs ml-2'>
-                                                    (Upload a thumbnail or select one from auto
-                                                    generated thumbnails)
+                                                    (Upload a thumbnail or it will take generated
+                                                    thumbnail by default)
                                                 </span>
                                             </label>
                                             <div className='flex items-center w-full gap-3'>
