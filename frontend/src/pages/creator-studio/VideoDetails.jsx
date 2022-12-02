@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../../components/creator-studio/Sidebar';
 import TopBar from '../../components/creator-studio/Topbar';
@@ -75,6 +75,7 @@ function VideoDetails() {
             },
         ],
     };
+    const playerRef = useRef(null)
     const handlePlayerReady = (player) => {
         playerRef.current = player;
 
