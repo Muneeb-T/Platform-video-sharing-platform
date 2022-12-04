@@ -172,7 +172,7 @@ function Login() {
                                             callback={responseFacebook}
                                         />
                                         <a
-                                            href={`${backendHostName}/api/auth/google-auth`}>
+                                            href={`/${backendHostName}/api/auth/google-auth`}>
                                             <img
                                                 className='h-10 w-auto'
                                                 style={{ cursor: 'pointer' }}
