@@ -23,7 +23,7 @@ app.use(passport.initialize());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false, }));
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: `${process.env.FRONTEND_HOST_NAME}`, credentials: true }));
 
 jwtStrategy();
 facebookAuthStrategy();
