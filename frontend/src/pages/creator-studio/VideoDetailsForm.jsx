@@ -1,5 +1,5 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef } from 'react';
 import * as Yup from 'yup';
 import languages from '../../utils/languages';
 import { useSelector, useDispatch } from 'react-redux';
@@ -67,7 +67,8 @@ function VideoDetailsForm() {
     useEffect(() => {
         getThumbnailForVideo(videoUrl);
     }, []);
-
+    
+    const playerRef = useRef(null)
     const videoJsOptions = {
         autoplay: false,
         controls: true,
