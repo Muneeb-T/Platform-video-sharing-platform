@@ -5,9 +5,9 @@ import GenreTitle from './GenreTitle';
 import VideoThumbnail from './VideoThumbnail';
 function Genres({ videos, title }) {
     return (
-        <div className='container mx-auto p-3'>
+        <div className='container mx-auto pt-0 p-2 space-y-2'>
+            <GenreTitle title={title} />
             <div className='space-y-5 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 overflow-hidden pb-5'>
-                <GenreTitle title={title} />
                 <div className='flex gap-3'>
                     {videos.map((video, index) => {
                         const {

@@ -12,13 +12,13 @@ import EmojiPicker from 'emoji-picker-react';
 import SendIcon from '@mui/icons-material/Send';
 import EmojiIcon from '@mui/icons-material/EmojiEmotions';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-function Comments({ comments, videoId, user }) {
+function Comments({ comments, videoId, user, channelOwnerId }) {
     const [showReplyInput, setShowReplyInput] = useState(null);
     const [showReplies, setShowReplies] = useState({ show: false, id: null });
     const dispatch = useDispatch();
     return (
         <>
-            <div>
+            <div className='mb-10'>
                 {comments &&
                     comments?.map((singleComment) => {
                         const {
@@ -47,11 +47,23 @@ function Comments({ comments, videoId, user }) {
                                 />
                                 <div className='text-sm space-y-2'>
                                     <div>
-                                        <p className='text-gray-300'>{commentedUser?.username}</p>
+                                        <p
+                                            className={`text-gray-300 ${
+                                                (commentedUser?._id === user?._id ||
+                                                    commentedUser?._id === channelOwnerId) &&
+                                                'bg-gray-600 w-max rounded-full px-3'
+                                            }`}>
+                                            {commentedUser?._id === user?._id
+                                                ? 'You'
+                                                : commentedUser?.username}
+                                        </p>
                                         <p className='text-gray-400'>{text}</p>
                                     </div>
                                     <div className='flex gap-5 items-center text-sm'>
-                                        <div className='flex gap-2 text-xs text-gray-300 items-center'>
+                                        <div
+                                            className={`flex gap-2 text-xs ${
+                                                !user ? 'text-gray-500' : 'text-gray-300'
+                                            } items-center`}>
                                             <button
                                                 onClick={() => {
                                                     dispatch(
@@ -71,7 +83,10 @@ function Comments({ comments, videoId, user }) {
 
                                             <p>{likes || 0}</p>
                                         </div>
-                                        <div className='flex gap-2 text-gray-300 text-xs items-center'>
+                                        <div
+                                            className={`flex gap-2 text-xs ${
+                                                !user ? 'text-gray-500' : 'text-gray-300'
+                                            } items-center`}>
                                             <button
                                                 className={`${disliked && 'text-red-600'}`}
                                                 onClick={() => {
@@ -111,31 +126,7 @@ function Comments({ comments, videoId, user }) {
                                         </p>
                                     </div>
                                     {showReplyInput === commentId && (
-                                        <div className='flex gap-3'>
-                                            {replies.length > 3 && (
-                                                <button
-                                                    onClick={() =>
-                                                        setShowReplies({
-                                                            show: !showReplies.show,
-                                                            id: showReplies?.show
-                                                                ? null
-                                                                : commentId,
-                                                        })
-                                                    }
-                                                    type='button'
-                                                    className='shrink-0 py-1 px-5 text-gray-300 rounded-full bg-gray-700'>
-                                                    <span className='sr-only'>Show replies</span>
-                                                    {showReplies.show
-                                                        ? `Hide replies`
-                                                        : `Show all ${replies.length} replies`}
-                                                    {showReplies.show ? (
-                                                        <ArrowRightIcon area-hidden='true' />
-                                                    ) : (
-                                                        <ArrowDropDownIcon aria-hidden='true' />
-                                                    )}
-                                                </button>
-                                            )}
-
+                                        <div className='gap-3'>
                                             <Formik
                                                 initialValues={{
                                                     videoId,
@@ -181,7 +172,7 @@ function Comments({ comments, videoId, user }) {
                                                             </div>
 
                                                             <div className='flex relative gap-1 mb-3 flex-none'>
-                                                                <Menu as='div' className='relative'>
+                                                                {/* <Menu as='div' className='relative'>
                                                                     <Menu.Button
                                                                         type='button'
                                                                         className='h-10 w-10 shrink-0 rounded-full bg-gray-700 text-yellow-500 hover:text-white '
@@ -207,7 +198,7 @@ function Comments({ comments, videoId, user }) {
                                                                             }}
                                                                         />
                                                                     </Menu.Items>
-                                                                </Menu>
+                                                                </Menu> */}
                                                                 <button
                                                                     type='submit'
                                                                     disabled={
@@ -239,7 +230,27 @@ function Comments({ comments, videoId, user }) {
                                             </Formik>
                                         </div>
                                     )}
-
+                                    {replies.length > 3 && showReplyInput === commentId && (
+                                        <button
+                                            onClick={() =>
+                                                setShowReplies({
+                                                    show: !showReplies.show,
+                                                    id: showReplies?.show ? null : commentId,
+                                                })
+                                            }
+                                            type='button'
+                                            className='shrink-0 py-1 px-5 text-gray-300 rounded-full bg-gray-700'>
+                                            <span className='sr-only'>Show replies</span>
+                                            {showReplies.show
+                                                ? `Hide replies`
+                                                : `Show all ${replies.length} replies`}
+                                            {showReplies.show ? (
+                                                <ArrowRightIcon area-hidden='true' />
+                                            ) : (
+                                                <ArrowDropDownIcon aria-hidden='true' />
+                                            )}
+                                        </button>
+                                    )}
                                     <div>
                                         {replies &&
                                             replies?.map((reply, replyIndex) => {
@@ -280,17 +291,30 @@ function Comments({ comments, videoId, user }) {
                                                                         />
                                                                         <div className='text-sm space-y-2'>
                                                                             <div>
-                                                                                <p className='text-gray-300'>
-                                                                                    {
-                                                                                        repliedUser?.username
-                                                                                    }
+                                                                                <p
+                                                                                    className={`text-gray-300 ${
+                                                                                        (repliedUser?._id ===
+                                                                                            user?._id ||
+                                                                                            repliedUser?._id ===
+                                                                                                channelOwnerId) &&
+                                                                                        'bg-gray-600 w-max rounded-full px-3'
+                                                                                    }`}>
+                                                                                    {repliedUser?._id ===
+                                                                                    user?._id
+                                                                                        ? 'You'
+                                                                                        : repliedUser?.username}
                                                                                 </p>
                                                                                 <p className='text-gray-400'>
                                                                                     {replyText}
                                                                                 </p>
                                                                             </div>
                                                                             <div className='flex gap-5 items-center text-sm'>
-                                                                                <div className='flex gap-2 text-xs text-gray-300 items-center'>
+                                                                                <div
+                                                                                    className={`flex gap-2 text-xs ${
+                                                                                        !user
+                                                                                            ? 'text-gray-500'
+                                                                                            : 'text-gray-300'
+                                                                                    } items-center`}>
                                                                                     <button
                                                                                         onClick={() =>
                                                                                             dispatch(
@@ -324,7 +348,12 @@ function Comments({ comments, videoId, user }) {
                                                                                             0}
                                                                                     </p>
                                                                                 </div>
-                                                                                <div className='flex gap-2 text-gray-300 text-xs items-center'>
+                                                                                <div
+                                                                                    className={`flex gap-2 text-xs ${
+                                                                                        !user
+                                                                                            ? 'text-gray-500'
+                                                                                            : 'text-gray-300'
+                                                                                    } items-center`}>
                                                                                     <button
                                                                                         className={`${
                                                                                             replyDisliked &&

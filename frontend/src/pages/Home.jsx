@@ -28,7 +28,7 @@ function Home() {
                     return null;
                 })
             ) : (
-                <div className='container p-5 mx-auto flex items-center justify-center pb-20'>
+                <div className='container p-3 mx-auto flex items-center justify-center pb-20'>
                     <div className='text-center'>
                         <p className='text-gray-500 text-6xl font-bold'>Sorry</p>
                         <p className='text-3xl sm:text-5xl text-red-500 font-bold'>No Content</p>

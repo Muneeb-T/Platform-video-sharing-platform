@@ -72,7 +72,7 @@ const getChannel = async (req, res, next) => {
                     if (category === 'popular') {
                         requestedVideos['popular videos'] = channelVideos.filter((video) => {
                             console.log(video.views.length);
-                            return video.views.length > 5;
+                            return video.views.length > 50000;
                         });
                     }
                     if (category === 'uploads') {
@@ -224,7 +224,7 @@ const updateChannel = async (req, res, next) => {
         await channel.save();
         res.status(200).json({ success: true, message: 'Channel updated successfully' });
     } catch (err) {
-        console.log(err)
+        console.log(err);
         // console.log('\nChannel update error');
         // console.log('=====================');
         // console.log(err);
@@ -272,7 +272,7 @@ const updateChannelNotProtected = async (req, res) => {
         await channel.save();
         res.status(201).json({ success: true, message: 'Channel updated successfully' });
     } catch (err) {
-        console.log(err)
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -318,7 +318,7 @@ const followChannel = async (req, res, next) => {
             message: 'Channel followed successfully',
         });
     } catch (err) {
-        console.log(err)
+        console.log(err);
         res.status(500).json({
             success: false,
             message: err.message,

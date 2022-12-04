@@ -629,9 +629,13 @@ export const videoSlice = createSlice({
                             state.playbackVideo.comments[commentIndex].replies[
                                 replyIndex
                             ].liked = false;
-                            state.playbackVideo.comments[commentIndex].replies[
-                                replyIndex
-                            ].likes -= 1;
+
+                            if (
+                                state.playbackVideo.comments[commentIndex].replies[replyIndex].likes
+                            )
+                                state.playbackVideo.comments[commentIndex].replies[
+                                    replyIndex
+                                ].likes -= 1;
                         } else {
                             const disliked =
                                 state.playbackVideo?.comments[commentIndex]?.replies[replyIndex]
@@ -640,16 +644,28 @@ export const videoSlice = createSlice({
                                 state.playbackVideo.comments[commentIndex].replies[
                                     replyIndex
                                 ].disliked = false;
-                                state.playbackVideo.comments[commentIndex].replies[
-                                    replyIndex
-                                ].dislikes -= 1;
+
+                                if (
+                                    state.playbackVideo.comments[commentIndex].replies[replyIndex]
+                                        .dislikes
+                                )
+                                    state.playbackVideo.comments[commentIndex].replies[
+                                        replyIndex
+                                    ].dislikes -= 1;
                             }
                             state.playbackVideo.comments[commentIndex].replies[
                                 replyIndex
                             ].liked = true;
-                            state.playbackVideo.comments[commentIndex].replies[
-                                replyIndex
-                            ].likes += 1;
+                            if (
+                                state.playbackVideo.comments[commentIndex].replies[replyIndex].likes
+                            )
+                                state.playbackVideo.comments[commentIndex].replies[
+                                    replyIndex
+                                ].likes += 1;
+                            else
+                                state.playbackVideo.comments[commentIndex].replies[
+                                    replyIndex
+                                ].likes = 1;
                         }
                     }
                     if (dislike) {
@@ -660,9 +676,13 @@ export const videoSlice = createSlice({
                             state.playbackVideo.comments[commentIndex].replies[
                                 replyIndex
                             ].disliked = false;
-                            state.playbackVideo.comments[commentIndex].replies[
-                                replyIndex
-                            ].dislikes -= 1;
+                            if (
+                                state.playbackVideo.comments[commentIndex].replies[replyIndex]
+                                    .dislikes
+                            )
+                                state.playbackVideo.comments[commentIndex].replies[
+                                    replyIndex
+                                ].dislikes -= 1;
                         } else {
                             const liked =
                                 state.playbackVideo?.comments[commentIndex]?.replies[replyIndex]
@@ -671,13 +691,25 @@ export const videoSlice = createSlice({
                                 state.playbackVideo.comments[commentIndex].replies[
                                     replyIndex
                                 ].liked = false;
+                                if (
+                                    state.playbackVideo.comments[commentIndex].replies[replyIndex]
+                                        .likes
+                                )
+                                    state.playbackVideo.comments[commentIndex].replies[
+                                        replyIndex
+                                    ].likes -= 1;
+                            }
+                            if (
+                                state.playbackVideo.comments[commentIndex].replies[replyIndex]
+                                    .dislikes
+                            )
                                 state.playbackVideo.comments[commentIndex].replies[
                                     replyIndex
-                                ].likes -= 1;
-                            }
-                            state.playbackVideo.comments[commentIndex].replies[
-                                replyIndex
-                            ].dislikes += 1;
+                                ].dislikes += 1;
+                            else
+                                state.playbackVideo.comments[commentIndex].replies[
+                                    replyIndex
+                                ].dislikes = 1;
                             state.playbackVideo.comments[commentIndex].replies[
                                 replyIndex
                             ].disliked = true;
@@ -688,29 +720,37 @@ export const videoSlice = createSlice({
                         const liked = state.playbackVideo?.comments[commentIndex]?.liked;
                         if (liked) {
                             state.playbackVideo.comments[commentIndex].liked = false;
-                            state.playbackVideo.comments[commentIndex].likes -= 1;
+                            if (state.playbackVideo.comments[commentIndex].likes)
+                                state.playbackVideo.comments[commentIndex].likes -= 1;
                         } else {
                             const disliked = state.playbackVideo?.comments[commentIndex]?.disliked;
                             if (disliked) {
                                 state.playbackVideo.comments[commentIndex].disliked = false;
-                                state.playbackVideo.comments[commentIndex].dislikes -= 1;
+                                if (state.playbackVideo.comments[commentIndex].dislikes)
+                                    state.playbackVideo.comments[commentIndex].dislikes -= 1;
                             }
                             state.playbackVideo.comments[commentIndex].liked = true;
-                            state.playbackVideo.comments[commentIndex].likes += 1;
+                            if (state.playbackVideo.comments[commentIndex].likes)
+                                state.playbackVideo.comments[commentIndex].likes += 1;
+                            else state.playbackVideo.comments[commentIndex].likes = 1;
                         }
                     }
                     if (dislike) {
                         const disliked = state.playbackVideo?.comments[commentIndex]?.disliked;
                         if (disliked) {
                             state.playbackVideo.comments[commentIndex].disliked = false;
-                            state.playbackVideo.comments[commentIndex].dislikes -= 1;
+                            if (state.playbackVideo.comments[commentIndex].dislikes)
+                                state.playbackVideo.comments[commentIndex].dislikes -= 1;
                         } else {
                             const liked = state.playbackVideo?.comments[commentIndex]?.liked;
                             if (liked) {
                                 state.playbackVideo.comments[commentIndex].liked = false;
-                                state.playbackVideo.comments[commentIndex].likes -= 1;
+                                if (state.playbackVideo.comments[commentIndex].likes)
+                                    state.playbackVideo.comments[commentIndex].likes -= 1;
                             }
-                            state.playbackVideo.comments[commentIndex].dislikes += 1;
+                            if (state.playbackVideo.comments[commentIndex].dislikes)
+                                state.playbackVideo.comments[commentIndex].dislikes += 1;
+                            else state.playbackVideo.comments[commentIndex].dislikes = 1;
                             state.playbackVideo.comments[commentIndex].disliked = true;
                         }
                     }

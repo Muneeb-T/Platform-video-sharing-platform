@@ -40,9 +40,7 @@ function Login() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { isLoading, isError, isSuccess, message, user } = useSelector(
-        (state) => state.auth
-    );
+    const { isLoading, isError, isSuccess, message, user } = useSelector((state) => state.auth);
 
     useEffect(() => {
         if (isError) {
@@ -95,10 +93,7 @@ function Login() {
                                             placeholder='Email address'
                                         />
                                         <div className='text-red-500 absolute text-[13px]'>
-                                            <ErrorMessage
-                                                name='email'
-                                                className='text-gray-500'
-                                            />
+                                            <ErrorMessage name='email' className='text-gray-500' />
                                         </div>
                                     </div>
                                     <div className='relative'>
@@ -114,8 +109,8 @@ function Login() {
                                                 className='text-gray-500'
                                             />
                                         </div>
-                                        <Link to='/account/reset-password'>
-                                            <p className='font-medium underline ablsolute text-[13px] text-right top-3 text-gray-400 hover:text-gray-300'>
+                                        <Link to='/account/reset-password' className='absolute right-0'>
+                                            <p className='font-medium underline text-[13px] text-gray-400 hover:text-gray-300'>
                                                 Forgot password?
                                             </p>
                                         </Link>
@@ -126,9 +121,7 @@ function Login() {
                                             disabled={isLoading}
                                             type='submit'
                                             className={`group relative flex w-full items-center justify-center rounded-sm border border-transparent ${
-                                                isLoading
-                                                    ? `bg-red-800`
-                                                    : `bg-red-700`
+                                                isLoading ? `bg-red-800` : `bg-red-700`
                                             } py-2 px-4 text-sm font-medium text-white ${
                                                 `hover:bg-red-600` && !isLoading
                                             } focus:outline-none focus:ring-1 focus:ring-red-700 focus:ring-offset-1`}>
@@ -155,12 +148,8 @@ function Login() {
                                             isDisabled={isLoading}
                                             render={(renderProps) => (
                                                 <img
-                                                    onClick={
-                                                        renderProps.onClick
-                                                    }
-                                                    disabled={
-                                                        renderProps.isDisabled
-                                                    }
+                                                    onClick={renderProps.onClick}
+                                                    disabled={renderProps.isDisabled}
                                                     className='h-10 w-auto'
                                                     src={FacebookIcon}
                                                     style={{
@@ -171,8 +160,7 @@ function Login() {
                                             )}
                                             callback={responseFacebook}
                                         />
-                                        <a
-                                            href={`/${backendHostName}/api/auth/google-auth`}>
+                                        <a href={`${backendHostName}/api/auth/google-auth`}>
                                             <img
                                                 className='h-10 w-auto'
                                                 style={{ cursor: 'pointer' }}
@@ -183,13 +171,9 @@ function Login() {
                                     </div>
 
                                     <div className='flex justify-center'>
-                                        <p className='text-red-500'>
-                                            Need an account ?
-                                        </p>
+                                        <p className='text-red-500'>Need an account ?</p>
                                         <Link to='/register'>
-                                            <p className='ml-2 text-gray-300 underline'>
-                                                SignUp
-                                            </p>
+                                            <p className='ml-2 text-gray-300 underline'>SignUp</p>
                                         </Link>
                                     </div>
                                 </Form>

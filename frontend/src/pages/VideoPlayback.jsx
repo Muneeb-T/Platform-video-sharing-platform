@@ -15,6 +15,8 @@ import { Menu } from '@headlessui/react';
 import { Link, useParams } from 'react-router-dom';
 import Comments from '../components/Comments';
 import DoneIcon from '@mui/icons-material/Done';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import mongoose from 'mongoose';
 import {
     reset as videoReset,
@@ -40,6 +42,7 @@ let authenticatedViewId = null;
 function VideoPlayback() {
     const rootUrl = process.env.REACT_APP_ROOT_URI;
     const [descriptionReadMore, setDescriptionReadMore] = useState(false);
+    const [showComments, setShowComments] = useState(false);
     const dispatch = useDispatch();
     const { id: videoId } = useParams();
     const { user } = useSelector((state) => state.auth);
@@ -132,6 +135,28 @@ function VideoPlayback() {
         };
     }, [videoId]);
 
+    const [windowSize, setWindowSize] = useState(getWindowSize());
+    function getWindowSize() {
+        const { innerWidth, innerHeight } = window;
+        return { innerWidth, innerHeight };
+    }
+    useEffect(() => {
+        function handleWindowResize() {
+            setWindowSize(getWindowSize());
+        }
+
+        window.addEventListener('resize', handleWindowResize);
+
+        return () => {
+            window.removeEventListener('resize', handleWindowResize);
+        };
+    }, []);
+
+    function getWindowSize() {
+        const { innerWidth, innerHeight } = window;
+        return { innerWidth, innerHeight };
+    }
+
     const onPlayVideo = function () {
         if (!viewed) {
             let viewData = {
@@ -160,7 +185,7 @@ function VideoPlayback() {
 
     return (
         <div className='container mx-auto'>
-            <div className='block lg:flex pt-20  px-2 space-x-0 lg:space-x-2 lg:max-h-screen'>
+            <div className='block lg:flex pt-20 space-x-0 lg:space-x-2 lg:max-h-screen'>
                 <div className='w-[100%] lg:w-[65%] space-y-1 overflow-y-scroll scrollbar-hide'>
                     <div className='relative'>
                         <video
@@ -181,7 +206,7 @@ function VideoPlayback() {
                             />
                         )}
                     </div>
-                    <div className='py-1 flex'>
+                    <div className='py-1 flex px-2'>
                         <div className='w-[70%]'>
                             <h1 className='text-lg text-gray-300 line-clamp-1'>{title}</h1>
                         </div>
@@ -205,12 +230,13 @@ function VideoPlayback() {
                             </button>
                         </div>
                     </div>
-                    <div className='flex gap-4 text-gray-300 text-sm items-center'>
+                    <div className='px-2 flex gap-4 text-gray-300 text-sm items-center'>
                         <div className='flex space-x-2 items-center'>
                             <button
+                                disabled={!user}
                                 className={`${
                                     liked ? 'bg-blue-500' : 'bg-gray-500'
-                                } rounded-full p-1 h-8 w-8 bg-opacity-80 hover:scale-90`}
+                                } rounded-full p-1 h-8 w-8 bg-opacity-80 hover:scale-90 ${!user && 'text-gray-500 bg-opacity-40'}`}
                                 onClick={(e) =>
                                     dispatch(
                                         likeOrDislikeVideo({
@@ -233,7 +259,7 @@ function VideoPlayback() {
 
                         <div className='flex space-x-2 items-center'>
                             <button
-                                className={`rounded-full p-1 h-8 w-8  bg-opacity-80 hover:scale-90 ${
+                                className={`${!user && 'text-gray-500 bg-opacity-40'} rounded-full p-1 h-8 w-8  bg-opacity-80 hover:scale-90 ${
                                     disliked ? 'bg-red-500' : 'bg-gray-500'
                                 }`}
                                 onClick={(e) =>
@@ -263,178 +289,217 @@ function VideoPlayback() {
                             <p>{moment(createdAt).format('MMMM Do YYYY')}</p>
                         </div>
                     </div>
-                    <div className='flex justify-between items-center pl-0 p-2'>
-                        <Link to={`/channel/${channel?.owner}`}>
-                            <div className='flex space-x-3 items-center'>
-                                <img
-                                    className='h-10 w-10 rounded-full shadow-md'
-                                    src={channelLogoUrl}
-                                    referrerPolicy='no-referrer'
-                                    alt={AvatarThumbnail}
-                                />
-                                <div>
-                                    <h2 className='text-gray-300 font-bold text-lg'>
-                                        {channelName}
-                                    </h2>
-                                    <p className='text-gray-500 text-sm'>
-                                        {channel?.followers || 0} Followers
-                                    </p>
-                                </div>
-                            </div>
-                        </Link>
-
-                        <button
-                            disabled={isFollowChannelLoading}
-                            className={`${
-                                followed ? 'bg-red-500' : 'bg-gray-300'
-                            }  h-[50%] rounded-sm py-1 gap-1 ${
-                                followed ? 'text-gray-300' : 'text-gray-700'
-                            } font-bold flex items-center justify-center text-sm w-28 hover:scale-95 ${
-                                isFollowChannelLoading && 'bg-opacity-80'
-                            }`}
-                            onClick={followOnClick}>
-                            {isFollowChannelLoading && (
-                                <div
-                                    className='spinner-border animate-spin inline-block w-3 h-3 border-2 rounded-full'
-                                    role='status'></div>
-                            )}
-                            {followed ? (
-                                <>
-                                    {!isFollowChannelLoading && (
-                                        <DoneIcon
-                                            sx={{
-                                                fontSize: 'medium',
-                                                fontWeight: 'bold',
-                                            }}
-                                        />
-                                    )}
-                                    Followed
-                                </>
-                            ) : (
-                                <>
-                                    {!isFollowChannelLoading && (
-                                        <FollowIcon
-                                            sx={{
-                                                fontSize: 'medium',
-                                                fontWeight: 'bold',
-                                            }}
-                                        />
-                                    )}
-                                    Follow
-                                </>
-                            )}
-                        </button>
-                    </div>
-                    <hr className='opacity-30' />
-                    <div className='py-2'>
-                        <p
-                            className={`text-sm text-gray-300 ${
-                                descriptionReadMore && 'line-clamp-3'
-                            }`}>
-                            {description}
-                        </p>
-                        <button
-                            className='text-sm text-red-600 font-bold'
-                            onClick={() => setDescriptionReadMore(!descriptionReadMore)}>
-                            {descriptionReadMore ? 'Read more' : 'Show less'}
-                        </button>
-                    </div>
-                    <hr className='opacity-30' />
-                    <Formik
-                        initialValues={{
-                            videoId,
-                            userId: user?._id,
-                            text: '',
-                        }}
-                        onSubmit={(values, { resetForm }) => {
-                            dispatch(saveComment(values));
-                            resetForm({});
-                        }}>
-                        {({ values }) => (
-                            <Form>
-                                <div className='flex space-x-3 pt-1'>
-                                    <div className='flex items-center flex-1'>
-                                        <img
-                                            className='h-9 w-9 rounded-full mr-2'
-                                            src={
-                                                user?.profilePicture?.url ||
-                                                user?.googleAccount?.picture ||
-                                                user?.facebookAccount?.picture ||
-                                                AvatarThumbnail
-                                            }
-                                            referrerPolicy='no-referrer'
-                                            alt='User profile'
-                                        />
-
-                                        <Field
-                                            type='text'
-                                            name='text'
-                                            disabled={commentSaveLoading}
-                                            value={values.text}
-                                            autoComplete='off'
-                                            className='shadow-none text-gray-300 p-2 bg-transparent border-0 border-b w-full border-gray-700 text-sm appearance-none  focus:outline-none focus:shadow-outline'
-                                            placeholder='Add your comment...'
-                                        />
+                    <div className='px-2'>
+                        <div className='flex justify-between items-center pl-0 p-2'>
+                            <Link to={`/channel/${channel?.owner}`}>
+                                <div className='flex space-x-3 items-center'>
+                                    <img
+                                        className='h-10 w-10 rounded-full shadow-md'
+                                        src={channelLogoUrl}
+                                        referrerPolicy='no-referrer'
+                                        alt={AvatarThumbnail}
+                                    />
+                                    <div>
+                                        <h2 className='text-gray-300 font-bold text-lg'>
+                                            {channelName}
+                                        </h2>
+                                        <p className='text-gray-500 text-sm'>
+                                            {channel?.followers || 0} Followers
+                                        </p>
                                     </div>
-
-                                    <div className='flex relative gap-1 mb-3 flex-none'>
-                                        <Menu as='div' className='relative'>
-                                            <Menu.Button
-                                                type='button'
-                                                className='h-10 w-10 shrink-0 rounded-full bg-gray-700 text-yellow-500 hover:text-white '
-                                                id='menu-button'
-                                                aria-expanded='true'
-                                                aria-haspopup='true'>
-                                                <span className='sr-only'>Emoji</span>
-                                                <EmojiIcon aria-hidden='true' />
-                                            </Menu.Button>
-                                            <Menu.Items className='absolute right-0 z-10'>
-                                                <EmojiPicker
-                                                    onEmojiClick={(emoji) => {
-                                                        const { emoji: emojiPicture } = emoji;
-                                                        console.log(emojiPicture);
+                                </div>
+                            </Link>
+                            {user && (
+                                <button
+                                    disabled={isFollowChannelLoading}
+                                    className={`${
+                                        followed ? 'bg-red-500' : 'bg-gray-300'
+                                    }  h-[50%] rounded-sm py-1 gap-1 ${
+                                        followed ? 'text-gray-300' : 'text-gray-700'
+                                    } font-bold flex items-center justify-center text-sm w-28 hover:scale-95 ${
+                                        isFollowChannelLoading && 'bg-opacity-80'
+                                    }`}
+                                    onClick={followOnClick}>
+                                    {isFollowChannelLoading && (
+                                        <div
+                                            className='spinner-border animate-spin inline-block w-3 h-3 border-2 rounded-full'
+                                            role='status'></div>
+                                    )}
+                                    {followed ? (
+                                        <>
+                                            {!isFollowChannelLoading && (
+                                                <DoneIcon
+                                                    sx={{
+                                                        fontSize: 'medium',
+                                                        fontWeight: 'bold',
                                                     }}
                                                 />
-                                            </Menu.Items>
-                                        </Menu>
-                                        <button
-                                            type='submit'
-                                            disabled={values.text?.length === 0}
-                                            className={`h-10 w-10 shrink-0 rounded-full bg-gray-700 ${
-                                                values.text.length !== 0
-                                                    ? 'text-white'
-                                                    : 'text-gray-400'
-                                            }`}>
-                                            <span className='sr-only'>Send message</span>
-
-                                            {commentSaveLoading ? (
-                                                <div
-                                                    className='spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full'
-                                                    role='status'></div>
-                                            ) : (
-                                                <SendIcon aria-hidden='true' />
                                             )}
-                                        </button>
-                                    </div>
-                                </div>
-                            </Form>
-                        )}
-                    </Formik>
-                    <>
-                        {comments?.length ? (
-                            <div className='py-5'>
-                                <Comments comments={comments} videoId={videoId} user={user} />
-                            </div>
-                        ) : (
-                            <p className='text-red-600 py-6 text-sm font-bold'>
-                                No comments yet. Add your comment
+                                            Followed
+                                        </>
+                                    ) : (
+                                        <>
+                                            {!isFollowChannelLoading && (
+                                                <FollowIcon
+                                                    sx={{
+                                                        fontSize: 'medium',
+                                                        fontWeight: 'bold',
+                                                    }}
+                                                />
+                                            )}
+                                            Follow
+                                        </>
+                                    )}
+                                </button>
+                            )}
+                        </div>
+                        <hr className='opacity-30' />
+                        <div className='py-2 px-2'>
+                            <p
+                                className={`text-sm text-gray-300 ${
+                                    descriptionReadMore && 'line-clamp-3'
+                                }`}>
+                                {description}
                             </p>
-                        )}
-                    </>
+                            <button
+                                className='text-sm text-red-600 font-bold'
+                                onClick={() => setDescriptionReadMore(!descriptionReadMore)}>
+                                {descriptionReadMore ? 'Read more' : 'Show less'}
+                            </button>
+                        </div>
+                        <hr className='opacity-30' />
+
+                        <>
+                            <div
+                                className='bg-gray-300 bg-opacity-20 p-2 px-5 my-2 flex items-center justify-between rounded-full cursor-pointer'
+                                onClick={(e) => setShowComments(!showComments)}>
+                                <p className='font-bold text-gray-300'>
+                                    Comments ({comments?.length || 0})
+                                </p>
+                                <button
+                                    className={`rounded-full bg-gray-300 text-red-500 p-1 h-8 w-8  bg-opacity-80 hover:scale-90`}>
+                                    {showComments ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+                                </button>
+                            </div>
+                            {user && (
+                                <>
+                                    <Formik
+                                        initialValues={{
+                                            videoId,
+                                            userId: user?._id,
+                                            text: '',
+                                        }}
+                                        onSubmit={(values, { resetForm }) => {
+                                            dispatch(saveComment(values));
+                                            resetForm({});
+                                        }}>
+                                        {({ values }) => (
+                                            <Form>
+                                                <div className='flex space-x-3 pt-1'>
+                                                    <div className='flex items-center flex-1'>
+                                                        <img
+                                                            className='h-9 w-9 rounded-full mr-2'
+                                                            src={
+                                                                user?.profilePicture?.url ||
+                                                                user?.googleAccount?.picture ||
+                                                                user?.facebookAccount?.picture ||
+                                                                AvatarThumbnail
+                                                            }
+                                                            referrerPolicy='no-referrer'
+                                                            alt='User profile'
+                                                        />
+
+                                                        <Field
+                                                            type='text'
+                                                            name='text'
+                                                            disabled={commentSaveLoading}
+                                                            value={values.text}
+                                                            autoComplete='off'
+                                                            className='shadow-none text-gray-300 p-2 bg-transparent border-0 border-b w-full border-gray-700 text-sm appearance-none  focus:outline-none focus:shadow-outline'
+                                                            placeholder='Add your comment...'
+                                                        />
+                                                    </div>
+
+                                                    <div className='flex relative gap-1 mb-3 flex-none'>
+                                                        {/* <Menu as='div' className='relative'>
+                                                            <Menu.Button
+                                                                type='button'
+                                                                className='h-10 w-10 shrink-0 rounded-full bg-gray-700 text-yellow-500 hover:text-white '
+                                                                id='menu-button'
+                                                                aria-expanded='true'
+                                                                aria-haspopup='true'>
+                                                                <span className='sr-only'>
+                                                                    Emoji
+                                                                </span>
+                                                                <EmojiIcon aria-hidden='true' />
+                                                            </Menu.Button>
+                                                            <Menu.Items className='absolute right-0 z-10'>
+                                                                <EmojiPicker
+                                                                    onEmojiClick={(emoji) => {
+                                                                        const {
+                                                                            emoji: emojiPicture,
+                                                                        } = emoji;
+                                                                        console.log(emojiPicture);
+                                                                    }}
+                                                                />
+                                                            </Menu.Items>
+                                                        </Menu> */}
+                                                        <button
+                                                            type='submit'
+                                                            disabled={values.text?.length === 0}
+                                                            className={`h-10 w-10 shrink-0 rounded-full bg-gray-700 ${
+                                                                values.text.length !== 0
+                                                                    ? 'text-white'
+                                                                    : 'text-gray-400'
+                                                            }`}>
+                                                            <span className='sr-only'>
+                                                                Send message
+                                                            </span>
+
+                                                            {commentSaveLoading ? (
+                                                                <div
+                                                                    className='spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full'
+                                                                    role='status'></div>
+                                                            ) : (
+                                                                <SendIcon aria-hidden='true' />
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </Form>
+                                        )}
+                                    </Formik>
+                                </>
+                            )}
+                            <div className='mb-10'>
+                                {showComments && (
+                                    <>
+                                        {comments?.length ? (
+                                            <div className='pt-2 pb-5'>
+                                                <Comments
+                                                    comments={comments}
+                                                    videoId={videoId}
+                                                    user={user}
+                                                    channelOwnerId={uploadedBy._id}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <p className='text-red-600 py-6 text-sm font-bold'>
+                                                No comments yet. Add your comment
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </>
+                    </div>
                 </div>
-                <div className='w-[100%] lg:w-[35%] overflow-y-scroll scrollbar-hide'>
-                    <VideoGroup3 videos={relatedVideos} />
-                </div>
+
+                {(!showComments || windowSize?.innerWidth >= 1024) && (
+                    <div className='w-[100%] lg:w-[35%] overflow-y-scroll scrollbar-hide'>
+                        <VideoGroup3 videos={relatedVideos} />
+                    </div>
+                )}
             </div>
         </div>
     );
