@@ -67,6 +67,10 @@ function VideoDetailsForm() {
     useEffect(() => {
         getThumbnailForVideo(videoUrl);
     }, []);
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 4f88bf718f02c73d10716252ab4c69610a2c8926
     const playerRef = useRef(null)
     const videoJsOptions = {
         autoplay: false,
