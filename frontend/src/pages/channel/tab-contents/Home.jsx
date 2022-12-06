@@ -69,7 +69,7 @@ function Home({ channel, isFollowChannelLoading, requestedVideos }) {
                                                       <>
                                                           <Link
                                                               to={`/videos/${videoId}`}
-                                                              className='min-w-[25%] max-w-[25%]'>
+                                                              className='min-w-[80%] max-w-[80%] md:min-w-[60%] md:max-w-[60%] md: lg:min-w-[25%] lg:max-w-[25%]'>
                                                               <VideoThumbnail
                                                                   image={thumbnail?.url}
                                                                   length={videoProperties?.duration}
@@ -85,7 +85,6 @@ function Home({ channel, isFollowChannelLoading, requestedVideos }) {
                                           </div>
                                       </>
                                   );
-                                  return null;
                               }
                           })
                         : null}
@@ -107,13 +106,12 @@ function FeaturedSection({ showVideo }) {
                     subject={`Platform-${showVideo?.title}`}
                 />
             )}
-            <div className='grid grid-cols-2 gap-4'>
-                <div>
+            <div className='lg:grid lg:grid-cols-2 lg:gap-4'>
+                <div className='video-container'>
                     <video
                         controls
-                        autoPlay={true}
                         poster={showVideo?.thumbnail?.url || ''}
-                        className='w-full'>
+                        className='w-full video'>
                         <source
                             src={showVideo?.video?.url || ''}
                             type={`video/${showVideo?.video?.format}`}
@@ -122,34 +120,27 @@ function FeaturedSection({ showVideo }) {
                         can
                     </video>
                 </div>
-                <div className='col space-y-5 my-auto'>
+                <div className='col space-y-2 lg:space-y-5 my-auto'>
                     <p className='text-xl text-gray-300 line-clamp-1'>{showVideo?.title || ''}</p>
-                    <p className='text-gray-500 text-sm line-clamp-4'>
+                    <p className='text-gray-500 text-sm line-clamp-2 md:line-clamp-4'>
                         {showVideo?.description || ''}
                     </p>
-
-                    <div className='flex gap-5 text-sm text-gray-400'>
-                        <div className='flex space-x-2 text-gray-300 items-center'>
-                            <LikeIcon sx={{ fontSize: 'large' }} />
-                            <p className='text-sm'>{showVideo?.likedBy?.length || 0}</p>
+                    <div className='flex items-center lg:block gap-3 lg:gap-0'>
+                        <div className='flex gap-5 text-sm text-gray-400'>
+                            <div className='flex space-x-2 text-gray-300 items-center'>
+                                <LikeIcon sx={{ fontSize: 'large' }} />
+                                <p className='text-sm'>{showVideo?.likedBy?.length || 0}</p>
+                            </div>
+                            <div className='flex space-x-2 text-gray-300 items-center'>
+                                <DislikeIcon sx={{ fontSize: 'large' }} />
+                                <p className='text-sm'>{showVideo?.dislikedBy?.length}</p>
+                            </div>
                         </div>
-                        <div className='flex space-x-2 text-gray-300 items-center'>
-                            <DislikeIcon sx={{ fontSize: 'large' }} />
-                            <p className='text-sm'>{showVideo?.dislikedBy?.length}</p>
+                        <div className='flex text-xs sm:text-sm text-gray-500'>
+                            <p>{showVideo?.views?.length || 0} Views</p>
+                            <p className='mx-3 text-gray-600'>|</p>
+                            <p>{moment(showVideo?.createdAt).from(new Date())}</p>
                         </div>
-                        <button
-                            className='flex items-center space-x-2'
-                            onClick={() => {
-                                dispatch(setShowShareModal(true));
-                            }}>
-                            <ShareIcon className='text-gray-300' />
-                            <div className='hidden sm:block'>Share</div>
-                        </button>
-                    </div>
-                    <div className='flex text-xs sm:text-sm text-gray-500'>
-                        <p>{showVideo?.views?.length || 0} Views</p>
-                        <p className='mx-3 text-gray-600'>|</p>
-                        <p>{moment(showVideo?.createdAt).from(new Date())}</p>
                     </div>
                 </div>
             </div>

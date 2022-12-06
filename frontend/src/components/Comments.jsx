@@ -125,7 +125,7 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                             {moment(createdAt).from(new Date())}
                                         </p>
                                     </div>
-                                    {showReplyInput === commentId && (
+                                    {showReplyInput === commentId && user && (
                                         <div className='gap-3'>
                                             <Formik
                                                 initialValues={{

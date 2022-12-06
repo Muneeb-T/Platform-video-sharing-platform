@@ -41,7 +41,7 @@ let unauthenticatedViewId = null;
 let authenticatedViewId = null;
 function VideoPlayback() {
     const rootUrl = process.env.REACT_APP_ROOT_URI;
-    const [descriptionReadMore, setDescriptionReadMore] = useState(false);
+    const [descriptionReadMore, setDescriptionReadMore] = useState(true);
     const [showComments, setShowComments] = useState(false);
     const dispatch = useDispatch();
     const { id: videoId } = useParams();
@@ -187,9 +187,9 @@ function VideoPlayback() {
         <div className='container mx-auto'>
             <div className='block lg:flex pt-20 space-x-0 lg:space-x-2 lg:max-h-screen'>
                 <div className='w-[100%] lg:w-[65%] space-y-1 overflow-y-scroll scrollbar-hide'>
-                    <div className='relative'>
+                    <div className='relative video-container'>
                         <video
-                            className='w-full bg-cover'
+                            className='w-full bg-cover video'
                             controls
                             autoPlay={true}
                             onPlay={onPlayVideo}
@@ -224,10 +224,10 @@ function VideoPlayback() {
                                 <ShareIcon className='text-gray-300' />
                                 <div className='hidden sm:block'>Share</div>
                             </button>
-                            <button className='flex items-center space-x-2'>
+                            {/* <button className='flex items-center space-x-2'>
                                 <ReportIcon className='text-gray-300' />
                                 <div className='hidden sm:block'>Report</div>
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                     <div className='px-2 flex gap-4 text-gray-300 text-sm items-center'>

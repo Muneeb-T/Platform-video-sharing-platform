@@ -81,10 +81,10 @@ const updateVideo = async function (updations, accessToken) {
     if (thumbnail) {
         const formData = new FormData();
         formData.append('file', thumbnail);
-        formData.append('upload_preset', 'channel-logos');
+        formData.append('upload_preset', 'thumbnails');
         formData.append('cloud_name', 'drjndmchy');
         const { data } = await axios.post(
-            'https://api.cloudinary.com/v1_1/drjndmchy/upload',
+            'https://api.cloudinary.com/v1_1/drjndmchy/upload/',
             formData
         );
         console.log(data);

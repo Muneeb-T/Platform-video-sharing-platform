@@ -22,7 +22,7 @@ function Videos({ owner }) {
     }
 
     return (
-        <div className='container min-h-screen mx-auto h-max bg-gray-900'>
+        <div className='container min-h-screen mx-auto'>
             <div className='mt-4'>
                 {getVideosLoading && (
                     <div className='flex items-center justify-center h-screen text-gray-300'>

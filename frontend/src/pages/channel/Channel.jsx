@@ -35,8 +35,8 @@ import About from './tab-contents/About';
 const tabs = [
     { id: '1', name: 'Home' },
     { id: '2', name: 'Videos' },
-    { id: '3', name: 'Community' },
-    { id: '4', name: 'About' },
+    // { id: '3', name: 'Community' },
+    { id: '3', name: 'About' },
 ];
 
 const genres = [
@@ -194,7 +194,7 @@ function ChannelHome() {
                                             </div>
                                         )}
 
-                                        <div className='flex justify-between bg-gray-800 bg-opacity-50 absolute w-full px-10 bottom-0 h-20 p-3'>
+                                        <div className='flex justify-between bg-gray-800 bg-opacity-50 absolute w-full px-5 md:px-10 bottom-0 h-20 p-3'>
                                             <div className='flex gap-5 h-full'>
                                                 <div>
                                                     <label className='relative cursor-pointer mt-6'>
@@ -244,7 +244,7 @@ function ChannelHome() {
                                                 </div>
 
                                                 <div className='text-gray-300 my-auto'>
-                                                    <p className='text-2xl font-bold'>
+                                                    <p className='text-xl md:text-2xl font-bold'>
                                                         {channelForm?.channelName ||
                                                             channel?.user?.username ||
                                                             user.username}
@@ -257,26 +257,28 @@ function ChannelHome() {
                                             {channel && (
                                                 <>
                                                     <div className='flex items-center'>
-                                                        <div className='flex items-center space-x-3'>
-                                                            <div className='flex space-x-2 text-gray-300'>
+                                                        <div className='flex items-center space-x-3 text-sm'>
+                                                            <div className='flex space-x-2 text-gray-300 items-center'>
                                                                 <LikeIcon
                                                                     className={`${
                                                                         channel?.liked &&
                                                                         'text-blue-700'
                                                                     } cursor-pointer`}
                                                                     onClick={handleLikeChannel}
+                                                                    sx={{ fontSize: 'medium' }}
                                                                 />
                                                                 <p className='text-sm'>
                                                                     {channel?.likes}
                                                                 </p>
                                                             </div>
-                                                            <div className='flex space-x-2 text-gray-300'>
+                                                            <div className='flex space-x-2 text-gray-300 items-center'>
                                                                 <DislikeIcon
                                                                     className={`${
                                                                         channel?.disliked &&
                                                                         'text-red-600'
                                                                     } cursor-pointer`}
                                                                     onClick={handleDislikeChannel}
+                                                                    sx={{ fontSize: 'medium' }}
                                                                 />
 
                                                                 <p className='text-sm'>
@@ -308,8 +310,8 @@ function ChannelHome() {
 
                                     {channel ? (
                                         <>
-                                            <div className='flex my-2'>
-                                                <>
+                                            <div>
+                                                <div className='flex m-2'>
                                                     {tabs.map((individualTab, index) => {
                                                         return (
                                                             <>
@@ -334,25 +336,31 @@ function ChannelHome() {
                                                             </>
                                                         );
                                                     })}
-                                                </>
+                                                </div>
                                             </div>
                                             <hr className='opacity-20 mb-2' />
-                                            {tab === '1' && (
-                                                <Home
-                                                    isFollowChannelLoading={isFollowChannelLoading}
-                                                    channel={channel}
-                                                    requestedVideos={requestedVideos}
-                                                />
-                                            )}
-                                            {tab === '2' && <Videos owner={channel?.owner?._id} />}
-                                            {tab === '3' && <Community />}
-                                            {tab === '4' && (
-                                                <About
-                                                    description={channel?.description}
-                                                    contact={channel?.contact}
-                                                    links={channel?.links}
-                                                />
-                                            )}
+                                            <div className='px-3 md:px-0 pb-10 h-[60vh] overflow-hidden overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 pr-5'>
+                                                {tab === '1' && (
+                                                    <Home
+                                                        isFollowChannelLoading={
+                                                            isFollowChannelLoading
+                                                        }
+                                                        channel={channel}
+                                                        requestedVideos={requestedVideos}
+                                                    />
+                                                )}
+                                                {tab === '2' && (
+                                                    <Videos owner={channel?.owner?._id} />
+                                                )}
+                                                {/* {tab === '3' && <Community />} */}
+                                                {tab === '3' && (
+                                                    <About
+                                                        description={channel?.description}
+                                                        contact={channel?.contact}
+                                                        links={channel?.links}
+                                                    />
+                                                )}
+                                            </div>
                                         </>
                                     ) : (
                                         <>
@@ -481,7 +489,7 @@ function ChannelHome() {
                             className='w-full h-40'
                             alt='channel banner'
                         />
-                        <div className='flex justify-between bg-gray-800 bg-opacity-50 absolute w-full px-10 bottom-0 h-[50%] p-3'>
+                        <div className='flex justify-between bg-gray-800 bg-opacity-50 absolute w-full px-3 md:px-10 bottom-0 h-[50%] p-3'>
                             <div className='flex gap-5 h-full'>
                                 <img
                                     className='rounded-full h-full shadow-md'
@@ -490,53 +498,55 @@ function ChannelHome() {
                                     alt=''
                                 />
                                 <div className='text-gray-300 my-auto'>
-                                    <p className='text-2xl font-bold'>
+                                    <p className='text-xl md:text-2xl font-bold'>
                                         {channel?.owner?.username || ''}
                                     </p>
-                                    <p>{channel?.followers || 0} Followers</p>
+                                    <p className='text-sm'>{channel?.followers || 0} Followers</p>
                                 </div>
                             </div>
                             <div className='flex items-center'>
-                                <div className='flex items-center space-x-3'>
-                                    <div className='flex space-x-2 text-gray-300'>
-                                        <LikeIcon
-                                            className={`${
-                                                channel?.liked && 'text-blue-700'
-                                            } cursor-pointer`}
-                                            onClick={handleLikeChannel}
-                                        />
-                                        <p className='text-sm'>{channel?.likes}</p>
+                                <div className='space-y-2'>
+                                    <div className='flex items-center space-x-3'>
+                                        <div className='flex space-x-2 text-gray-300 items-center'>
+                                            <LikeIcon
+                                                className={`${
+                                                    channel?.liked && 'text-blue-700'
+                                                } cursor-pointer`}
+                                                onClick={handleLikeChannel}
+                                                sx={{ fontSize: 'medium' }}
+                                            />
+                                            <p className='text-sm'>{channel?.likes}</p>
+                                        </div>
+                                        <div className='flex space-x-2 text-gray-300 items-center'>
+                                            <DislikeIcon
+                                                className={`${
+                                                    channel?.disliked && 'text-red-600'
+                                                } cursor-pointer`}
+                                                onClick={handleDislikeChannel}
+                                                sx={{ fontSize: 'medium' }}
+                                            />
+                                            <p className='text-sm'>{channel?.dislikes}</p>
+                                        </div>
+                                        <div className='flex gap-3 text-sm text-gray-400 justify-end'>
+                                            <button
+                                                className='flex items-center space-x-2'
+                                                onClick={(e) => dispatch(setShowShareModal(true))}>
+                                                <ShareIcon className='text-gray-300' />
+                                                <div className='hidden sm:block'>Share</div>
+                                            </button>
+                                            {/* <button className='flex items-center space-x-2'>
+                                                <ReportIcon className='text-gray-300' />
+                                                <div className='hidden sm:block'>Report</div>
+                                            </button> */}
+                                        </div>
                                     </div>
-                                    <div className='flex space-x-2 text-gray-300'>
-                                        <DislikeIcon
-                                            className={`${
-                                                channel?.disliked && 'text-red-600'
-                                            } cursor-pointer`}
-                                            onClick={handleDislikeChannel}
-                                        />
-
-                                        <p className='text-sm'>{channel?.dislikes}</p>
-                                    </div>
-                                    <div className='flex gap-3 text-sm text-gray-400 justify-end pr-3'>
-                                        <button
-                                            className='flex items-center space-x-2'
-                                            onClick={(e) => dispatch(setShowShareModal(true))}>
-                                            <ShareIcon className='text-gray-300' />
-                                            <div className='hidden sm:block'>Share</div>
-                                        </button>
-                                        <button className='flex items-center space-x-2'>
-                                            <ReportIcon className='text-gray-300' />
-                                            <div className='hidden sm:block'>Report</div>
-                                        </button>
-                                    </div>
-
                                     <button
                                         disabled={isFollowChannelLoading}
                                         className={`${
                                             channel?.followed ? 'bg-red-500' : 'bg-gray-300'
                                         }  h-[50%] rounded-sm py-1 gap-1 ${
                                             channel?.followed ? 'text-gray-300' : 'text-gray-700'
-                                        } font-bold flex items-center justify-center text-sm w-28 hover:scale-95 ${
+                                        } font-bold flex items-center justify-center text-sm w-28 hover:scale-95 mx-auto ${
                                             isFollowChannelLoading && 'bg-opacity-80'
                                         }`}
                                         onClick={followOnClick}>
@@ -575,8 +585,8 @@ function ChannelHome() {
                             </div>
                         </div>
                     </div>
-                    <div className='flex my-2'>
-                        <>
+                    <div>
+                        <div className='flex m-2'>
                             {tabs.map((individualTab, index) => {
                                 return (
                                     <>
@@ -597,25 +607,27 @@ function ChannelHome() {
                                     </>
                                 );
                             })}
-                        </>
+                        </div>
                     </div>
                     <hr className='opacity-20 mb-2' />
-                    {tab === '1' && (
-                        <Home
-                            isFollowChannelLoading={isFollowChannelLoading}
-                            channel={channel}
-                            requestedVideos={requestedVideos}
-                        />
-                    )}
-                    {tab === '2' && <Videos owner={channel?.owner?._id} />}
-                    {tab === '3' && <Community />}
-                    {tab === '4' && (
-                        <About
-                            description={channel?.description}
-                            contact={channel?.contact}
-                            links={channel?.links}
-                        />
-                    )}
+                    <div className='px-3 md:px-0 pb-10 h-[60vh] overflow-hidden overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 pr-5'>
+                        {tab === '1' && (
+                            <Home
+                                isFollowChannelLoading={isFollowChannelLoading}
+                                channel={channel}
+                                requestedVideos={requestedVideos}
+                            />
+                        )}
+                        {tab === '2' && <Videos owner={channel?.owner?._id} />}
+                        {/* {tab === '3' && <Community />} */}
+                        {tab === '3' && (
+                            <About
+                                description={channel?.description}
+                                contact={channel?.contact}
+                                links={channel?.links}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
             <>
