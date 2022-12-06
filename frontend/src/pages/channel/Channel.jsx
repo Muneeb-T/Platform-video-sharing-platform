@@ -49,6 +49,8 @@ function ChannelHome() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [tab, setTab] = useState('1');
+    const [logo, setLogo] = useState('');
+    const [bannerUrl, setChannelBanner] = useState('');
     const { showShareModal } = useSelector((state) => state.common);
     const { user, accessToken } = useSelector((state) => state.auth);
     const { _id: authenticatedUserId } = user || {};
@@ -124,8 +126,8 @@ function ChannelHome() {
             <>
                 <Formik
                     initialValues={{
-                        banner: channelBannerUrl || channel?.banner || null,
-                        channelLogo: channelLogoUrl || channel?.channelLogo || null,
+                        banner: channelBanner || channel?.banner || null,
+                        channelLogo: channelLogo || channel?.channelLogo || null,
                         channelName:
                             channelForm?.channelName ||
                             channel?.owner?.username ||
@@ -166,7 +168,9 @@ function ChannelHome() {
                                         )}
 
                                         <img
-                                            src={channelBanner || channelBannerThumbnail}
+                                            src={
+                                                bannerUrl || channelBanner || channelBannerThumbnail
+                                            }
                                             className={`w-full ${
                                                 !channel && 'hover:opacity-80'
                                             } h-40`}
@@ -175,8 +179,8 @@ function ChannelHome() {
                                         {!channel && (
                                             <div className='absolute right-5 top-5'>
                                                 <label className='relative cursor-pointer mt-6'>
-                                                    <span className='relative bg-cover bg-gray-500 text-gray-300 bg-gray-800 bg-opacity-70 shadow p-4 rounded-full'>
-                                                        <EditIcon />
+                                                    <span className='relative bg-gray-500 text-gray-300 bg-gray-800 bg-opacity-70 p-3 shadow rounded-full'>
+                                                        <EditIcon sx={{ fontSize: 'large' }} />
                                                     </span>
                                                     <input
                                                         type='file'
@@ -187,6 +191,7 @@ function ChannelHome() {
                                                             form.setFieldValue('banner', file);
                                                             const fileUrl =
                                                                 URL.createObjectURL(file);
+                                                            setChannelBanner(fileUrl);
                                                             dispatch(setBanner(fileUrl));
                                                         }}
                                                     />
@@ -200,8 +205,12 @@ function ChannelHome() {
                                                     <label className='relative cursor-pointer mt-6'>
                                                         <span className='relative bg-cover bg-gray-500'>
                                                             <img
-                                                                className='rounded-full h-full shadow-md hover:opacity-80'
-                                                                src={channelLogo || AvatarThumbnail}
+                                                                className='rounded-full h-[60px] w-[60px] shadow-md hover:opacity-80'
+                                                                src={
+                                                                    logo ||
+                                                                    channelLogo ||
+                                                                    AvatarThumbnail
+                                                                }
                                                                 referrerPolicy='no-referrer'
                                                                 alt=''
                                                             />
@@ -223,15 +232,15 @@ function ChannelHome() {
                                                                             URL.createObjectURL(
                                                                                 file
                                                                             );
-
-                                                                        dispatch(
-                                                                            setChannelLogo(fileUrl)
-                                                                        );
+                                                                        setLogo(fileUrl);
+                                                                        // dispatch(
+                                                                        //     setChannelLogo(fileUrl)
+                                                                        // );
                                                                     }}
                                                                 />
                                                                 <button
                                                                     type='button'
-                                                                    className='text-gray-300 absolute -right-2 -bottom-2 bg-gray-600 bg-opacity-90 shadow rounded-full h-8 w-8'>
+                                                                    className='text-gray-300 absolute -right-2 -bottom-1 bg-gray-600 bg-opacity-90 shadow rounded-full h-7 w-7'>
                                                                     <EditIcon
                                                                         sx={{
                                                                             fontSize: 'medium',
@@ -268,7 +277,7 @@ function ChannelHome() {
                                                                     sx={{ fontSize: 'medium' }}
                                                                 />
                                                                 <p className='text-sm'>
-                                                                    {channel?.likes}
+                                                                    {channel?.likes || 0}
                                                                 </p>
                                                             </div>
                                                             <div className='flex space-x-2 text-gray-300 items-center'>
@@ -282,7 +291,7 @@ function ChannelHome() {
                                                                 />
 
                                                                 <p className='text-sm'>
-                                                                    {channel?.dislikes}
+                                                                    {channel?.dislikes || 0}
                                                                 </p>
                                                             </div>
 
@@ -364,17 +373,17 @@ function ChannelHome() {
                                         </>
                                     ) : (
                                         <>
-                                            <div className='p-3 bg-gray-700 bg-opacity-20'>
-                                                <div className='p-10 py-20 items-center justify-center w-full rounded-md'>
+                                            <div className='p-3 bg-gray-700 bg-opacity-20 h-[63vh] overflow-scroll overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 pr-5'>
+                                                <div className='pb-20 pt-10 items-center justify-center w-full rounded-md'>
                                                     <div className='text-center'>
                                                         <p className='text-gray-300'>
                                                             You don't have a channel yet ?
                                                         </p>
-                                                        <p className='px-8 py-3 text-red-500 text-4xl font-bold'>
+                                                        <p className='px-6 py-3 text-red-500 text-4xl font-bold'>
                                                             Create Channel
                                                         </p>
                                                     </div>
-                                                    <div className='px-28 space-y-2'>
+                                                    <div className='px-5 md:px-10 space-y-2'>
                                                         <div className='w-full mb-6 md:mb-0 rounded-sm'>
                                                             <label
                                                                 className='block tracking-wide text-gray-300 font-bold mb-2'

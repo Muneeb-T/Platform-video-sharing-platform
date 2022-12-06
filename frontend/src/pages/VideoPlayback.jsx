@@ -236,7 +236,9 @@ function VideoPlayback() {
                                 disabled={!user}
                                 className={`${
                                     liked ? 'bg-blue-500' : 'bg-gray-500'
-                                } rounded-full p-1 h-8 w-8 bg-opacity-80 hover:scale-90 ${!user && 'text-gray-500 bg-opacity-40'}`}
+                                } rounded-full p-1 h-8 w-8 bg-opacity-80 hover:scale-90 ${
+                                    !user && 'text-gray-500 bg-opacity-40'
+                                }`}
                                 onClick={(e) =>
                                     dispatch(
                                         likeOrDislikeVideo({
@@ -259,7 +261,9 @@ function VideoPlayback() {
 
                         <div className='flex space-x-2 items-center'>
                             <button
-                                className={`${!user && 'text-gray-500 bg-opacity-40'} rounded-full p-1 h-8 w-8  bg-opacity-80 hover:scale-90 ${
+                                className={`${
+                                    !user && 'text-gray-500 bg-opacity-40'
+                                } rounded-full p-1 h-8 w-8  bg-opacity-80 hover:scale-90 ${
                                     disliked ? 'bg-red-500' : 'bg-gray-500'
                                 }`}
                                 onClick={(e) =>

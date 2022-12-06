@@ -1,8 +1,6 @@
 import mongoose from 'mongoose';
-import emailValidator from 'email-validator';
 import linkModel from './link.js';
 import imageFileModel from '../file/image-file.js';
-import videoFileModel from '../file/video-file.js';
 import findOneOrCreate from 'mongoose-find-one-or-create';
 
 const { Schema } = mongoose;

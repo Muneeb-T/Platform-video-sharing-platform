@@ -44,7 +44,7 @@ function Genres({ videos, title }) {
                                             alt='Rounded avatar'
                                         />
                                         <div className='flex text-xs sm:text-sm'>
-                                            <p>{uploadedBy.username}</p>
+                                            <p>{uploadedBy?.username}</p>
                                             <p className='mx-3 text-gray-600'>|</p>
                                             <p>{views} Views</p>
                                             <p className='mx-3 text-gray-600'>|</p>
