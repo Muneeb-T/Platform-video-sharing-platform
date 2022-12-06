@@ -253,7 +253,7 @@ function ChannelHome() {
                                                 </div>
 
                                                 <div className='text-gray-300 my-auto'>
-                                                    <p className='text-xl md:text-2xl font-bold'>
+                                                    <p className='text-xl md:text-2xl font-bold line-clamp-1'>
                                                         {channelForm?.channelName ||
                                                             channel?.user?.username ||
                                                             user.username}
@@ -507,7 +507,7 @@ function ChannelHome() {
                                     alt=''
                                 />
                                 <div className='text-gray-300 my-auto'>
-                                    <p className='text-xl md:text-2xl font-bold'>
+                                    <p className='text-xl md:text-2xl font-bold line-clamp-1'>
                                         {channel?.owner?.username || ''}
                                     </p>
                                     <p className='text-sm'>{channel?.followers || 0} Followers</p>
