@@ -57,10 +57,6 @@ function Content() {
         }
     }, []);
 
-    if (getVideosLoading) {
-        return <Spinner />;
-    }
-
     return (
         <>
             <div className='container mx-auto bg-gray-900'>
@@ -69,12 +65,12 @@ function Content() {
                     <div className='col-span-4 gap-2 space-y-2'>
                         <TopBar title='Channel Content' />
                         <div className='bg-gray-300 bg-opacity-5  p-5'>
-                            <div className='flex text-gray-300 gap-2 text-sm justify-'>
+                            <div className='flex text-gray-300  text-sm gap-3'>
                                 <Menu
                                     as='div'
                                     className='relative flex-none inline-block text-left'>
                                     <div>
-                                        <Menu.Button className='flex space-x-5 items-center w-full justify-center text-gray-300 px-4 py-2 text-sm text-md font-bold'>
+                                        <Menu.Button className='flex items-center w-full justify-center text-gray-300  text-sm text-md font-bold'>
                                             <FilterListIcon />
                                             Filter
                                         </Menu.Button>
@@ -153,7 +149,7 @@ function Content() {
                                     as='div'
                                     className='relative flex-none inline-block text-left'>
                                     <div>
-                                        <Menu.Button className='flex space-x-5 items-center w-full justify-center text-gray-300 px-4 py-2 text-sm text-md font-bold'>
+                                        <Menu.Button className='flex items-center w-full justify-center text-gray-300 text-sm text-md font-bold'>
                                             <SortIcon />
                                             Sort
                                         </Menu.Button>
@@ -325,14 +321,15 @@ function Content() {
                                         </Menu.Items>
                                     </Transition>
                                 </Menu>
+
                                 {selectedVideos.length > 0 && (
-                                    <div>
+                                    <div className='ml-auto'>
                                         <button
                                             disabled={deleteVideosLoading}
                                             onClick={() => dispatch(deleteVideos(selectedVideos))}
-                                            className='flex space-x-5 text-red-500 items-center w-full justify-center px-4 py-2 text-sm text-md font-bold'>
+                                            className='flex space-x-5 text-red-500 items-center w-full justify-center text-sm text-md font-bold'>
                                             <DeleteIcon />
-                                            Delete {selectedVideos.length} items
+                                            Delete ({selectedVideos.length})
                                             {deleteVideosLoading && (
                                                 <div
                                                     className='spinner-border text-gray-300 animate-spin w-5 h-5 border-2 rounded-full'
@@ -343,26 +340,34 @@ function Content() {
                                 )}
                             </div>
                             <hr className='opacity-20 mt-2' />
-                            {videos?.length ? (
-                                <div className='space-y-3 mt-3 '>
-                                    <VideoContent videos={videos} sort={sortVideos} />
-                                </div>
+                            {getVideosLoading ? (
+                                <Spinner />
                             ) : (
-                                <div className='container flex pt-20 justify-center h-screen'>
-                                    <div className='text-center'>
-                                        <p className='text-3xl text-red-500 font-bold'>
-                                            You have no uploads
-                                        </p>
-                                        <p className='text-gray-500'>
-                                            There are no contents in your channel.
-                                        </p>
-                                        <button
-                                            className='rounded-md text-gray-300 border border-red-500 px-3 py-2 font-bold mt-3'
-                                            onClick={() => dispatch(setShowVideoUploadModal(true))}>
-                                            Upload your first video
-                                        </button>
-                                    </div>
-                                </div>
+                                <>
+                                    {videos?.length ? (
+                                        <div className='space-y-3 mt-3'>
+                                            <VideoContent videos={videos} sort={sortVideos} />
+                                        </div>
+                                    ) : (
+                                        <div className='container flex pt-20 justify-center h-screen'>
+                                            <div className='text-center'>
+                                                <p className='text-3xl text-red-500 font-bold'>
+                                                    You have no uploads
+                                                </p>
+                                                <p className='text-gray-500'>
+                                                    There are no contents in your channel.
+                                                </p>
+                                                <button
+                                                    className='rounded-md text-gray-300 border border-red-500 px-3 py-2 font-bold mt-3'
+                                                    onClick={() =>
+                                                        dispatch(setShowVideoUploadModal(true))
+                                                    }>
+                                                    Upload your first video
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>

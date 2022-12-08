@@ -40,12 +40,12 @@ function SearchResults() {
                 <div className='flex flex-1 space-x-3 items-center scrollbar-hide overflow-x-scroll'>
                     {categories.map((category, index) => {
                         return (
-                            <>
-                                <Link className='shrink-0'>
+                            <div key={category.id} className='flex shrink-0'>
+                                <Link>
                                     <p className='text-gray-300'>{category.name}</p>
                                 </Link>
                                 <p className='mx-3 text-gray-500'>|</p>
-                            </>
+                            </div>
                         );
                     })}
                 </div>

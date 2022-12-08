@@ -32,29 +32,27 @@ function VideoGroup4({ videos }) {
                             videoUrl={videoProperties?.url}
                         />
 
-                        <div className='space-y-2 lg:space-y-2 my-auto'>
-                            <p className='text-gray-200 line-clamp-1'>
-                                {title}
-                            </p>
+                        <div className='lg:space-y-1 my-auto'>
+                            <p className='text-gray-200 text-sm line-clamp-1'>{title}</p>
 
-                            <p className='text-xs text-gray-400 sm:block hidden lg:hidden line-clamp-3'>
-                                {description}
-                            </p>
-                            <div className='space-x-3 py-2 text-xs flex'>
-                                <div className='flex space-x-2 text-gray-300 items-center'>
-                                    <LikeIcon sx={{ fontSize: 'medium' }} />
-                                    <p className='text-sm'>{likes || 0}</p>
+                            <p className='text-xs text-gray-400 line-clamp-2'>{description}</p>
+                            <div className='md:block flex gap-3 items-center'>
+                                <div className='space-x-3 text-xs flex items-center'>
+                                    <div className='flex space-x-2 text-gray-300 items-center'>
+                                        <LikeIcon sx={{ fontSize: 'small' }} />
+                                        <p className='text-sm'>{likes || 0}</p>
+                                    </div>
+                                    <div className='flex space-x-2 text-gray-300 items-center'>
+                                        <DislikeIcon sx={{ fontSize: 'small' }} />
+                                        <p className='text-sm'>{dislikes || 0}</p>
+                                    </div>
                                 </div>
-                                <div className='flex space-x-2 text-gray-300 items-center'>
-                                    <DislikeIcon sx={{ fontSize: 'medium' }} />
-                                    <p className='text-sm'>{dislikes || 0}</p>
-                                </div>
-                            </div>
-                            <div className='flex gap-2 items-center text-gray-400'>
-                                <div className='flex text-xs'>
-                                    <p>{views || 0} Views</p>
-                                    <p className='mx-2 text-gray-600'>|</p>
-                                    <p>{moment(createdAt).from(new Date())}</p>
+                                <div className='flex gap-2 text-gray-400'>
+                                    <div className='flex text-xs'>
+                                        <p>{views || 0} Views</p>
+                                        <p className='mx-2 text-gray-600'>|</p>
+                                        <p>{moment(createdAt).from(new Date())}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

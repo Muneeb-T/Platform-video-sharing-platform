@@ -127,15 +127,6 @@ function Dashboard() {
         // });
     };
 
-    if (
-        isGetLatestVideoLoading ||
-        isGetChannelLoading ||
-        getTopVideosLoading ||
-        isChannelAnalyticsLoading
-    ) {
-        return <Spinner />;
-    }
-
     if (isGetChannelError && !channel) {
         toast.error('You have no channel.Create a channel and explore Platform.');
         navigate(`/channel/${user._id}`);
@@ -148,118 +139,137 @@ function Dashboard() {
                     <Sidebar />
                     <div className='col-span-4 gap-2 space-y-2'>
                         <TopBar title='Channel Dashboard' />
-                        <div className='grid grid-cols-2 gap-2'>
-                            <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-5 space-y-3 h-screen'>
-                                {Object.keys(latestVideo)?.length ? (
-                                    <>
-                                        <VideoJS
-                                            options={videoJsOptions}
-                                            onReady={handlePlayerReady}
-                                        />
-                                        <p className='text-gray-300 line-clamp-1'>{title}</p>
-                                        <p className='text-gray-400 text-sm'>
-                                            Latest video perfomance
-                                        </p>
-                                        <div className='space-y-2'>
-                                            <div className='flex gap-2 items-center text-sm text-gray-300'>
-                                                <ViewsIcon sx={{ fontSize: 'large' }} />
-                                                <div className='flex w-full justify-between'>
-                                                    <p>Views</p>
-                                                    <p>{views || 0}</p>
+                        {isGetLatestVideoLoading ||
+                        isGetChannelLoading ||
+                        getTopVideosLoading ||
+                        isChannelAnalyticsLoading ? (
+                            <Spinner />
+                        ) : (
+                            <div className='grid grid-cols-1 lg:grid-cols-2 gap-2 h-[80vh] overflow-scroll overflow-x-hidden'>
+                                <>
+                                    <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-5 space-y-3 lg:h-full lg:overflow-scroll'>
+                                        {Object.keys(latestVideo)?.length ? (
+                                            <>
+                                                <VideoJS
+                                                    options={videoJsOptions}
+                                                    onReady={handlePlayerReady}
+                                                />
+                                                <p className='text-gray-300 line-clamp-1'>
+                                                    {title}
+                                                </p>
+                                                <p className='text-gray-400 text-sm'>
+                                                    Latest video perfomance
+                                                </p>
+                                                <div className='space-y-2'>
+                                                    <div className='flex gap-2 items-center text-sm text-gray-300'>
+                                                        <ViewsIcon sx={{ fontSize: 'large' }} />
+                                                        <div className='flex w-full justify-between'>
+                                                            <p>Views</p>
+                                                            <p>{views || 0}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className='flex gap-2 items-center text-sm text-gray-300'>
+                                                        <ThumbUpIcon sx={{ fontSize: 'large' }} />
+                                                        <div className='flex w-full justify-between'>
+                                                            <p>Likes</p>
+                                                            <p>{likes || 0}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className='flex gap-2 items-center text-sm text-gray-300'>
+                                                        <ThumbDownIcon sx={{ fontSize: 'large' }} />
+                                                        <div className='flex w-full justify-between'>
+                                                            <p>Dislikes</p>
+                                                            <p>{dislikes || 0}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className='flex gap-2 items-center text-sm text-gray-300'>
+                                                        <AverageDurationIcon
+                                                            sx={{ fontSize: 'large' }}
+                                                        />
+                                                        <div className='flex w-full justify-between'>
+                                                            <p>Average view duration</p>
+                                                            <p>
+                                                                {averageViewDuration || '00:00:00'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <hr className='opacity-20' />
+                                                    {/* <div className='flex justify-between items-center'>
+                        <p className='text-gray-300'>Top comments</p>
+                        <button className='text-red-600 text-sm font-bold'>
+                            View all ({comments?.length})
+                        </button>
+                    </div>
+                    <Comments comments={comments} videoId={latestVideoId} /> */}
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className='container p-10 flex items-center justify-center max-h-[80vh] overflow-scroll'>
+                                                <div className='text-center'>
+                                                    <p className='text-3xl text-red-500 font-bold'>
+                                                        You have no uploads
+                                                    </p>
+                                                    <p className='text-gray-500'>
+                                                        There are no contents in your channel.
+                                                    </p>
+                                                    <button
+                                                        className='rounded-md text-gray-300 border border-red-500 px-3 py-2 font-bold mt-3'
+                                                        onClick={() =>
+                                                            dispatch(setShowVideoUploadModal(true))
+                                                        }>
+                                                        Upload your first video
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <div className='flex gap-2 items-center text-sm text-gray-300'>
-                                                <ThumbUpIcon sx={{ fontSize: 'large' }} />
-                                                <div className='flex w-full justify-between'>
-                                                    <p>Likes</p>
-                                                    <p>{likes || 0}</p>
-                                                </div>
-                                            </div>
-                                            <div className='flex gap-2 items-center text-sm text-gray-300'>
-                                                <ThumbDownIcon sx={{ fontSize: 'large' }} />
-                                                <div className='flex w-full justify-between'>
-                                                    <p>Dislikes</p>
-                                                    <p>{dislikes || 0}</p>
-                                                </div>
-                                            </div>
-                                            <div className='flex gap-2 items-center text-sm text-gray-300'>
-                                                <AverageDurationIcon sx={{ fontSize: 'large' }} />
-                                                <div className='flex w-full justify-between'>
-                                                    <p>Average view duration</p>
-                                                    <p>{averageViewDuration || '00:00:00'}</p>
-                                                </div>
-                                            </div>
-                                            <hr className='opacity-20' />
-                                            <div className='flex justify-between items-center'>
-                                                <p className='text-gray-300'>Top comments</p>
-                                                <button className='text-red-600 text-sm font-bold'>
-                                                    View all ({comments?.length})
-                                                </button>
-                                            </div>
-                                            <Comments comments={comments} videoId={latestVideoId} />
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className='container p-20 flex items-center justify-center'>
-                                        <div className='text-center'>
-                                            <p className='text-3xl text-red-500 font-bold'>
-                                                You have no uploads
+                                        )}
+                                    </div>
+
+                                    <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-5 h-full'>
+                                        <div className='flex items-center justify-between '>
+                                            <p className='text-md text-gray-300 font-bold'>
+                                                Channel analytics
                                             </p>
-                                            <p className='text-gray-500'>
-                                                There are no contents in your channel.
-                                            </p>
-                                            <button
-                                                className='rounded-md text-gray-300 border border-red-500 px-3 py-2 font-bold mt-3'
-                                                onClick={() =>
-                                                    dispatch(setShowVideoUploadModal(true))
-                                                }>
-                                                Upload your first video
+                                            <button className='text-red-600 font-bold'>
+                                                Explore
                                             </button>
                                         </div>
+                                        <hr className='opacity-20 mt-2' />
+                                        <p className='text-3xl font-bold text-red-500 mt-3'>
+                                            {channel?.followers || 0}{' '}
+                                            <span className='text-gray-300 text-xl'>Followers</span>
+                                        </p>
+                                        <div className='text-gray-400 mt-3 text-sm lg:text-md'>
+                                            <p>Total views - {analytics?.totalViews || 0}</p>
+                                            <p className='text-xs'>
+                                                Total Watch time (hh:mm:ss) -{' '}
+                                                {totalWatchTime || '00:00:00'}
+                                            </p>
+                                        </div>
+                                        <div className='mt-5 mb-20'>
+                                            <p className='font-bold text-gray-300'>Top 5 videos</p>
+                                            <hr className='opacity-20 mb-3' />
+                                            {topVideos.length ? (
+                                                <div className='lg:max-h-[40vh] lg:overflow-scroll lg:border border-gray-300 border-opacity-20'>
+                                                    <VideoGroup3 videos={topVideos}/>
+                                                </div>
+                                            ) : (
+                                                <div className='container p-10 mx-auto flex items-center justify-center bg-gray-600 bg-opacity-20'>
+                                                    <div className='text-center'>
+                                                        <p className='text-3xl text-red-500 font-bold'>
+                                                            Oops!
+                                                        </p>
+                                                        <p className='text-gray-500'>
+                                                            We couldn't find anything in your
+                                                            channel. Please upload your content.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                )}
+                                </>
                             </div>
-
-                            <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-8'>
-                                <div className='flex items-center justify-between '>
-                                    <p className='text-2xl text-gray-300 font-bold'>
-                                        Channel analytics
-                                    </p>
-                                    <button className='text-red-600 font-bold'>Explore</button>
-                                </div>
-                                <hr className='opacity-20 mt-2' />
-                                <p className='text-3xl font-bold text-red-500 mt-3'>
-                                    {channel?.followers || 0}{' '}
-                                    <span className='text-gray-300 text-xl'>Followers</span>
-                                </p>
-                                <div className='text-gray-400 mt-3'>
-                                    <p>Total views - {analytics?.totalViews || 0}</p>
-                                    <p>
-                                        Total Watch time (hh:mm:ss) - {totalWatchTime || '00:00:00'}
-                                    </p>
-                                </div>
-                                <div className='mt-5 mb-20'>
-                                    <p className='font-bold text-gray-300'>Top videos</p>
-                                    {topVideos.length ? (
-                                        <div>
-                                            <VideoGroup3 videos={topVideos} />
-                                        </div>
-                                    ) : (
-                                        <div className='container p-10 mx-auto flex items-center justify-center bg-gray-600 bg-opacity-20'>
-                                            <div className='text-center'>
-                                                <p className='text-3xl text-red-500 font-bold'>
-                                                    Oops!
-                                                </p>
-                                                <p className='text-gray-500'>
-                                                    We couldn't find anything in your channel.
-                                                    Please upload your content.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -7,7 +7,6 @@ function VideoThumbnail(props) {
         <div className='relative hover:scale-95 duration-75'>
             <HoverVideoPlayer
                 videoSrc={videoUrl}
-                controls
                 pausedOverlay={
                     <img
                         className='relative'

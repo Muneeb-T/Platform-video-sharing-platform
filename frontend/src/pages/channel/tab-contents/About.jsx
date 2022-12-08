@@ -8,10 +8,10 @@ function About({ description, contact, links }) {
             {contact?.phoneNumber && <p className='text-gray-400'>Phone: {contact?.phoneNumber}</p>}
 
             {contact?.phoneNumber && <p className='text-gray-400'>Email : {contact?.email}</p>}
-            {links.length
+            {links?.length
                 ? links?.map((link) => (
-                      <p className='text-gray-400' key={link._id}>
-                          {link.title} : {link.url}
+                      <p className='text-gray-400' key={link?._id}>
+                          {link?.title} : {link?.url}
                       </p>
                   ))
                 : null}
