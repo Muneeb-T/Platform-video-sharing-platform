@@ -73,7 +73,7 @@ function Content(props) {
                                     onChange={() => dispatch(setSelectedVideos(videoId))}
                                 />
                             </div>
-                            <div className='flex gap-5 overflow-scroll overflow-y-hidden items-center'>
+                            <div className='flex gap-5 overflow-scroll overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 items-center pb-5'>
                                 <div className='md:flex gap-3 items-center'>
                                     <div className='w-[200px] shrink-0'>
                                         <VideoThumbnail

@@ -41,29 +41,27 @@ function Layout() {
     }
     return (
         <>
-            <div>
-                <ul className='space-y-4'>
+            <div className=''>
+                <ul className='space-y-4 block'>
                     <li className='space-y-2'>
-                        <p className='text-gray-400'>
+                        <p className='text-gray-400 text-sm'>
                             Channel trailer (For people those who are not followed)
                         </p>
-                        <div className={`grid grid-cols-3 ${!channel?.channelTrailer && 'h-40'}`}>
+                        <div className={`md:grid md:grid-cols-3`}>
                             {channel?.channelTrailer ? (
                                 <div className='bg-gray-600 bg-opacity-40 flex items-center justify-center'>
                                     <Link
                                         to={`/videos/${channel?.channelTrailer?._id}`}
-                                        className='h-full w-auto'>
-                                        <div>
-                                            <VideoThumbnail
-                                                image={channel?.channelTrailer?.thumbnail?.url}
-                                                length={channel?.channelTrailer?.video?.duration}
-                                                videoUrl={channel?.channelTrailer?.video?.url}
-                                            />
-                                        </div>
+                                        className='w-full'>
+                                        <VideoThumbnail
+                                            image={channel?.channelTrailer?.thumbnail?.url}
+                                            length={channel?.channelTrailer?.video?.duration}
+                                            videoUrl={channel?.channelTrailer?.video?.url}
+                                        />
                                     </Link>
                                 </div>
                             ) : (
-                                <div className='bg-gray-600 bg-opacity-40 flex items-center justify-center'>
+                                <div className='bg-gray-600 bg-opacity-40 p-14 flex items-center justify-center'>
                                     <button
                                         className='border border-red-500 rounded text-gray-300 p-2 text-xs'
                                         onClick={() =>
@@ -82,7 +80,7 @@ function Layout() {
                                                 <p className='text-gray-200 line-clamp-2 text-justify'>
                                                     {channel?.channelTrailer?.title}
                                                 </p>
-                                                <p className='text-gray-400 text-justify line-clamp-2 text-xs hidden md:block'>
+                                                <p className='text-gray-400 text-justify line-clamp-2 text-xs hidden'>
                                                     {channel?.channelTrailer?.description}
                                                 </p>
                                             </div>
@@ -106,7 +104,7 @@ function Layout() {
                                             </div>
                                         </div>
                                     ) : (
-                                        <p className='text-gray-500'>
+                                        <p className='text-gray-500 text-xs'>
                                             Lorem Ipsum is simply dummy text of the printing and
                                             typesetting industry. Lorem Ipsum has been the
                                             industry's standard dummy text ever since
@@ -117,24 +115,22 @@ function Layout() {
                         </div>
                     </li>
                     <li className='space-y-2'>
-                        <p className='text-gray-400'>Featured video (For the followers)</p>
-                        <div className={`grid grid-cols-3 ${!channel?.featuredVideo && 'h-40'}`}>
+                        <p className='text-gray-400  text-sm'>Featured video (For the followers)</p>
+                        <div className={`md:grid md:grid-cols-3`}>
                             {channel?.featuredVideo ? (
                                 <div className='bg-gray-600 bg-opacity-40 flex items-center justify-center'>
                                     <Link
                                         to={`/videos/${channel?.featuredVideo?._id}`}
-                                        className='h-full w-auto'>
-                                        <div>
-                                            <VideoThumbnail
-                                                image={channel?.featuredVideo?.thumbnail?.url}
-                                                length={channel?.featuredVideo?.video?.duration}
-                                                videoUrl={channel?.featuredVideo?.video?.url}
-                                            />
-                                        </div>
+                                        className='w-full'>
+                                        <VideoThumbnail
+                                            image={channel?.featuredVideo?.thumbnail?.url}
+                                            length={channel?.featuredVideo?.video?.duration}
+                                            videoUrl={channel?.featuredVideo?.video?.url}
+                                        />
                                     </Link>
                                 </div>
                             ) : (
-                                <div className='bg-gray-600 bg-opacity-40 flex items-center justify-center'>
+                                <div className='bg-gray-600 bg-opacity-40 p-14 flex items-center justify-center'>
                                     <button
                                         className='border border-red-500 rounded text-gray-300 p-2 text-xs'
                                         onClick={() =>
@@ -153,7 +149,7 @@ function Layout() {
                                                 <p className='text-gray-200 line-clamp-2 text-justify'>
                                                     {channel?.featuredVideo?.title}
                                                 </p>
-                                                <p className='text-gray-400 text-justify line-clamp-2 text-xs hidden md:block'>
+                                                <p className='text-gray-400 text-justify line-clamp-2 text-xs hidden'>
                                                     {channel?.featuredVideo?.description}
                                                 </p>
                                             </div>
@@ -177,7 +173,7 @@ function Layout() {
                                             </div>
                                         </div>
                                     ) : (
-                                        <p className='text-gray-500'>
+                                        <p className='text-gray-500 text-xs'>
                                             Lorem Ipsum is simply dummy text of the printing and
                                             typesetting industry. Lorem Ipsum has been the
                                             industry's standard dummy text ever since

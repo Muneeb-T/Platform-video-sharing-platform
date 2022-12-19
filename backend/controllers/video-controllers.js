@@ -12,7 +12,9 @@ const saveVideo = async (req, res, next) => {
         const { id: requestedUserId } = params;
         const channel = await channelModel.findById(requestedChannel);
         if (requestedUserId !== authenticatedUserId || !channel) {
-            return res.status(401).json({ success: false, message: 'Unautherized access' });
+            return res
+                .status(401)
+                .json({ success: false, message: 'Unautherized access' });
         }
 
         const video = await videoModel.create({
@@ -27,7 +29,7 @@ const saveVideo = async (req, res, next) => {
             video,
         });
     } catch (err) {
-        console.log(err)
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -56,17 +58,31 @@ const updateVideoDetails = async (req, res, next) => {
         const { user: authenticatedUser } = req;
         const { _id: authenticatedUserId } = authenticatedUser;
 
-        let video = await videoModel.findById(videoId).populate('uploadedBy').populate('channel');
+        let video = await videoModel
+            .findById(videoId)
+            .populate('uploadedBy')
+            .populate('channel');
         if (!video) {
-            return res.status(404).json({ success: false, message: 'Video not found' });
+            return res
+                .status(404)
+                .json({ success: false, message: 'Video not found' });
         }
 
         const check =
-            (title || description || tags || category || language || visibility || thumbnail) &&
-            video?.uploadedBy?._id.toString() !== authenticatedUserId.toString();
+            (title ||
+                description ||
+                tags ||
+                category ||
+                language ||
+                visibility ||
+                thumbnail) &&
+            video?.uploadedBy?._id.toString() !==
+                authenticatedUserId.toString();
 
         if (check) {
-            return res.status(401).json({ success: false, message: 'Unauthorized access' });
+            return res
+                .status(401)
+                .json({ success: false, message: 'Unauthorized access' });
         }
 
         if (title) {
@@ -117,9 +133,14 @@ const updateVideoDetails = async (req, res, next) => {
             if (reply) {
                 console.log(comment.reply);
                 const { commentId } = reply;
-                const commentIndex = video.comments.findIndex((comment) => comment.id == commentId);
+                const commentIndex = video.comments.findIndex(
+                    (comment) => comment.id == commentId
+                );
                 if (commentIndex !== -1) {
-                    video.comments[commentIndex].replies.push({ id, ...comment });
+                    video.comments[commentIndex].replies.push({
+                        id,
+                        ...comment,
+                    });
                 }
             } else {
                 video.comments.push(comment);
@@ -128,28 +149,77 @@ const updateVideoDetails = async (req, res, next) => {
 
         if (updateComment) {
             let { commentId, like, dislike, reply } = updateComment;
-            const commentIndex = video.comments.findIndex((comment) => comment.id == commentId);
+            const commentIndex = video.comments.findIndex(
+                (comment) => comment.id == commentId
+            );
             if (reply) {
                 let { replyId } = reply;
-                const replyIndex = video.comments[commentIndex].replies.findIndex(
-                    (reply) => reply.id == replyId
-                );
+                const replyIndex = video.comments[
+                    commentIndex
+                ].replies.findIndex((reply) => reply.id == replyId);
                 if (like) {
                     const liked =
-                        video?.comments[commentIndex]?.replies[replyIndex]?.likedBy?.indexOf(like);
+                        video?.comments[commentIndex]?.replies[
+                            replyIndex
+                        ]?.likedBy?.indexOf(like);
                     if (liked === -1) {
                         const disliked =
-                            video?.comments[commentIndex]?.replies[replyIndex]?.dislikedBy?.indexOf(
+                            video?.comments[commentIndex]?.replies[
+                                replyIndex
+                            ]?.dislikedBy?.indexOf(like);
+                        if (disliked !== -1)
+                            video?.comments[commentIndex]?.replies[
+                                replyIndex
+                            ]?.dislikedBy?.splice(disliked, 1);
+                        video?.comments[commentIndex]?.replies[
+                            replyIndex
+                        ]?.likedBy?.push(like);
+                    } else {
+                        video?.comments[commentIndex]?.replies[
+                            replyIndex
+                        ]?.likedBy?.splice(liked, 1);
+                    }
+                }
+                if (dislike) {
+                    const disliked =
+                        video?.comments[commentIndex]?.replies[
+                            replyIndex
+                        ]?.dislikedBy?.indexOf(dislike);
+                    if (disliked === -1) {
+                        const liked =
+                            video?.comments[commentIndex]?.replies[
+                                replyIndex
+                            ]?.likedBy?.indexOf(dislike);
+                        if (liked !== -1)
+                            video?.comments[commentIndex]?.replies[
+                                replyIndex
+                            ]?.likedBy?.splice(liked, 1);
+                        video?.comments[commentIndex]?.replies[
+                            replyIndex
+                        ]?.dislikedBy.push(dislike);
+                    } else {
+                        video?.comments[commentIndex]?.replies[
+                            replyIndex
+                        ]?.dislikedBy?.splice(disliked, 1);
+                    }
+                }
+            } else {
+                if (like) {
+                    const liked =
+                        video?.comments[commentIndex]?.likedBy?.indexOf(like);
+                    if (liked === -1) {
+                        const disliked =
+                            video?.comments[commentIndex]?.dislikedBy?.indexOf(
                                 like
                             );
                         if (disliked !== -1)
-                            video?.comments[commentIndex]?.replies[replyIndex]?.dislikedBy?.splice(
+                            video?.comments[commentIndex]?.dislikedBy?.splice(
                                 disliked,
                                 1
                             );
-                        video?.comments[commentIndex]?.replies[replyIndex]?.likedBy?.push(like);
+                        video?.comments[commentIndex]?.likedBy?.push(like);
                     } else {
-                        video?.comments[commentIndex]?.replies[replyIndex]?.likedBy?.splice(
+                        video?.comments[commentIndex]?.likedBy?.splice(
                             liked,
                             1
                         );
@@ -157,49 +227,25 @@ const updateVideoDetails = async (req, res, next) => {
                 }
                 if (dislike) {
                     const disliked =
-                        video?.comments[commentIndex]?.replies[replyIndex]?.dislikedBy?.indexOf(
+                        video?.comments[commentIndex]?.dislikedBy?.indexOf(
                             dislike
                         );
                     if (disliked === -1) {
                         const liked =
-                            video?.comments[commentIndex]?.replies[replyIndex]?.likedBy?.indexOf(
+                            video?.comments[commentIndex]?.likedBy?.indexOf(
                                 dislike
                             );
                         if (liked !== -1)
-                            video?.comments[commentIndex]?.replies[replyIndex]?.likedBy?.splice(
+                            video?.comments[commentIndex]?.likedBy?.splice(
                                 liked,
                                 1
                             );
-                        video?.comments[commentIndex]?.replies[replyIndex]?.dislikedBy.push(
-                            dislike
-                        );
+                        video?.comments[commentIndex]?.dislikedBy.push(dislike);
                     } else {
-                        video?.comments[commentIndex]?.replies[replyIndex]?.dislikedBy?.splice(
+                        video?.comments[commentIndex]?.dislikedBy?.splice(
                             disliked,
                             1
                         );
-                    }
-                }
-            } else {
-                if (like) {
-                    const liked = video?.comments[commentIndex]?.likedBy?.indexOf(like);
-                    if (liked === -1) {
-                        const disliked = video?.comments[commentIndex]?.dislikedBy?.indexOf(like);
-                        if (disliked !== -1)
-                            video?.comments[commentIndex]?.dislikedBy?.splice(disliked, 1);
-                        video?.comments[commentIndex]?.likedBy?.push(like);
-                    } else {
-                        video?.comments[commentIndex]?.likedBy?.splice(liked, 1);
-                    }
-                }
-                if (dislike) {
-                    const disliked = video?.comments[commentIndex]?.dislikedBy?.indexOf(dislike);
-                    if (disliked === -1) {
-                        const liked = video?.comments[commentIndex]?.likedBy?.indexOf(dislike);
-                        if (liked !== -1) video?.comments[commentIndex]?.likedBy?.splice(liked, 1);
-                        video?.comments[commentIndex]?.dislikedBy.push(dislike);
-                    } else {
-                        video?.comments[commentIndex]?.dislikedBy?.splice(disliked, 1);
                     }
                 }
             }
@@ -236,7 +282,8 @@ const getVideos = async (req, res, next) => {
         }
 
         if (top) {
-            searchObject.uploadedBy = mongoose.Types.ObjectId(authenticatedUser);
+            searchObject.uploadedBy =
+                mongoose.Types.ObjectId(authenticatedUser);
         }
 
         let videos = await videoModel
@@ -249,11 +296,14 @@ const getVideos = async (req, res, next) => {
                     .filter((video) => {
                         let schedule = true;
                         let visibility = true;
-                        if (authenticatedUser?.toString() !== video?.uploadedBy?._id.toString()) {
+                        if (
+                            authenticatedUser?.toString() !==
+                            video?.uploadedBy?._id.toString()
+                        ) {
                             if (video?.schedule?.dateTime) {
-                                schedule = moment(video?.schedule?.dateTime).isSameOrBefore(
-                                    new Date()
-                                );
+                                schedule = moment(
+                                    video?.schedule?.dateTime
+                                ).isSameOrBefore(new Date());
                             }
                             visibility = video?.visibility === 'public';
                         }
@@ -294,7 +344,9 @@ const transformComments = (comments, userId) => {
         let transform = { ...video };
         transform.likes = transform?.likedBy?.length || 0;
         transform.dislikes = transform?.dislikedBy?.length || 0;
-        const userLiked = transform?.likedBy?.findIndex((likedBy) => likedBy == userId);
+        const userLiked = transform?.likedBy?.findIndex(
+            (likedBy) => likedBy == userId
+        );
         if (userLiked !== -1) {
             transform.liked = true;
         } else {
@@ -312,7 +364,13 @@ const transformComments = (comments, userId) => {
 
 const getVideo = async (req, res, next) => {
     try {
-        const { video: videoId, user: userId, channelId, latest, related } = req.query;
+        const {
+            video: videoId,
+            user: userId,
+            channelId,
+            latest,
+            related,
+        } = req.query;
 
         let video = null;
         if (videoId)
@@ -339,7 +397,9 @@ const getVideo = async (req, res, next) => {
         }
 
         if (!video) {
-            return res.status(404).json({ success: false, message: 'Video not found' });
+            return res
+                .status(404)
+                .json({ success: false, message: 'Video not found' });
         }
 
         async function getRelatedVideos() {
@@ -380,11 +440,18 @@ const getVideo = async (req, res, next) => {
         if (latest) {
             const { views } = video;
             video.averageViewDuration =
-                views.reduce((previousDuration, view) => previousDuration + view.duration, 0) /
-                views.length;
+                views.reduce(
+                    (previousDuration, view) =>
+                        previousDuration + view.duration,
+                    0
+                ) / views.length;
         }
 
-        if (userId && video && (video.likes || video.dislikes || video.channel.followers)) {
+        if (
+            userId &&
+            video &&
+            (video.likes || video.dislikes || video.channel.followers)
+        ) {
             if (userLiked) {
                 video.liked = true;
             } else {
@@ -421,7 +488,9 @@ const updateVideoDetailsNotProtected = async (req, res, next) => {
 
         let video = await videoModel.findById(videoId);
         if (!video) {
-            return res.status(404).json({ success: true, message: 'Video not found' });
+            return res
+                .status(404)
+                .json({ success: true, message: 'Video not found' });
         }
 
         //if updation is to create new view
@@ -439,7 +508,9 @@ const updateVideoDetailsNotProtected = async (req, res, next) => {
         if (viewData) {
             const { authenticatedView, viewId, duration } = viewData;
             if (authenticatedView) {
-                const viewIndex = video.views.findIndex((view) => view.viewId == viewId);
+                const viewIndex = video.views.findIndex(
+                    (view) => view.viewId == viewId
+                );
                 if (viewIndex !== -1) {
                     video.views[viewIndex].duration = duration;
                 }
@@ -454,7 +525,7 @@ const updateVideoDetailsNotProtected = async (req, res, next) => {
             message: 'Video updated successfully',
         });
     } catch (err) {
-        console.log(err)
+        console.log(err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -463,14 +534,19 @@ const deleteVideos = async (req, res, next) => {
     try {
         const { user, body: videoIds } = req;
 
-        const videos = await videoModel.find({ _id: { $in: videoIds } }).select({ uploadedBy: 1 });
+        const videos = await videoModel
+            .find({ _id: { $in: videoIds } })
+            .select({ uploadedBy: 1 });
 
         videos.forEach(async (video) => {
             video.deleted = true;
             await video.save();
         });
 
-        res.status(201).json({ success: true, message: 'Videos deleted successfully' });
+        res.status(201).json({
+            success: true,
+            message: 'Videos deleted successfully',
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ success: false, message: err.message });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link} from 'react-router-dom';
 import VideoThumbnail from './VideoThumbnail';
 import LikeIcon from '@mui/icons-material/ThumbUp';
 import DislikeIcon from '@mui/icons-material/ThumbDown';
@@ -13,7 +13,6 @@ function VideoGroup5({ videos }) {
                     thumbnail,
                     title,
                     video: videoProperties,
-                    uploadedBy,
                     views,
                     createdAt,
                     description,
@@ -23,7 +22,7 @@ function VideoGroup5({ videos }) {
                 return (
                     <div key={videoId}>
                         <Link to={`/videos/${videoId}`}>
-                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3'>
+                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mr-4'>
                                 <VideoThumbnail
                                     image={thumbnail?.url}
                                     length={videoProperties?.duration}
@@ -31,10 +30,10 @@ function VideoGroup5({ videos }) {
                                 />
 
                                 <div className='space-y-1  md:space-y-2 lg:col-span-3  my-auto'>
-                                    <p className='text-gray-200 line-clamp-2 text-justify'>
+                                    <p className='text-gray-200 line-clamp-1 text-justify'>
                                         {title}
                                     </p>
-                                    <p className='text-gray-400 text-justify line-clamp-2 text-xs hidden md:block'>
+                                    <p className='text-gray-400 text-justify line-clamp-2 text-xs hidden'>
                                         {description}
                                     </p>
                                     <div className='md:flex space-x-3 py-2 text-xs hidden'>

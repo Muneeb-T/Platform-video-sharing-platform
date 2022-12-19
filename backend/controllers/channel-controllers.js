@@ -17,7 +17,7 @@ const createChannel = async (req, res, next) => {
         }
         const { channelLogo, channelName, ...otherDetails } = channelDetails;
 
-        const channel = await channelModel.create({
+        let channel = await channelModel.create({
             owner: authenticatedUserId,
             ...otherDetails,
         });
@@ -34,6 +34,9 @@ const createChannel = async (req, res, next) => {
                 ...accountUpdateObject,
             });
         }
+
+        channel = channel.toObject();
+        channel.owner = req.user;
 
         res.status(200).json({
             success: true,
@@ -53,31 +56,41 @@ const getChannel = async (req, res, next) => {
         const { videos, playlists } = req.query;
         let channel = await channelModel
             .findOne({
-                $or: [{ owner: mongoose.Types.ObjectId(id) }, { _id: mongoose.Types.ObjectId(id) }],
+                $or: [
+                    { owner: mongoose.Types.ObjectId(id) },
+                    { _id: mongoose.Types.ObjectId(id) },
+                ],
             })
             .populate('owner')
             .populate('featuredVideo')
             .populate('channelTrailer');
 
         if (!channel) {
-            return res.status(404).json({ success: false, message: 'Channel not found' });
+            return res
+                .status(404)
+                .json({ success: false, message: 'Channel not found' });
         }
         let requestedVideos = {};
         if (videos) {
-            channel = await channel.populate({ path: 'videos', visibility: 'public' });
+            channel = await channel.populate({
+                path: 'videos',
+                visibility: 'public',
+            });
             const { categories } = JSON.parse(videos);
             const { videos: channelVideos } = channel;
             if (channelVideos.length) {
                 categories.forEach((category) => {
                     if (category === 'popular') {
-                        requestedVideos['popular videos'] = channelVideos.filter((video) => {
-                            console.log(video.views.length);
-                            return video.views.length > 50000;
-                        });
+                        requestedVideos['popular videos'] =
+                            channelVideos.filter((video) => {
+                                console.log(video.views.length);
+                                return video.views.length > 50000;
+                            });
                     }
                     if (category === 'uploads') {
                         requestedVideos['uploads'] = channelVideos.sort(
-                            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                            (a, b) =>
+                                new Date(b.createdAt) - new Date(a.createdAt)
                         );
                     }
                 });
@@ -122,12 +135,20 @@ const updateChannel = async (req, res, next) => {
         const channel = await channelModel.findById(channelId);
 
         if (!channel) {
-            return res.status(404).json({ success: false, message: 'Channel not found' });
+            return res
+                .status(404)
+                .json({ success: false, message: 'Channel not found' });
         }
-        if (userId.toString() !== channel.owner.toString() && role !== 'admin') {
+        if (
+            userId.toString() !== channel.owner.toString() &&
+            role !== 'admin'
+        ) {
             return res
                 .status(401)
-                .json({ success: false, message: 'Unautherized access.Channel not matching' });
+                .json({
+                    success: false,
+                    message: 'Unautherized access.Channel not matching',
+                });
         }
         const {
             channelName,
@@ -143,7 +164,9 @@ const updateChannel = async (req, res, next) => {
             channelTrailer,
         } = body;
         if (channelName) {
-            await accountModel.findByIdAndUpdate(userId, { username: channelName });
+            await accountModel.findByIdAndUpdate(userId, {
+                username: channelName,
+            });
         }
         if (description) {
             channel.description = description;
@@ -153,7 +176,9 @@ const updateChannel = async (req, res, next) => {
             console.log(links);
             links.forEach((link) => {
                 if (Object.keys(link).length) {
-                    const linkIndex = channel.links.findIndex((element) => element._id == link._id);
+                    const linkIndex = channel.links.findIndex(
+                        (element) => element._id == link._id
+                    );
                     if (linkIndex === -1) {
                         channel.links.push(link);
                     } else {
@@ -179,7 +204,9 @@ const updateChannel = async (req, res, next) => {
             channel.watermark = watermark;
         }
         if (channelLogo) {
-            await accountModel.findByIdAndUpdate(userId, { profilePicture: channelLogo });
+            await accountModel.findByIdAndUpdate(userId, {
+                profilePicture: channelLogo,
+            });
         }
         if (banner) {
             channel.banner = banner;
@@ -222,7 +249,10 @@ const updateChannel = async (req, res, next) => {
             }
         }
         await channel.save();
-        res.status(200).json({ success: true, message: 'Channel updated successfully' });
+        res.status(200).json({
+            success: true,
+            message: 'Channel updated successfully',
+        });
     } catch (err) {
         console.log(err);
         // console.log('\nChannel update error');
@@ -241,36 +271,53 @@ const updateChannelNotProtected = async (req, res) => {
         const { like, dislike } = req.body;
         const channel = await channelModel.findById(channelId);
         if (!channel) {
-            return res.status(404).json({ success: false, message: 'Channel not found' });
+            return res
+                .status(404)
+                .json({ success: false, message: 'Channel not found' });
         }
         if (like) {
             if (authenticatedUser != like) {
-                return res.status(401).json({ success: false, message: 'Unauthorized access' });
+                return res
+                    .status(401)
+                    .json({ success: false, message: 'Unauthorized access' });
             }
             const { likedBy, dislikedBy } = channel;
             const liked = likedBy?.includes(like);
             if (liked) {
-                channel.likedBy = likedBy.filter((likedUser) => likedUser != like);
+                channel.likedBy = likedBy.filter(
+                    (likedUser) => likedUser != like
+                );
             } else {
                 channel.likedBy.push(like);
-                channel.dislikedBy = dislikedBy?.filter((dislikedUser) => dislikedUser != like);
+                channel.dislikedBy = dislikedBy?.filter(
+                    (dislikedUser) => dislikedUser != like
+                );
             }
         }
         if (dislike) {
             if (authenticatedUser != dislike) {
-                return res.status(401).json({ success: false, message: 'Unauthorized access' });
+                return res
+                    .status(401)
+                    .json({ success: false, message: 'Unauthorized access' });
             }
             const { likedBy, dislikedBy } = channel;
             const disliked = dislikedBy?.includes(dislike);
             if (disliked) {
-                channel.dislikedBy = dislikedBy.filter((dislikedUser) => dislikedUser != dislike);
+                channel.dislikedBy = dislikedBy.filter(
+                    (dislikedUser) => dislikedUser != dislike
+                );
             } else {
                 channel.dislikedBy.push(dislike);
-                channel.likedBy = likedBy?.filter((likedUser) => likedUser != dislike);
+                channel.likedBy = likedBy?.filter(
+                    (likedUser) => likedUser != dislike
+                );
             }
         }
         await channel.save();
-        res.status(201).json({ success: true, message: 'Channel updated successfully' });
+        res.status(201).json({
+            success: true,
+            message: 'Channel updated successfully',
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ success: false, message: err.message });
@@ -340,16 +387,21 @@ const channelAnalytics = async (req, res, next) => {
                 message: 'Unauthorized access',
             });
         }
-        const channel = await channelModel.findOne({ owner }).populate('videos');
+        const channel = await channelModel
+            .findOne({ owner })
+            .populate('videos');
         if (!channel) {
-            return res.status(404).json({ success: false, message: 'No such channel found' });
+            return res
+                .status(404)
+                .json({ success: false, message: 'No such channel found' });
         }
         const { videos } = channel;
         const responseObject = {};
         if (totalViews) {
             totalViews = videos.reduce((previous, video) => {
                 console.log(video.deleted);
-                if (video.deleted === false) return previous + video.views.length;
+                if (video.deleted === false)
+                    return previous + video.views.length;
                 return previous;
             }, 0);
             responseObject.totalViews = totalViews;
@@ -360,7 +412,10 @@ const channelAnalytics = async (req, res, next) => {
             };
             const totalViewDuraion = (previousVideoViewDuration, video) => {
                 if (video.deleted === false) {
-                    const currentVideoViewDuration = video.views.reduce(singleViewDuration, 0);
+                    const currentVideoViewDuration = video.views.reduce(
+                        singleViewDuration,
+                        0
+                    );
                     return previousVideoViewDuration + currentVideoViewDuration;
                 }
                 return previousVideoViewDuration;

@@ -24,16 +24,16 @@ function CustomizeChannel() {
 
     return (
         <>
-            <div className='container mx-auto bg-gray-900'>
-                <div className='grid grid-cols-5 gap-2 h-screen pt-20'>
-                    <div className='bg-gray-300 bg-opacity-5 overflow-y-scroll scrollbar-hide'>
+            <div className='container min-h-screen mx-auto bg-gray-900'>
+                <div className='grid grid-cols-5 gap-2 min-h-screen pt-20'>
+                    <div className='bg-gray-300 bg-opacity-5'>
                         <Sidebar />
                     </div>
-                    <div className='col-span-4 gap-2 overflow-y-scroll scrollbar-hide space-y-2'>
+                    <div className='col-span-4 gap-2 space-y-2'>
                         <TopBar title='Customize channel' />
-                        <div className='bg-gray-300 bg-opacity-5 p-5'>
+                        <div className='bg-gray-300 bg-opacity-5 p-5 h-screen'>
                             <nav>
-                                <ul className='flex text-gray-300 divide-x divide-gray-600'>
+                                <ul className='flex text-gray-300 divide-x divide-gray-600 font-bold text-sm'>
                                     <li
                                         className={`pr-3 cursor-pointer ${
                                             activeNav === 'layout' && 'text-red-500'
@@ -56,8 +56,9 @@ function CustomizeChannel() {
                                         Branding
                                     </li>
                                 </ul>
+                                <hr className='opacity-20 mt-2' />
                             </nav>
-                            <div className='my-3'>
+                            <div className='my-3 h-[60vh] overflow-scroll overflow-hidden'>
                                 {activeNav === 'layout' && <Layout />}
                                 {activeNav === 'basic-info' && <BasicInfo />}
                                 {activeNav === 'branding' && <Branding />}

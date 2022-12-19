@@ -61,6 +61,8 @@ const getLatestVideo = async function (params) {
 };
 
 const getVideos = async function (searchParams, accessToken) {
+    console.log('Search')
+    console.log(searchParams)
     const { data } = await api.get(`${API_URL}/videos/`, {
         params: searchParams,
         headers: {

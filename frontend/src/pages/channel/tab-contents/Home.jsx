@@ -57,7 +57,7 @@ function Home({ channel, isFollowChannelLoading, requestedVideos }) {
                                           <div>
                                               <GenreTitle title={category} />
                                           </div>
-                                          <div className='flex gap-3 overflow-hidden overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 pb-5'>
+                                          <div className='flex gap-3 md:mr-5 overflow-hidden overflow-x-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 pb-5'>
                                               {requestedVideos[category].map((video, index) => {
                                                   const {
                                                       _id: videoId,
@@ -69,7 +69,7 @@ function Home({ channel, isFollowChannelLoading, requestedVideos }) {
                                                       <>
                                                           <Link
                                                               to={`/videos/${videoId}`}
-                                                              className='min-w-[80%] max-w-[80%] md:min-w-[60%] md:max-w-[60%] md: lg:min-w-[25%] lg:max-w-[25%]'>
+                                                              className='min-w-[80%] max-w-[80%] md:min-w-[30%] md:max-w-[30%] md: lg:min-w-[25%] lg:max-w-[25%]'>
                                                               <VideoThumbnail
                                                                   image={thumbnail?.url}
                                                                   length={videoProperties?.duration}

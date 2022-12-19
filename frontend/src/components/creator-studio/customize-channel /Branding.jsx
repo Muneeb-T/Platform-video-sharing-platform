@@ -78,13 +78,13 @@ function Branding() {
             <ul className='space-y-4'>
                 <li className='space-y-2'>
                     <p className='text-gray-400 text-sm'>Logo</p>
-                    <div className='grid grid-cols-3'>
+                    <div className='md:grid md:grid-cols-3 '>
                         <div className='bg-gray-600 bg-opacity-40 h-36 flex items-center justify-center'>
                             <img
                                 className='h-20 w-20 rounded-full'
                                 src={profilePicture || AvatarThumbnail}
                                 referrerPolicy='no-referrer'
-                                alt=''
+                                alt='channel logo'
                             />
                         </div>
                         <div className='col-span-2 bg-gray-700 bg-opacity-20 flex items-center p-6'>
@@ -130,7 +130,7 @@ function Branding() {
                 </li>
                 <li className='space-y-2'>
                     <p className='text-gray-400 text-sm'>Banner</p>
-                    <div className='grid grid-cols-3'>
+                    <div className='md:grid md:grid-cols-3'>
                         <div className='bg-gray-600 bg-opacity-40 h-36 flex items-center justify-center'>
                             <img
                                 className='w-full h-full'
@@ -180,13 +180,13 @@ function Branding() {
                 </li>
                 <li className='space-y-2'>
                     <p className='text-gray-400 text-sm'>Watermark</p>
-                    <div className='grid grid-cols-3'>
+                    <div className='md:grid md:grid-cols-3'>
                         <div className='col bg-gray-600 bg-opacity-40 h-36 flex items-start justify-end p-3'>
                             <img
                                 className='w-12 h-12'
                                 src={channel?.watermark?.url || channelBannerThumbnail}
                                 referrerPolicy='no-referrer'
-                                alt=''
+                                alt='watermark'
                             />
                         </div>
                         <div className='col-span-2 bg-gray-700 bg-opacity-20 flex items-center p-6'>

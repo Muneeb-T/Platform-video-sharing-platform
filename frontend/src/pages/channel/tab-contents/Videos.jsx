@@ -1,7 +1,4 @@
 import React, { useEffect, Fragment } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Menu, Transition } from '@headlessui/react';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import VideoGroup from '../../../components/VideoGroup-5';
 import { useSelector, useDispatch } from 'react-redux';
 import { getVideos, resetVideos } from '../../../redux/features/video/videoSlice';

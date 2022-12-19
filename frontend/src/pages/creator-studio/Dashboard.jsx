@@ -135,7 +135,7 @@ function Dashboard() {
     return (
         <>
             <div className='mx-auto bg-gray-900 pt-20'>
-                <div className='grid grid-cols-5 gap-2 container mx-auto'>
+                <div className='grid grid-cols-5 gap-2 container h-screen mx-auto'>
                     <Sidebar />
                     <div className='col-span-4 gap-2 space-y-2'>
                         <TopBar title='Channel Dashboard' />
@@ -145,9 +145,9 @@ function Dashboard() {
                         isChannelAnalyticsLoading ? (
                             <Spinner />
                         ) : (
-                            <div className='grid grid-cols-1 lg:grid-cols-2 gap-2 h-[80vh] overflow-scroll overflow-x-hidden'>
+                            <div className='grid grid-cols-1 lg:grid-cols-2 gap-2 h-[80vh] overflow-scroll overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700'>
                                 <>
-                                    <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-5 space-y-3 lg:h-full lg:overflow-scroll'>
+                                    <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-5 space-y-3 overflow-x-hidden min-h-[60vh] lg:h-full scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700'>
                                         {Object.keys(latestVideo)?.length ? (
                                             <>
                                                 <VideoJS
@@ -204,7 +204,7 @@ function Dashboard() {
                                                 </div>
                                             </>
                                         ) : (
-                                            <div className='container p-10 flex items-center justify-center max-h-[80vh] overflow-scroll'>
+                                            <div className='container p-10 flex items-center justify-center max-h-[80vh] overflow-x-hidden overflow-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700'>
                                                 <div className='text-center'>
                                                     <p className='text-3xl text-red-500 font-bold'>
                                                         You have no uploads
@@ -224,8 +224,8 @@ function Dashboard() {
                                         )}
                                     </div>
 
-                                    <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-5 h-full'>
-                                        <div className='flex items-center justify-between '>
+                                    <div className='grid-cols-1 bg-gray-300 bg-opacity-5 p-5 h-full '>
+                                        <div className='flex items-center justify-between'>
                                             <p className='text-md text-gray-300 font-bold'>
                                                 Channel analytics
                                             </p>
@@ -249,8 +249,8 @@ function Dashboard() {
                                             <p className='font-bold text-gray-300'>Top 5 videos</p>
                                             <hr className='opacity-20 mb-3' />
                                             {topVideos.length ? (
-                                                <div className='lg:max-h-[40vh] lg:overflow-scroll lg:border border-gray-300 border-opacity-20'>
-                                                    <VideoGroup3 videos={topVideos}/>
+                                                <div className='lg:max-h-[40vh] overflow-x-hidden lg:overflow-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 border-opacity-20'>
+                                                    <VideoGroup3 videos={topVideos} />
                                                 </div>
                                             ) : (
                                                 <div className='container p-10 mx-auto flex items-center justify-center bg-gray-600 bg-opacity-20'>

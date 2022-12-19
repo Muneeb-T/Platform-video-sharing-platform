@@ -31,24 +31,41 @@ function Genres({ videos, title }) {
                                     length={videoProperties?.duration}
                                 />
                                 <div className='my-auto'>
-                                    <p className='text-gray-200 line-clamp-1'>{videoTitle}</p>
+                                    <p className='text-gray-200 line-clamp-1'>
+                                        {videoTitle}
+                                    </p>
                                     <div className='flex gap-2 mt-1 items-center text-gray-400'>
                                         <img
                                             className='w-8 h-8 rounded-full'
                                             src={
-                                                uploadedBy?.profilePicture?.url ||
-                                                uploadedBy?.googleAccount?.picture ||
-                                                uploadedBy?.facebookAccount?.picture ||
+                                                uploadedBy?.profilePicture
+                                                    ?.url ||
+                                                uploadedBy?.googleAccount
+                                                    ?.picture ||
+                                                uploadedBy?.facebookAccount
+                                                    ?.picture ||
                                                 AvatarThumbnail
                                             }
                                             alt='Rounded avatar'
                                         />
-                                        <div className='flex text-xs sm:text-sm'>
-                                            <p>{uploadedBy?.username}</p>
-                                            <p className='mx-3 text-gray-600'>|</p>
-                                            <p>{views} Views</p>
-                                            <p className='mx-3 text-gray-600'>|</p>
-                                            <p>{moment(createdAt).from(new Date())}</p>
+                                        <div className='flex text-xs items-center'>
+                                            <p className='line-clamp-1 shrink-0 max-w-[25%]'>
+                                                {uploadedBy?.username}
+                                            </p>
+                                            <p className='mx-3 text-gray-600 shrink-0'>
+                                                |
+                                            </p>
+                                            <p className='shrink-0'>
+                                                {views} Views
+                                            </p>
+                                            <p className='mx-3 text-gray-600'>
+                                                |
+                                            </p>
+                                            <p className='shrink-0'>
+                                                {moment(createdAt).from(
+                                                    new Date()
+                                                )}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>

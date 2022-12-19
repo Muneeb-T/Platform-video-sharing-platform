@@ -23,18 +23,17 @@ function BasicInfo() {
     console.log(updateChannelMessage);
 
     useEffect(() => {
-        dispatch(getChannel({userId:requestedUserId}));
-        if(updateChannelSuccess){
-            toast.success(updateChannelMessage)
+        dispatch(getChannel({ userId: requestedUserId }));
+        if (updateChannelSuccess) {
+            toast.success(updateChannelMessage);
         }
-        if(updateChannelError){
-            toast.error(updateChannelError)
+        if (updateChannelError) {
+            toast.error(updateChannelError);
         }
         return () => {
             dispatch(reset());
         };
-    }, [requestedUserId,updateChannelSuccess, updateChannelError]);
-
+    }, [requestedUserId, updateChannelSuccess, updateChannelError]);
 
     if (isGetChannelLoading) {
         return <Spinner2 />;
@@ -76,41 +75,44 @@ function BasicInfo() {
             {(form) => {
                 return (
                     <>
-                        <Form className='col-span-4 gap-2 overflow-y-scroll overflow-hidden scrollbar-hide space-y-2'>
+                        <Form className='col-span-4 gap-2 overflow-y-scroll scrollbar-hide space-y-2'>
                             <div>
-                                <hr className='opacity-30' />
-                                <ul className='space-y-4 mt-6'>
-                                    <li className='flex justify-between items-center'>
+                                <ul className='space-y-4 mt-3'>
+                                    <li>
                                         <div>
                                             <p className='text-gray-400 text-sm'>Channel name</p>
-                                            <Field
-                                                id='channelName'
-                                                name='channelName'
-                                                className='relative block bg-transparent appearance-none rounded-sm border-b border-gray-500 py-1 text-gray-300 placeholder-gray-500 focus:z-10 focus:border-red-500 focus:outline-none focus:ring-red-500'
-                                                placeholder='Channel name'
-                                            />
-                                            <div className='text-red-500 absolute text-[13px]'>
-                                                <ErrorMessage
-                                                    name='channel-name'
-                                                    className='text-gray-500'
+                                            <div className='flex gap-3'>
+                                                <Field
+                                                    id='channelName'
+                                                    name='channelName'
+                                                    className='bg-transparent w-full rounded-sm border-b border-gray-500 py-1 text-gray-300 placeholder-gray-500 focus:z-10 focus:border-red-500 focus:outline-none focus:ring-red-500'
+                                                    placeholder='Channel name'
                                                 />
+                                                <div className='text-red-500 absolute text-[13px]'>
+                                                    <ErrorMessage
+                                                        name='channel-name'
+                                                        className='text-gray-500'
+                                                    />
+                                                </div>
+                                                <button
+                                                    disabled={updateChannelLoading}
+                                                    type='submit'
+                                                    className={`px-10 group relative flex items-center justify-center rounded-sm border border-transparent ${
+                                                        updateChannelLoading
+                                                            ? `bg-red-800`
+                                                            : `bg-red-700`
+                                                    } py-1 text-sm font-medium text-white ${
+                                                        `hover:bg-red-600` && updateChannelLoading
+                                                    } focus:outline-none`}>
+                                                    {updateChannelLoading && (
+                                                        <div
+                                                            className='spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full absolute left-3'
+                                                            role='status'></div>
+                                                    )}
+                                                    Save
+                                                </button>
                                             </div>
                                         </div>
-                                        <button
-                                            disabled={updateChannelLoading}
-                                            type='submit'
-                                            className={`px-10 group relative flex items-center justify-center rounded-sm border border-transparent ${
-                                                updateChannelLoading ? `bg-red-800` : `bg-red-700`
-                                            } py-1 text-sm font-medium text-white ${
-                                                `hover:bg-red-600` && updateChannelLoading
-                                            } focus:outline-none`}>
-                                            {updateChannelLoading && (
-                                                <div
-                                                    className='spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full absolute left-3'
-                                                    role='status'></div>
-                                            )}
-                                            Save
-                                        </button>
                                     </li>
                                     <li>
                                         <p className='text-gray-400 text-sm'>Channel description</p>

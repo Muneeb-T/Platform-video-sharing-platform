@@ -59,13 +59,13 @@ function Content() {
 
     return (
         <>
-            <div className='container mx-auto bg-gray-900'>
+            <div className='container mx-auto bg-gray-900 min-h-screen'>
                 <div className='grid grid-cols-5 gap-2 pt-20'>
                     <Sidebar />
                     <div className='col-span-4 gap-2 space-y-2'>
                         <TopBar title='Channel Content' />
-                        <div className='bg-gray-300 bg-opacity-5  p-5'>
-                            <div className='flex text-gray-300  text-sm gap-3'>
+                        <div className='bg-gray-300 bg-opacity-5 h-screen  p-5'>
+                            <div className='flex text-gray-300 text-sm gap-3'>
                                 <Menu
                                     as='div'
                                     className='relative flex-none inline-block text-left'>
@@ -345,7 +345,7 @@ function Content() {
                             ) : (
                                 <>
                                     {videos?.length ? (
-                                        <div className='space-y-3 mt-3'>
+                                        <div className='space-y-3 mt-3 max-h-[60vh] overflow-scroll overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 pr-5'>
                                             <VideoContent videos={videos} sort={sortVideos} />
                                         </div>
                                     ) : (

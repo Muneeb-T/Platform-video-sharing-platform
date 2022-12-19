@@ -320,13 +320,13 @@ function ChannelHome() {
                                     {channel ? (
                                         <>
                                             <div>
-                                                <div className='flex m-2'>
+                                                <div className='flex m-2 '>
                                                     {tabs.map((individualTab, index) => {
                                                         return (
                                                             <>
                                                                 <Link
                                                                     key={individualTab.id}
-                                                                    className='shrink-0'
+                                                                    className='shrink-0 font-bold'
                                                                     onClick={() =>
                                                                         setTab(individualTab.id)
                                                                     }>
