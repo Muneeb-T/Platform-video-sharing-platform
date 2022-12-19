@@ -36,29 +36,36 @@ function CustomizeChannel() {
                                 <ul className='flex text-gray-300 divide-x divide-gray-600 font-bold text-sm'>
                                     <li
                                         className={`pr-3 cursor-pointer ${
-                                            activeNav === 'layout' && 'text-red-500'
+                                            activeNav === 'layout' &&
+                                            'text-red-500'
                                         }`}
                                         onClick={() => setActiveNav('layout')}>
                                         Layout
                                     </li>
                                     <li
                                         className={`px-3 cursor-pointer ${
-                                            activeNav === 'basic-info' && 'text-red-500'
+                                            activeNav === 'basic-info' &&
+                                            'text-red-500'
                                         }`}
-                                        onClick={() => setActiveNav('basic-info')}>
+                                        onClick={() =>
+                                            setActiveNav('basic-info')
+                                        }>
                                         Basic info
                                     </li>
                                     <li
                                         className={`pl-3 cursor-pointer ${
-                                            activeNav === 'branding' && 'text-red-500'
+                                            activeNav === 'branding' &&
+                                            'text-red-500'
                                         }`}
-                                        onClick={() => setActiveNav('branding')}>
+                                        onClick={() =>
+                                            setActiveNav('branding')
+                                        }>
                                         Branding
                                     </li>
                                 </ul>
                                 <hr className='opacity-20 mt-2' />
                             </nav>
-                            <div className='my-3 h-[60vh] overflow-scroll overflow-hidden'>
+                            <div className='my-3 h-[60vh] overflow-scroll overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 pr-5'>
                                 {activeNav === 'layout' && <Layout />}
                                 {activeNav === 'basic-info' && <BasicInfo />}
                                 {activeNav === 'branding' && <Branding />}

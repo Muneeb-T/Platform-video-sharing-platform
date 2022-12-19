@@ -26,9 +26,8 @@ function Content(props) {
     const { videos, sort } = props || {};
     const transform = [...videos];
     const { order, credential } = sort || {};
-    const { updateVideoLoading, updateVideoSuccess, updateVideoMessage } = useSelector(
-        (state) => state.video
-    );
+    const { updateVideoLoading, updateVideoSuccess, updateVideoMessage } =
+        useSelector((state) => state.video);
     if (transform?.length && order === 'desc') {
         transform.sort(function (a, b) {
             return new Date(b[credential]) - new Date(a[credential]);
@@ -64,13 +63,17 @@ function Content(props) {
 
                 return (
                     <>
-                        <div key={videoId} className='flex gap-2 max-w-full items-center'>
+                        <div
+                            key={videoId}
+                            className='flex gap-2 max-w-full items-center'>
                             <div className='form-check'>
                                 <input
                                     className='form-check-input appearance-none h-4 w-4 border border-gray-500 rounded-sm  checked:bg-red-600 checked:bg-opacity-60 checked:border-gray-300 checked:border-opacity-40 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer'
                                     type='checkbox'
                                     id='flexCheckChecked'
-                                    onChange={() => dispatch(setSelectedVideos(videoId))}
+                                    onChange={() =>
+                                        dispatch(setSelectedVideos(videoId))
+                                    }
                                 />
                             </div>
                             <div className='flex gap-5 overflow-scroll overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 items-center pb-5'>
@@ -83,7 +86,9 @@ function Content(props) {
                                         />
                                     </div>
                                     <div className='space-y-1 lg:max-w-[300px]'>
-                                        <p className='text-gray-300 line-clamp-1'>{title}</p>
+                                        <p className='text-gray-300 line-clamp-1'>
+                                            {title}
+                                        </p>
                                         {/* <button className='rounded-full px-1 bg-gray-300 bg-opacity-20'>
                                                         <MoreVertIcon
                                                             sx={{
@@ -106,7 +111,9 @@ function Content(props) {
                                                             fontSize: 'medium',
                                                         }}
                                                     />
-                                                    <p className='hidden md:block'>Details</p>
+                                                    <p className='hidden md:block'>
+                                                        Details
+                                                    </p>
                                                 </Link>
                                             </li>
                                             <li>
@@ -116,7 +123,9 @@ function Content(props) {
                                                             fontSize: 'medium',
                                                         }}
                                                     />
-                                                    <p className='hidden md:block'>Analytics</p>
+                                                    <p className='hidden md:block'>
+                                                        Analytics
+                                                    </p>
                                                 </Link>
                                             </li>
                                             <li>
@@ -126,7 +135,9 @@ function Content(props) {
                                                             fontSize: 'medium',
                                                         }}
                                                     />
-                                                    <p className='hidden md:block'>Comments</p>
+                                                    <p className='hidden md:block'>
+                                                        Comments
+                                                    </p>
                                                 </Link>
                                             </li>
                                         </ul>
@@ -146,7 +157,8 @@ function Content(props) {
                                             </label>
                                             <>
                                                 {updateVideoLoading &&
-                                                    videoId === updatingVideoId && (
+                                                    videoId ===
+                                                        updatingVideoId && (
                                                         <>
                                                             <div
                                                                 className='spinner-border lg:mx-auto  text-gray-300 animate-spin w-3 h-3 border-2 rounded-full'
@@ -166,7 +178,8 @@ function Content(props) {
                                                     updateVideo({
                                                         videoId,
                                                         userId: user?._id,
-                                                        visibility: e.target.value,
+                                                        visibility:
+                                                            e.target.value,
                                                     })
                                                 );
                                             }}
@@ -188,16 +201,24 @@ function Content(props) {
                                     <table className='text-xs text-gray-300 shrink-0'>
                                         <tr className='gap-3'>
                                             <td className='flex items-center gap-2 px-2'>
-                                                <CalendarIcon sx={{ fontSize: 'medium' }} />
+                                                <CalendarIcon
+                                                    sx={{ fontSize: 'medium' }}
+                                                />
                                                 <p>Uploaded date</p>
                                             </td>
                                             <td className='px-2'>
-                                                <p>{moment(createdAt).format('MMM DD - YYYY')}</p>
+                                                <p>
+                                                    {moment(createdAt).format(
+                                                        'MMM DD - YYYY'
+                                                    )}
+                                                </p>
                                             </td>
                                         </tr>
                                         <tr className='gap-3'>
                                             <td className='flex items-center gap-2 px-2'>
-                                                <ViewsIcon sx={{ fontSize: 'medium' }} />
+                                                <ViewsIcon
+                                                    sx={{ fontSize: 'medium' }}
+                                                />
                                                 <p>Views</p>
                                             </td>
                                             <td className='px-2'>
@@ -206,7 +227,9 @@ function Content(props) {
                                         </tr>
                                         <tr className='gap-3'>
                                             <td className='flex items-center gap-2 px-2'>
-                                                <LikeIcon sx={{ fontSize: 'medium' }} />
+                                                <LikeIcon
+                                                    sx={{ fontSize: 'medium' }}
+                                                />
                                                 <p>Likes</p>
                                             </td>
                                             <td className='px-2'>
@@ -215,8 +238,12 @@ function Content(props) {
                                         </tr>
                                         <tr className='gap-3'>
                                             <td className='flex items-center gap-2 px-2'>
-                                                <DislikeIcon sx={{ fontSize: 'medium' }} />
-                                                <p className='text-xs'>Dislikes</p>
+                                                <DislikeIcon
+                                                    sx={{ fontSize: 'medium' }}
+                                                />
+                                                <p className='text-xs'>
+                                                    Dislikes
+                                                </p>
                                             </td>
                                             <td className='px-2'>
                                                 <p>{dislikes} Dislikes</p>

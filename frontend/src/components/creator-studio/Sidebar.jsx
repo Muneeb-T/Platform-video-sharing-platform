@@ -15,8 +15,6 @@ import { useSelector } from 'react-redux';
 import AvatarThumbnail from '../../assets/images/avatar-thumbnail.png';
 
 function Sidebar() {
-    const [active, setActive] = useState(1);
-    let activeClass = 'bg-red-600';
     const { user } = useSelector((state) => state.auth);
     const { id: channelId } = useParams();
     const { channel } = useSelector((state) => state.channel);
@@ -45,10 +43,7 @@ function Sidebar() {
                         <li>
                             <Link
                                 to={`${baseNavigation}`}
-                                onClick={(e) => setActive(1)}
-                                className={`${
-                                    active === 1 && activeClass
-                                } relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600`}>
+                                className='relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600'>
                                 <span className='inline-flex justify-center items-center mx-auto lg:mx-0 lg:ml-8'>
                                     <DashboardIcon />
                                 </span>
@@ -60,10 +55,7 @@ function Sidebar() {
                         <li>
                             <Link
                                 to={`${baseNavigation}/content`}
-                                onClick={(e) => setActive(2)}
-                                className={`${
-                                    active === 2 && activeClass
-                                } relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600`}>
+                                className='relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600'>
                                 <span className='inline-flex justify-center items-center mx-auto lg:mx-0 lg:ml-8'>
                                     <ContentIcon />
                                 </span>
@@ -75,10 +67,7 @@ function Sidebar() {
                         <li>
                             <Link
                                 to={`${baseNavigation}/analytics`}
-                                onClick={(e) => setActive(3)}
-                                className={`${
-                                    active === 3 && activeClass
-                                } relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600`}>
+                                className='relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600'>
                                 <span className='inline-flex justify-center items-center mx-auto lg:mx-0 lg:ml-8'>
                                     <AnalyticsIcon />
                                 </span>
@@ -90,10 +79,7 @@ function Sidebar() {
                         <li>
                             <Link
                                 to={`${baseNavigation}/playlist`}
-                                onClick={(e) => setActive(4)}
-                                className={`${
-                                    active === 4 && activeClass
-                                } relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600`}>
+                                className='relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600'>
                                 {' '}
                                 <span className='inline-flex justify-center items-center mx-auto lg:mx-0 lg:ml-8'>
                                     <PlaylistPlayIcon />
@@ -106,10 +92,7 @@ function Sidebar() {
                         <li>
                             <Link
                                 to={`${baseNavigation}/comments`}
-                                onClick={(e) => setActive(5)}
-                                className={`${
-                                    active === 5 && activeClass
-                                } relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600`}>
+                                className='relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600'>
                                 <span className='inline-flex justify-center items-center mx-auto lg:mx-0 lg:ml-8'>
                                     <CommentIcon />
                                 </span>
@@ -121,10 +104,7 @@ function Sidebar() {
                         <li>
                             <Link
                                 to={`${baseNavigation}/monitization`}
-                                onClick={(e) => setActive(6)}
-                                className={`${
-                                    active === 6 && activeClass
-                                } relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600`}>
+                                className='relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600'>
                                 {' '}
                                 <span className='inline-flex justify-center items-center mx-auto lg:mx-0 lg:ml-8'>
                                     <MonetizationOnIcon />
@@ -137,10 +117,7 @@ function Sidebar() {
                         <li>
                             <Link
                                 to={`${baseNavigation}/customize-channel`}
-                                onClick={(e) => setActive(7)}
-                                className={`${
-                                    active === 7 && activeClass
-                                } relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600`}>
+                                className='relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600'>
                                 {' '}
                                 <span className='inline-flex justify-center items-center mx-auto lg:mx-0 lg:ml-8'>
                                     <CustomizationIcon />
@@ -153,10 +130,7 @@ function Sidebar() {
                         <li>
                             <Link
                                 to={`${baseNavigation}/copyright`}
-                                onClick={(e) => setActive(8)}
-                                className={`${
-                                    active === 8 && activeClass
-                                } relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600`}>
+                                className='relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600'>
                                 {' '}
                                 <span className='inline-flex justify-center items-center mx-auto lg:mx-0 lg:ml-8'>
                                     <CopyrightIcon />
@@ -169,10 +143,7 @@ function Sidebar() {
                         <li>
                             <Link
                                 to={`channel/${channelId}/settings`}
-                                onClick={(e) => setActive(9)}
-                                className={`${
-                                    active === 9 && activeClass
-                                } relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600`}>
+                                className='relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600'>
                                 <span className='inline-flex justify-center items-center mx-auto lg:mx-0 lg:ml-8'>
                                     <SettingsIcon />
                                 </span>
@@ -184,10 +155,7 @@ function Sidebar() {
                         <li>
                             <Link
                                 to={`/channel/${channelId}/send-feedback`}
-                                onClick={(e) => setActive(10)}
-                                className={`${
-                                    active === 10 && activeClass
-                                } relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600`}>
+                                className='relative flex flex-row items-center h-11 focus:outline-none bg-gray-700 bg-opacity-50 hover:bg-gray-600'>
                                 <span className='inline-flex justify-center items-center mx-auto lg:mx-0 lg:ml-8'>
                                     <FeedbackIcon />
                                 </span>
@@ -201,7 +169,6 @@ function Sidebar() {
             </div>
             <Routes>
                 <Route path='/channel/creator-studio' element={<Dashboard />} />
-                <Route path='/topics' element={<></>} />
             </Routes>
         </>
     );

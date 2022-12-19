@@ -51,46 +51,53 @@ function VideoUploadModal() {
 
     return (
         <>
-            <div className='fixed inset-0 z-50 overflow-y-auto scrollbar-hide'>
-                <div className='flex items-center min-h-screen px-4 py-8'>
+            <div className='fixed inset-0 z-50 overflow-y-auto scrollbar-hide bg-gray-900 bg-opacity-60'>
+                <div className='flex items-center min-h-screen'>
                     <div className='relative w-full  p-10 max-w-5xl mx-auto bg-gray-900 bg-opacity-90 rounded-md shadow-lg space-y-5'>
                         <>
                             <div className='flex text-gray-300 justify-between'>
-                                <p className='font-bold text-lg'>Upload video</p>
+                                <p className='font-bold text-lg'>
+                                    Upload video
+                                </p>
                                 <CloseIcon
                                     className='cursor-pointer'
-                                    onClick={() => dispatch(setShowVideoUploadModal(false))}
+                                    onClick={() =>
+                                        dispatch(setShowVideoUploadModal(false))
+                                    }
                                 />
                             </div>
                             <hr className='opacity-20' />
                             {uploadingOnProcess ? (
                                 <>
-                                    <div className='space-y-5 relative'>
+                                    <div className='space-y-5 relative flex flex-col-reverse md:block'>
                                         <VideoDetailsForm />
                                         {isVideoUploadLoading ? (
                                             <>
-                                                <div className='h-10 flex items-center gap-3 rounded-sm w-full absolute -bottom-10 right-0'>
+                                                <div className='h-10 flex items-center gap-3 rounded-sm w-full'>
                                                     <ProgressBar
-                                                        videoUploadProgress={videoUploadProgress}
+                                                        videoUploadProgress={
+                                                            videoUploadProgress
+                                                        }
                                                     />
                                                 </div>
                                             </>
                                         ) : null}
                                         {isVideoUploadSuccess ? (
                                             <>
-                                                <div className='h-10 flex gap-3 text-center items-center justify-center rounded-sm w-full absolute -bottom-10 right-0'>
+                                                <div className='h-10 flex gap-3 text-center items-center justify-center rounded-sm w-full '>
                                                     <div className='text-green-400'>
                                                         <DoneIcon />
                                                     </div>
                                                     <p className='text-gray-300'>
-                                                        Video uploaded successfully
+                                                        Video uploaded
+                                                        successfully
                                                     </p>
                                                 </div>
                                             </>
                                         ) : null}
                                         {isVideoUploadError ? (
                                             <>
-                                                <div className='h-10 flex gap-3 text-center items-center justify-center rounded-sm w-full absolute -bottom-10 right-0'>
+                                                <div className='h-10 flex gap-3 text-center items-center justify-center rounded-sm w-full'>
                                                     <div className='text-red-400'>
                                                         <CloseIcon />
                                                     </div>
@@ -103,7 +110,7 @@ function VideoUploadModal() {
                                     </div>
                                 </>
                             ) : (
-                                <div className='p-20 space-y-5 relative text-center'>
+                                <div className='p-5 sm:p-20 space-y-5 relative text-center'>
                                     <div className='flex items-center justify-center bg-grey-lighter'>
                                         <div className='flex justify-center items-center w-full'>
                                             <label
@@ -127,7 +134,8 @@ function VideoUploadModal() {
                                                         <span className='font-semibold'>
                                                             Click to upload
                                                         </span>{' '}
-                                                        or drag and drop your video
+                                                        or drag and drop your
+                                                        video
                                                     </p>
                                                 </div>
                                                 <input
@@ -135,7 +143,9 @@ function VideoUploadModal() {
                                                     type='file'
                                                     className='hidden'
                                                     onDrop={inputVideoOnDrop}
-                                                    onChange={inputVideoOnChange}
+                                                    onChange={
+                                                        inputVideoOnChange
+                                                    }
                                                     accept='video/*'
                                                 />
                                             </label>

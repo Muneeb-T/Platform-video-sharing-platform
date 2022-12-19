@@ -13,7 +13,7 @@ function ProgressBar({ videoUploadProgress }) {
                     }}></div>
             </div>
             <Link className='text-gray-300'>
-                <CloseIcon />
+                <CloseIcon sx={{ fontSize: 'medium' }} />
             </Link>
         </>
     );

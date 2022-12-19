@@ -16,7 +16,7 @@ function UploadToast() {
     const videoTitle = video?.details?.title || videoUploadForm?.title;
     return (
         <>
-            <div className='bg-gray-700 flex bg-opacity-90 justify-between px-5 py-2  items-center'>
+            <div className='bg-gray-700 flex bg-opacity-90 justify-between px-5 py-2 text-sm font-bold  items-center'>
                 <p className='text-gray-300'>
                     {isVideoUploadSuccess
                         ? 'Uploaded finished'

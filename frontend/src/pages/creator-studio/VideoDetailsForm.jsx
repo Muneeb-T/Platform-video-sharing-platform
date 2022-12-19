@@ -37,7 +37,13 @@ function VideoDetailsForm() {
 
         canvas
             .getContext('2d')
-            .drawImage(tempVideo, 0, 0, tempVideo.videoWidth, tempVideo.videoHeight);
+            .drawImage(
+                tempVideo,
+                0,
+                0,
+                tempVideo.videoWidth,
+                tempVideo.videoHeight
+            );
         const imageUrl = canvas.toDataURL('image/png');
         setGeneratedThumbnail(imageUrl);
     }
@@ -100,7 +106,6 @@ function VideoDetailsForm() {
         category: Yup.string().required('Select video category'),
         language: Yup.string().required('Select video language'),
         schedule: Yup.object().shape({
-            premiere: Yup.boolean(),
             date: Yup.string(),
             time: Yup.string(),
         }),
@@ -128,7 +133,6 @@ function VideoDetailsForm() {
                     language: videoUploadForm?.language || 'English',
                     schedule: schedule
                         ? videoUploadForm?.schedule || {
-                              premiere: false,
                               dateTime: null,
                           }
                         : {},
@@ -143,10 +147,80 @@ function VideoDetailsForm() {
                     return (
                         <>
                             <Form onChange={onChangeUploadForm}>
-                                <div className='grid grid-cols-3 gap-3 mb-3'>
+                                <div className='md:grid md:grid-cols-3 gap-3 mb-3'>
+                                    <div className='space-y-3 bg-gray-700 bg-opacity-20 py-3 px-4 h-full mb-3 md:mb-0'>
+                                        <div>
+                                            <label className='text-gray-300 text-sm font-bold'>
+                                                Preview
+                                            </label>
+                                            <div>
+                                                <VideoJS
+                                                    options={videoJsOptions}
+                                                    onReady={handlePlayerReady}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className='relative'>
+                                            <label
+                                                htmlFor='video-visibility'
+                                                className='text-gray-300 text-sm font-bold'>
+                                                Visibility
+                                            </label>
+                                            <Field
+                                                as='select'
+                                                name='visibility'
+                                                className='relative block w-full block w-full rounded-sm border-0 outline-0 text-gray-300 py-2 px-3 bg-gray-700 shadow-sm sm:text-sm'
+                                                placeholder='Visibility'>
+                                                <option value='public'>
+                                                    Public
+                                                </option>
+                                                <option value='private'>
+                                                    Private
+                                                </option>
+
+                                                <option value='unlisted'>
+                                                    Unlisted
+                                                </option>
+                                            </Field>
+                                            <div className='text-red-500 absolute text-[13px]'>
+                                                <ErrorMessage name='visibility' />
+                                            </div>
+                                        </div>
+                                        <div className='relative'>
+                                            <label
+                                                htmlFor='video-schedule'
+                                                className='text-gray-300 text-sm font-bold flex items-center gap-3'>
+                                                <p>Schedule</p>
+                                                <input
+                                                    type='checkbox'
+                                                    className='rounded-sm'
+                                                    checked={schedule}
+                                                    onChange={(e) =>
+                                                        setSchedule(!schedule)
+                                                    }
+                                                />
+                                            </label>
+
+                                            <div className='relative mb-3'>
+                                                <div className='datepicker'>
+                                                    <Field
+                                                        disabled={!schedule}
+                                                        type='datetime-local'
+                                                        name='schedule.dateTime'
+                                                        className='relative block w-full block w-full  rounded-sm border-0 outline-0 text-gray-300 py-2 px-3 bg-gray-700 shadow-sm sm:text-sm'
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className='text-red-500 absolute text-[13px]'>
+                                                <ErrorMessage name='schedule.date' />
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div className='col-span-2 space-y-5 rounded'>
                                         <div className='relative'>
-                                            <label htmlFor='video-title' className='text-gray-300'>
+                                            <label
+                                                htmlFor='video-title'
+                                                className='text-gray-300'>
                                                 Video Title
                                             </label>
                                             <Field
@@ -188,18 +262,21 @@ function VideoDetailsForm() {
                                                 className='text-gray-300'>
                                                 Thumbnail
                                                 <span className='text-gray-500 text-xs ml-2'>
-                                                    (Upload a thumbnail or it will take generated
+                                                    (Upload a thumbnail or it
+                                                    will take generated
                                                     thumbnail by default)
                                                 </span>
                                             </label>
-                                            <div className='flex items-center w-full gap-3'>
+                                            <div className='flex items-center flex-wrap w-full gap-3'>
                                                 <label
                                                     htmlFor='dropzone-file'
-                                                    className='flex flex-col relative justify-center items-center w-[160px] h-[90px] bg-gray-50 rounded-sm border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600'>
+                                                    className='flex flex-col relative justify-center items-center w-[160px] h-[90px] bg-gray-50 rounded-sm border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 shrink-0'>
                                                     {uploadedThumbnail ? (
                                                         <>
                                                             <img
-                                                                src={uploadedThumbnail}
+                                                                src={
+                                                                    uploadedThumbnail
+                                                                }
                                                                 className='w-full h-full'
                                                                 alt=''
                                                             />
@@ -221,7 +298,7 @@ function VideoDetailsForm() {
                                                                         d='M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12'></path>
                                                                 </svg>
                                                             </div>
-                                                            <p className='text-sm text-gray-500 dark:text-gray-400'>
+                                                            <p className='text-xs text-gray-500 dark:text-gray-400'>
                                                                 Upload Thumbnail
                                                             </p>
                                                         </>
@@ -232,13 +309,24 @@ function VideoDetailsForm() {
                                                         name='thumbnail'
                                                         className='hidden absolute'
                                                         onChange={(e) => {
-                                                            let file = e.target.files[0];
+                                                            let file =
+                                                                e.target
+                                                                    .files[0];
 
-                                                            form.setFieldValue('thumbnail', file);
+                                                            form.setFieldValue(
+                                                                'thumbnail',
+                                                                file
+                                                            );
 
                                                             const fileUrl =
-                                                                URL.createObjectURL(file);
-                                                            dispatch(setUploadedThumbnail(fileUrl));
+                                                                URL.createObjectURL(
+                                                                    file
+                                                                );
+                                                            dispatch(
+                                                                setUploadedThumbnail(
+                                                                    fileUrl
+                                                                )
+                                                            );
                                                         }}
                                                     />
                                                 </label>
@@ -250,10 +338,12 @@ function VideoDetailsForm() {
                                                             generatedThumbnail
                                                         );
                                                         dispatch(
-                                                            setUploadedThumbnail(generatedThumbnail)
+                                                            setUploadedThumbnail(
+                                                                generatedThumbnail
+                                                            )
                                                         );
                                                     }}
-                                                    className='flex flex-col relative justify-center items-center w-[160px] h-[90px] bg-gray-50 rounded-sm  border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600'>
+                                                    className='flex flex-col relative justify-center items-center w-[160px] h-[90px] bg-gray-50 rounded-sm  border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 shrink-0'>
                                                     <img
                                                         src={generatedThumbnail}
                                                         className='h-full'
@@ -275,15 +365,22 @@ function VideoDetailsForm() {
                                                     id='video-language'
                                                     className='relative block w-full block w-full  rounded-sm border-0 outline-0 text-gray-300 py-2 px-3 bg-gray-700 shadow-sm sm:text-sm'
                                                     placeholder='Language'>
-                                                    {languages.map((language) => {
-                                                        return (
-                                                            <>
-                                                                <option value={language.language}>
-                                                                    {language.language}
-                                                                </option>
-                                                            </>
-                                                        );
-                                                    })}
+                                                    {languages.map(
+                                                        (language) => {
+                                                            return (
+                                                                <>
+                                                                    <option
+                                                                        value={
+                                                                            language.language
+                                                                        }>
+                                                                        {
+                                                                            language.language
+                                                                        }
+                                                                    </option>
+                                                                </>
+                                                            );
+                                                        }
+                                                    )}
                                                 </Field>
                                                 <div className='text-red-500 absolute text-[13px]'>
                                                     <ErrorMessage
@@ -310,7 +407,9 @@ function VideoDetailsForm() {
                                                         Entertainment
                                                     </option>
 
-                                                    <option value='Sports'>Sports</option>
+                                                    <option value='Sports'>
+                                                        Sports
+                                                    </option>
                                                 </Field>
                                                 <div className='text-red-500 absolute text-[13px]'>
                                                     <ErrorMessage
@@ -327,7 +426,7 @@ function VideoDetailsForm() {
                                                     isVideoUploadLoading
                                                 }
                                                 type='submit'
-                                                className={`group relative flex items-center w-[20%] justify-center rounded-sm border border-transparent ${
+                                                className={`group relative flex items-center w-full md:w-[20%] justify-center rounded-sm border border-transparent ${
                                                     isVideoDetailsSaveLoading ||
                                                     isVideoUploadLoading
                                                         ? `bg-red-800`
@@ -344,85 +443,6 @@ function VideoDetailsForm() {
                                                 )}
                                                 Save
                                             </button>
-                                        </div>
-                                    </div>
-                                    <div className='space-y-3 bg-gray-700 bg-opacity-20 py-3 px-4 h-full'>
-                                        <div>
-                                            <label className='text-gray-300 text-sm font-bold'>
-                                                Preview
-                                            </label>
-                                            <div>
-                                                <VideoJS
-                                                    options={videoJsOptions}
-                                                    onReady={handlePlayerReady}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className='relative'>
-                                            <label
-                                                htmlFor='video-visibility'
-                                                className='text-gray-300 text-sm font-bold'>
-                                                Visibility
-                                            </label>
-                                            <Field
-                                                as='select'
-                                                name='visibility'
-                                                className='relative block w-full block w-full  rounded-sm border-0 outline-0 text-gray-300 py-2 px-3 bg-gray-700 shadow-sm sm:text-sm'
-                                                placeholder='Visibility'>
-                                                <option value='public'>Public</option>
-                                                <option value='private'>Private</option>
-
-                                                <option value='unlisted'>Unlisted</option>
-                                            </Field>
-                                            <div className='text-red-500 absolute text-[13px]'>
-                                                <ErrorMessage name='visibility' />
-                                            </div>
-                                        </div>
-                                        <div className='relative'>
-                                            <label
-                                                htmlFor='video-schedule'
-                                                className='text-gray-300 text-sm font-bold flex items-center gap-3'>
-                                                <p>Schedule</p>
-                                                <input
-                                                    type='checkbox'
-                                                    className='rounded-sm'
-                                                    checked={schedule}
-                                                    onChange={(e) => setSchedule(!schedule)}
-                                                />
-                                            </label>
-
-                                            <div className='flex gap-3'>
-                                                <Field
-                                                    type='checkbox'
-                                                    disabled={!schedule}
-                                                    onChange={(e) => {
-                                                        form.setFieldValue(
-                                                            'schedule.premiere',
-                                                            e.target.checked
-                                                        );
-                                                    }}
-                                                    name='schedule.premiere'
-                                                    className='rounded-sm'
-                                                />
-                                                <p className='text-gray-400'>Premiere</p>
-                                            </div>
-                                            <div className='text-red-500 absolute text-[13px]'>
-                                                <ErrorMessage name='schedule.premiere' />
-                                            </div>
-
-                                            <div className='relative mb-3'>
-                                                <div className='datepicker'>
-                                                    <Field
-                                                        disabled={!schedule}
-                                                        type='datetime-local'
-                                                        name='schedule.dateTime'
-                                                        className='relative block w-full block w-full  rounded-sm border-0 outline-0 text-gray-300 py-2 px-3 bg-gray-700 shadow-sm sm:text-sm'
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className='text-red-500 absolute text-[13px]'>
-                                                <ErrorMessage name='schedule.date' />
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

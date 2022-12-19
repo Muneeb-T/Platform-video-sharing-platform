@@ -15,7 +15,9 @@ import { toast } from 'react-toastify';
 import Channel from '../pages/channel/Channel';
 import VideoDetails from '../pages/creator-studio/VideoDetails';
 function ChannelRoutes() {
-    const { uploadingOnProcess, showVideoUploadModal } = useSelector((state) => state.video);
+    const { uploadingOnProcess, showVideoUploadModal } = useSelector(
+        (state) => state.video
+    );
     return (
         <>
             <Routes>
@@ -32,7 +34,10 @@ function ChannelRoutes() {
                         <Route path='playlist' element={<Playlist />} />
                         <Route path='comments' element={<Comments />} />
                         <Route path='monitization' element={<Monitization />} />
-                        <Route path='customize-channel' element={<CustomizeChannel />} />
+                        <Route
+                            path='customize-channel'
+                            element={<CustomizeChannel />}
+                        />
                         <Route path='copyright' element={<Copyright />} />
                     </Route>
                 </Route>
@@ -40,7 +45,7 @@ function ChannelRoutes() {
                 <Route path='*' element={<PageNotFound />} />
             </Routes>
             {uploadingOnProcess && !showVideoUploadModal && (
-                <div className='absolute bottom-20 fixed right-10 w-[30%] z-[50]'>
+                <div className='fixed right-[5%] bottom-[15%] w-[80%] sm:[60%] md:w-[40%] lg:w-[40%] z-[50]'>
                     <UploadToast />
                 </div>
             )}

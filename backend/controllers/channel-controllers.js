@@ -143,12 +143,10 @@ const updateChannel = async (req, res, next) => {
             userId.toString() !== channel.owner.toString() &&
             role !== 'admin'
         ) {
-            return res
-                .status(401)
-                .json({
-                    success: false,
-                    message: 'Unautherized access.Channel not matching',
-                });
+            return res.status(401).json({
+                success: false,
+                message: 'Unautherized access.Channel not matching',
+            });
         }
         const {
             channelName,
