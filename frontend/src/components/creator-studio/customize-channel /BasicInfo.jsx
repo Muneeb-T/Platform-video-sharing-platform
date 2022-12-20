@@ -2,7 +2,11 @@ import { ErrorMessage, Field, Formik, Form } from 'formik';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { getChannel, reset, updateChannel } from '../../../redux/features/channel/channelSlice';
+import {
+    getChannel,
+    reset,
+    updateChannel,
+} from '../../../redux/features/channel/channelSlice';
 import Spinner2 from '../../Spinner2';
 import { toast } from 'react-toastify';
 function BasicInfo() {
@@ -80,7 +84,9 @@ function BasicInfo() {
                                 <ul className='space-y-4 mt-3'>
                                     <li>
                                         <div>
-                                            <p className='text-gray-400 text-sm'>Channel name</p>
+                                            <p className='text-gray-400 text-sm'>
+                                                Channel name
+                                            </p>
                                             <div className='flex gap-3'>
                                                 <Field
                                                     id='channelName'
@@ -95,14 +101,17 @@ function BasicInfo() {
                                                     />
                                                 </div>
                                                 <button
-                                                    disabled={updateChannelLoading}
+                                                    disabled={
+                                                        updateChannelLoading
+                                                    }
                                                     type='submit'
                                                     className={`px-10 group relative flex items-center justify-center rounded-sm border border-transparent ${
                                                         updateChannelLoading
                                                             ? `bg-red-800`
                                                             : `bg-red-700`
                                                     } py-1 text-sm font-medium text-white ${
-                                                        `hover:bg-red-600` && updateChannelLoading
+                                                        `hover:bg-red-600` &&
+                                                        updateChannelLoading
                                                     } focus:outline-none`}>
                                                     {updateChannelLoading && (
                                                         <div
@@ -115,7 +124,9 @@ function BasicInfo() {
                                         </div>
                                     </li>
                                     <li>
-                                        <p className='text-gray-400 text-sm'>Channel description</p>
+                                        <p className='text-gray-400 text-sm'>
+                                            Channel description
+                                        </p>
                                         <Field
                                             as='textarea'
                                             id='channel-description'
@@ -133,11 +144,15 @@ function BasicInfo() {
                                     </li>
                                     <hr className='opacity-30' />
                                     <li>
-                                        <p className='text-gray-400 text-sm'>Links</p>
+                                        <p className='text-gray-400 text-sm'>
+                                            Links
+                                        </p>
                                         <ul className='space-y-2 text-sm'>
                                             <li className='flex gap-3'>
                                                 <div>
-                                                    <p className='text-gray-300'>Title</p>
+                                                    <p className='text-gray-300'>
+                                                        Title
+                                                    </p>
                                                     <Field
                                                         type='text'
                                                         id='linkName1'
@@ -153,7 +168,9 @@ function BasicInfo() {
                                                     </div>
                                                 </div>
                                                 <div className='w-full'>
-                                                    <p className='text-gray-300'>URL</p>
+                                                    <p className='text-gray-300'>
+                                                        URL
+                                                    </p>
                                                     <Field
                                                         type='text'
                                                         id='linkUrl1'
@@ -171,7 +188,9 @@ function BasicInfo() {
                                             </li>
                                             <li className='flex gap-3'>
                                                 <div>
-                                                    <p className='text-gray-300'>Title</p>
+                                                    <p className='text-gray-300'>
+                                                        Title
+                                                    </p>
                                                     <Field
                                                         type='text'
                                                         id='linkName2'
@@ -187,7 +206,9 @@ function BasicInfo() {
                                                     </div>
                                                 </div>
                                                 <div className='w-full'>
-                                                    <p className='text-gray-300'>URL</p>
+                                                    <p className='text-gray-300'>
+                                                        URL
+                                                    </p>
                                                     <Field
                                                         type='text'
                                                         id='linkUrl2'
@@ -205,7 +226,9 @@ function BasicInfo() {
                                             </li>
                                             <li className='flex gap-3'>
                                                 <div>
-                                                    <p className='text-gray-300'>Title</p>
+                                                    <p className='text-gray-300'>
+                                                        Title
+                                                    </p>
                                                     <Field
                                                         type='text'
                                                         id='linkName3'
@@ -221,7 +244,9 @@ function BasicInfo() {
                                                     </div>
                                                 </div>
                                                 <div className='w-full'>
-                                                    <p className='text-gray-300'>URL</p>
+                                                    <p className='text-gray-300'>
+                                                        URL
+                                                    </p>
                                                     <Field
                                                         type='text'
                                                         id='linkUrl3'
@@ -242,7 +267,8 @@ function BasicInfo() {
                                     <hr className='opacity-30' />
                                     <li>
                                         <p className='text-gray-400 text-sm'>
-                                            Links on banner (Links to show on channel banner)
+                                            Links on banner (Links to show on
+                                            channel banner)
                                         </p>
                                         <Field
                                             as='select'
@@ -251,17 +277,27 @@ function BasicInfo() {
                                             className='relative  rounded-sm border-0 outline-0 text-gray-300 py-2 px-3 bg-gray-700 shadow-sm '
                                             placeholder='Language'>
                                             <option value={0}>None</option>
-                                            <option value={1}>First 1 link</option>
-                                            <option value={2}>First 2 links</option>
-                                            <option value={3}>First 3 links</option>
+                                            <option value={1}>
+                                                First 1 link
+                                            </option>
+                                            <option value={2}>
+                                                First 2 links
+                                            </option>
+                                            <option value={3}>
+                                                First 3 links
+                                            </option>
                                         </Field>
                                     </li>
                                     <li>
-                                        <p className='text-gray-400 text-sm'>Contact info</p>
+                                        <p className='text-gray-400 text-sm'>
+                                            Contact info
+                                        </p>
 
                                         <div className='flex gap-3'>
                                             <div>
-                                                <p className='text-gray-300'>Phone</p>
+                                                <p className='text-gray-300'>
+                                                    Phone
+                                                </p>
                                                 <Field
                                                     type='text'
                                                     id='phone'
@@ -277,7 +313,9 @@ function BasicInfo() {
                                                 </div>
                                             </div>
                                             <div>
-                                                <p className='text-gray-300'>Email</p>
+                                                <p className='text-gray-300'>
+                                                    Email
+                                                </p>
                                                 <Field
                                                     type='email'
                                                     id='email'

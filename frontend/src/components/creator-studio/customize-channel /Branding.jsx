@@ -1,8 +1,11 @@
-import { ErrorMessage, Field, Formik, Form } from 'formik';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { getChannel, reset, updateChannel } from '../../../redux/features/channel/channelSlice';
+import {
+    getChannel,
+    reset,
+    updateChannel,
+} from '../../../redux/features/channel/channelSlice';
 import channelBannerThumbnail from '../../../assets/images/Transparent grid.png';
 import Spinner2 from '../../Spinner2';
 import AvatarThumbnail from '../../../assets/images/avatar-thumbnail.png';
@@ -23,7 +26,7 @@ function Branding() {
         dispatch(updateChannel({ channelId: channel?._id, channelLogo: file }));
     };
 
-    const handleChannelBannerUpdate = (event) => {
+    const handleChannelBannerUpdate = () => {
         channelBannerInput?.current?.click();
     };
     const channelBannerOnChange = (event) => {
@@ -31,7 +34,7 @@ function Branding() {
         dispatch(updateChannel({ channelId: channel?._id, banner: file }));
     };
 
-    const handleChannelWatermarkUpdate = (event) => {
+    const handleChannelWatermarkUpdate = () => {
         channelWatermarkInput?.current?.click();
     };
     const channelWatermarkOnChange = (event) => {
@@ -45,9 +48,7 @@ function Branding() {
         updateChannelLoading,
         updateChannelSuccess,
         updateChannelError,
-        updateChannelMessage,
     } = useSelector((state) => state.channel);
-    const { owner, banner, watermark } = channel || {};
     const profilePicture =
         channel?.owner?.profilePicture?.url ||
         channel?.owner?.googleAccount?.picture ||
@@ -60,14 +61,26 @@ function Branding() {
     }, [requestedUserId, updateChannelSuccess, updateChannelError]);
 
     const handleRemoveChannelLogo = () => {
-        dispatch(updateChannel({ channelId: channel?._id, remove: { channelLogo: true } }));
+        dispatch(
+            updateChannel({
+                channelId: channel?._id,
+                remove: { channelLogo: true },
+            })
+        );
     };
     const handleRemoveBanner = () => {
-        dispatch(updateChannel({ channelId: channel?._id, remove: { banner: true } }));
+        dispatch(
+            updateChannel({ channelId: channel?._id, remove: { banner: true } })
+        );
     };
 
     const handleRemoveWatermark = () => {
-        dispatch(updateChannel({ channelId: channel?._id, remove: { watermark: true } }));
+        dispatch(
+            updateChannel({
+                channelId: channel?._id,
+                remove: { watermark: true },
+            })
+        );
     };
 
     if (isGetChannelLoading || updateChannelLoading) {
@@ -90,8 +103,9 @@ function Branding() {
                         <div className='col-span-2 bg-gray-700 bg-opacity-20 flex items-center p-6'>
                             <div className='text-sm space-y-3'>
                                 <p className='text-gray-500'>
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting
-                                    industry. Lorem Ipsum has been the industry's standard dummy
+                                    Lorem Ipsum is simply dummy text of the
+                                    printing and typesetting industry. Lorem
+                                    Ipsum has been the industry's standard dummy
                                     text ever since
                                 </p>
                                 <div className='flex space-x-3'>
@@ -100,11 +114,13 @@ function Branding() {
                                         onClick={handleChannelLogoUpdate}>
                                         {profilePicture ? (
                                             <>
-                                                <RotateRightIcon /> <p>Change</p>
+                                                <RotateRightIcon />{' '}
+                                                <p>Change</p>
                                             </>
                                         ) : (
                                             <>
-                                                <AddPhotoAlternateIcon /> <p>Add</p>
+                                                <AddPhotoAlternateIcon />{' '}
+                                                <p>Add</p>
                                             </>
                                         )}
                                     </button>
@@ -134,7 +150,10 @@ function Branding() {
                         <div className='bg-gray-600 bg-opacity-40 h-36 flex items-center justify-center'>
                             <img
                                 className='w-full h-full'
-                                src={channel?.banner?.url || channelBannerThumbnail}
+                                src={
+                                    channel?.banner?.url ||
+                                    channelBannerThumbnail
+                                }
                                 referrerPolicy='no-referrer'
                                 alt=''
                             />
@@ -142,8 +161,9 @@ function Branding() {
                         <div className='col-span-2 bg-gray-700 bg-opacity-20 flex items-center p-6'>
                             <div className='text-sm space-y-3'>
                                 <p className='text-gray-500'>
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting
-                                    industry. Lorem Ipsum has been the industry's standard dummy
+                                    Lorem Ipsum is simply dummy text of the
+                                    printing and typesetting industry. Lorem
+                                    Ipsum has been the industry's standard dummy
                                     text ever since
                                 </p>
                                 <div className='flex space-x-3'>
@@ -152,11 +172,13 @@ function Branding() {
                                         onClick={handleChannelBannerUpdate}>
                                         {channel?.banner?.url ? (
                                             <>
-                                                <RotateRightIcon /> <p>Change</p>
+                                                <RotateRightIcon />{' '}
+                                                <p>Change</p>
                                             </>
                                         ) : (
                                             <>
-                                                <AddPhotoAlternateIcon /> <p>Add</p>
+                                                <AddPhotoAlternateIcon />{' '}
+                                                <p>Add</p>
                                             </>
                                         )}
                                     </button>
@@ -169,7 +191,9 @@ function Branding() {
                                         ref={channelBannerInput}
                                         style={{ display: 'none' }}
                                     />
-                                    <button className='text-gray-300' onClick={handleRemoveBanner}>
+                                    <button
+                                        className='text-gray-300'
+                                        onClick={handleRemoveBanner}>
                                         <RemoveCircleOutlineIcon className='mr-1' />
                                         Remove
                                     </button>
@@ -184,7 +208,10 @@ function Branding() {
                         <div className='col bg-gray-600 bg-opacity-40 h-36 flex items-start justify-end p-3'>
                             <img
                                 className='w-12 h-12'
-                                src={channel?.watermark?.url || channelBannerThumbnail}
+                                src={
+                                    channel?.watermark?.url ||
+                                    channelBannerThumbnail
+                                }
                                 referrerPolicy='no-referrer'
                                 alt='watermark'
                             />
@@ -192,8 +219,9 @@ function Branding() {
                         <div className='col-span-2 bg-gray-700 bg-opacity-20 flex items-center p-6'>
                             <div className='text-sm space-y-3'>
                                 <p className='text-gray-500'>
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting
-                                    industry. Lorem Ipsum has been the industry's standard dummy
+                                    Lorem Ipsum is simply dummy text of the
+                                    printing and typesetting industry. Lorem
+                                    Ipsum has been the industry's standard dummy
                                     text ever since
                                 </p>
                                 <div className='flex space-x-3'>
@@ -202,11 +230,13 @@ function Branding() {
                                         onClick={handleChannelWatermarkUpdate}>
                                         {channel?.watermark?.url ? (
                                             <>
-                                                <RotateRightIcon /> <p>Change</p>
+                                                <RotateRightIcon />{' '}
+                                                <p>Change</p>
                                             </>
                                         ) : (
                                             <>
-                                                <AddPhotoAlternateIcon /> <p>Add</p>
+                                                <AddPhotoAlternateIcon />{' '}
+                                                <p>Add</p>
                                             </>
                                         )}
                                     </button>

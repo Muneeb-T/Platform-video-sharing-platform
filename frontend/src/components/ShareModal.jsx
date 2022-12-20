@@ -28,9 +28,7 @@ function ShareModal(props) {
                     <div className='flex items-center min-h-screen px-4 py-8'>
                         <div className='relative w-full  p-10 max-w-2xl mx-auto bg-gray-900 rounded-md shadow-lg space-y-5'>
                             <div className='flex items-center justify-center gap-3'>
-                                <ShareIcon
-                                    className='text-gray-300'
-                                />
+                                <ShareIcon className='text-gray-300' />
                                 <p className='text-3xl text-gray-300'>
                                     Share via
                                 </p>

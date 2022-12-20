@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import RotateRightIcon from '@mui/icons-material/RotateRight';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { useDispatch, useSelector } from 'react-redux';
-import { getChannel, reset, updateChannel } from '../../../redux/features/channel/channelSlice';
+import {
+    getChannel,
+    reset,
+    updateChannel,
+} from '../../../redux/features/channel/channelSlice';
 import { Link, useParams } from 'react-router-dom';
 import Spinner2 from '../../Spinner2';
 import ContentModal from './ContentModal';
@@ -11,23 +14,35 @@ import VideoThumbnail from '../../VideoThumbnail';
 function Layout() {
     const dispatch = useDispatch();
     const { id: requestedUserId } = useParams();
-    const [openVideoModal, setOpenVideoModal] = useState({ open: false, purpose: null });
+    const [openVideoModal, setOpenVideoModal] = useState({
+        open: false,
+        purpose: null,
+    });
     const {
         channel,
         isGetChannelLoading,
         updateChannelLoading,
         updateChannelSuccess,
         updateChannelError,
-        updateChannelMessage,
     } = useSelector((state) => state.channel);
     console.log(channel?.featuredVideo);
     console.log(channel?.channelTrailer);
     const handleRemoveChannelTrailer = () => {
-        dispatch(updateChannel({ channelId: channel?._id, remove: { channelTrailer: true } }));
+        dispatch(
+            updateChannel({
+                channelId: channel?._id,
+                remove: { channelTrailer: true },
+            })
+        );
     };
 
     const handleRemoveFeaturedVideo = () => {
-        dispatch(updateChannel({ channelId: channel?._id, remove: { featuredVideo: true } }));
+        dispatch(
+            updateChannel({
+                channelId: channel?._id,
+                remove: { featuredVideo: true },
+            })
+        );
     };
     useEffect(() => {
         dispatch(getChannel({ userId: requestedUserId }));
@@ -45,7 +60,8 @@ function Layout() {
                 <ul className='space-y-4 block'>
                     <li className='space-y-2'>
                         <p className='text-gray-400 text-sm'>
-                            Channel trailer (For people those who are not followed)
+                            Channel trailer (For people those who are not
+                            followed)
                         </p>
                         <div className={`md:grid md:grid-cols-3`}>
                             {channel?.channelTrailer ? (
@@ -54,9 +70,18 @@ function Layout() {
                                         to={`/videos/${channel?.channelTrailer?._id}`}
                                         className='w-full'>
                                         <VideoThumbnail
-                                            image={channel?.channelTrailer?.thumbnail?.url}
-                                            length={channel?.channelTrailer?.video?.duration}
-                                            videoUrl={channel?.channelTrailer?.video?.url}
+                                            image={
+                                                channel?.channelTrailer
+                                                    ?.thumbnail?.url
+                                            }
+                                            length={
+                                                channel?.channelTrailer?.video
+                                                    ?.duration
+                                            }
+                                            videoUrl={
+                                                channel?.channelTrailer?.video
+                                                    ?.url
+                                            }
                                         />
                                     </Link>
                                 </div>
@@ -65,7 +90,10 @@ function Layout() {
                                     <button
                                         className='border border-red-500 rounded text-gray-300 p-2 text-xs'
                                         onClick={() =>
-                                            setOpenVideoModal({ open: true, purpose: 'trailer' })
+                                            setOpenVideoModal({
+                                                open: true,
+                                                purpose: 'trailer',
+                                            })
                                         }>
                                         Choose video
                                     </button>
@@ -78,10 +106,16 @@ function Layout() {
                                         <div className='space-y-2'>
                                             <div className='space-y-1 my-auto'>
                                                 <p className='text-gray-200 line-clamp-2 text-justify'>
-                                                    {channel?.channelTrailer?.title}
+                                                    {
+                                                        channel?.channelTrailer
+                                                            ?.title
+                                                    }
                                                 </p>
                                                 <p className='text-gray-400 text-justify line-clamp-2 text-xs hidden'>
-                                                    {channel?.channelTrailer?.description}
+                                                    {
+                                                        channel?.channelTrailer
+                                                            ?.description
+                                                    }
                                                 </p>
                                             </div>
                                             <div className='flex gap-3'>
@@ -93,11 +127,14 @@ function Layout() {
                                                             purpose: 'trailer',
                                                         })
                                                     }>
-                                                    <RotateRightIcon className='mr-1' /> Change
+                                                    <RotateRightIcon className='mr-1' />{' '}
+                                                    Change
                                                 </button>
                                                 <button
                                                     className='text-gray-300'
-                                                    onClick={handleRemoveChannelTrailer}>
+                                                    onClick={
+                                                        handleRemoveChannelTrailer
+                                                    }>
                                                     <RemoveCircleOutlineIcon className='mr-1' />
                                                     Remove
                                                 </button>
@@ -105,9 +142,11 @@ function Layout() {
                                         </div>
                                     ) : (
                                         <p className='text-gray-500 text-xs'>
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting industry. Lorem Ipsum has been the
-                                            industry's standard dummy text ever since
+                                            Lorem Ipsum is simply dummy text of
+                                            the printing and typesetting
+                                            industry. Lorem Ipsum has been the
+                                            industry's standard dummy text ever
+                                            since
                                         </p>
                                     )}
                                 </div>
@@ -115,7 +154,9 @@ function Layout() {
                         </div>
                     </li>
                     <li className='space-y-2'>
-                        <p className='text-gray-400  text-sm'>Featured video (For the followers)</p>
+                        <p className='text-gray-400  text-sm'>
+                            Featured video (For the followers)
+                        </p>
                         <div className={`md:grid md:grid-cols-3`}>
                             {channel?.featuredVideo ? (
                                 <div className='bg-gray-600 bg-opacity-40 flex items-center justify-center'>
@@ -123,9 +164,18 @@ function Layout() {
                                         to={`/videos/${channel?.featuredVideo?._id}`}
                                         className='w-full'>
                                         <VideoThumbnail
-                                            image={channel?.featuredVideo?.thumbnail?.url}
-                                            length={channel?.featuredVideo?.video?.duration}
-                                            videoUrl={channel?.featuredVideo?.video?.url}
+                                            image={
+                                                channel?.featuredVideo
+                                                    ?.thumbnail?.url
+                                            }
+                                            length={
+                                                channel?.featuredVideo?.video
+                                                    ?.duration
+                                            }
+                                            videoUrl={
+                                                channel?.featuredVideo?.video
+                                                    ?.url
+                                            }
                                         />
                                     </Link>
                                 </div>
@@ -134,7 +184,10 @@ function Layout() {
                                     <button
                                         className='border border-red-500 rounded text-gray-300 p-2 text-xs'
                                         onClick={() =>
-                                            setOpenVideoModal({ open: true, purpose: 'featured' })
+                                            setOpenVideoModal({
+                                                open: true,
+                                                purpose: 'featured',
+                                            })
                                         }>
                                         Choose video
                                     </button>
@@ -147,10 +200,16 @@ function Layout() {
                                         <div className='space-y-2'>
                                             <div className='space-y-1 my-auto'>
                                                 <p className='text-gray-200 line-clamp-2 text-justify'>
-                                                    {channel?.featuredVideo?.title}
+                                                    {
+                                                        channel?.featuredVideo
+                                                            ?.title
+                                                    }
                                                 </p>
                                                 <p className='text-gray-400 text-justify line-clamp-2 text-xs hidden'>
-                                                    {channel?.featuredVideo?.description}
+                                                    {
+                                                        channel?.featuredVideo
+                                                            ?.description
+                                                    }
                                                 </p>
                                             </div>
                                             <div className='flex gap-3'>
@@ -162,11 +221,14 @@ function Layout() {
                                                             purpose: 'featured',
                                                         })
                                                     }>
-                                                    <RotateRightIcon className='mr-1' /> Change
+                                                    <RotateRightIcon className='mr-1' />{' '}
+                                                    Change
                                                 </button>
                                                 <button
                                                     className='text-gray-300'
-                                                    onClick={handleRemoveFeaturedVideo}>
+                                                    onClick={
+                                                        handleRemoveFeaturedVideo
+                                                    }>
                                                     <RemoveCircleOutlineIcon className='mr-1' />
                                                     Remove
                                                 </button>
@@ -174,9 +236,11 @@ function Layout() {
                                         </div>
                                     ) : (
                                         <p className='text-gray-500 text-xs'>
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting industry. Lorem Ipsum has been the
-                                            industry's standard dummy text ever since
+                                            Lorem Ipsum is simply dummy text of
+                                            the printing and typesetting
+                                            industry. Lorem Ipsum has been the
+                                            industry's standard dummy text ever
+                                            since
                                         </p>
                                     )}
                                 </div>

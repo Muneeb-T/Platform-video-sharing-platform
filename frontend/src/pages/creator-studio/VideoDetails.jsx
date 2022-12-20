@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../../components/creator-studio/Sidebar';
-import TopBar from '../../components/creator-studio/Topbar';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import languages from '../../utils/languages';
@@ -9,13 +8,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import CopyIcon from '@mui/icons-material/ContentCopy';
 import {
-    saveVideoDetails,
-    setVideoDetails,
-    setVideoUploadForm,
     setUploadedThumbnail,
     getVideo,
     updateVideo,
-    reset,
 } from '../../redux/features/video/videoSlice';
 import VideoJS from '../../components/VideoPlayer';
 import { toast } from 'react-toastify';
@@ -25,7 +20,6 @@ function VideoDetails() {
     const rootUrl = process.env.REACT_APP_ROOT_URI;
 
     const { content: contentId } = useParams();
-    const [schedule, setSchedule] = useState(false);
     const dispatch = useDispatch();
     const {
         getVideoLoading,
@@ -40,7 +34,6 @@ function VideoDetails() {
     const {
         title,
         description,
-        video,
         category,
         language,
         thumbnail,
@@ -85,15 +78,6 @@ function VideoDetails() {
     const playerRef = useRef(null);
     const handlePlayerReady = (player) => {
         playerRef.current = player;
-
-        // // You can handle player events here, for example:
-        // player.on('waiting', () => {
-        //     videojs.log('player is waiting');
-        // });
-
-        // player.on('dispose', () => {
-        //     videojs.log('player will dispose');
-        // });
     };
 
     const videoUploadFormSchema = Yup.object().shape({
@@ -103,7 +87,6 @@ function VideoDetails() {
         category: Yup.string().required('Select video category'),
         language: Yup.string().required('Select video language'),
         schedule: Yup.object().shape({
-            premiere: Yup.boolean(),
             date: Yup.string(),
             time: Yup.string(),
         }),
@@ -169,7 +152,7 @@ function VideoDetails() {
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className='bg-gray-300 bg-opacity-5 h-full p-2 md:p-6'>
+                                        <div className='bg-gray-300 bg-opacity-5 p-2 md:p-6'>
                                             <div className='md:grid grid-cols-3 gap-3 max-h-[70vh] overflow-x-hidden overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700 pr-4'>
                                                 <div className='pb-5 space-y-3 bg-gray-700 bg-opacity-20 py-3 px-4 h-full mb-3 md:mb-0'>
                                                     <div>

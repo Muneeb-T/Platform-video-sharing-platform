@@ -1,8 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import VideoThumbnail from './VideoThumbnail';
-import LikeIcon from '@mui/icons-material/ThumbUp';
-import DislikeIcon from '@mui/icons-material/ThumbDown';
 import AvatarThumbnail from '../assets/images/avatar-thumbnail.png';
 import moment from 'moment';
 
@@ -19,8 +17,6 @@ function VideoGroup3({ videos }) {
                     views,
                     createdAt,
                     description,
-                    likes,
-                    dislikes,
                 } = video;
                 return (
                     <Link
@@ -34,7 +30,9 @@ function VideoGroup3({ videos }) {
                         />
 
                         <div className='space-y-2 lg:space-y-2 my-auto'>
-                            <p className='text-gray-200 text-sm line-clamp-1'>{title}</p>
+                            <p className='text-gray-200 text-sm line-clamp-1'>
+                                {title}
+                            </p>
                             <div className='flex items-center gap-3'>
                                 <img
                                     className='w-7 h-7 rounded-full'
@@ -46,7 +44,9 @@ function VideoGroup3({ videos }) {
                                     }
                                     alt='Rounded avatar'
                                 />
-                                <p className='text-sm text-gray-400'>{uploadedBy?.username}</p>
+                                <p className='text-sm text-gray-400'>
+                                    {uploadedBy?.username}
+                                </p>
                             </div>
                             <p className='text-xs text-gray-400 sm:block hidden lg:hidden line-clamp-3'>
                                 {description}

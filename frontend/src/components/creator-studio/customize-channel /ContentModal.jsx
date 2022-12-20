@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getVideos } from '../../../redux/features/video/videoSlice';
 import { updateChannel } from '../../../redux/features/channel/channelSlice';
 import VideoThumbnail from '../../VideoThumbnail';
-import { Link } from 'react-router-dom';
 import Spinner2 from '../../Spinner2';
 function ContentModal({ purpose, handleClose }) {
     const { user } = useSelector((state) => state.auth);

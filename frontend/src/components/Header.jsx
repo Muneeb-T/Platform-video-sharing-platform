@@ -96,7 +96,9 @@ export default function Header() {
                                         }}>
                                         {() => {
                                             return (
-                                                <Form className='input-group w-full mr-2 text-gray-300 flex items-center' aria-autocomplete='none'>
+                                                <Form
+                                                    className='input-group w-full mr-2 text-gray-300 flex items-center'
+                                                    aria-autocomplete='none'>
                                                     <Field
                                                         className='shadow-none bg-transparent border-0 border-b w-full border-gray-400 text-sm appearance-none  py-1  focus:outline-none'
                                                         type='text'
@@ -205,12 +207,6 @@ export default function Header() {
                                                                     <p className='text-white text-sm'>
                                                                         {`Hello ${user.username}`}
                                                                     </p>
-                                                                    <Link
-                                                                        to={`/profile`}
-                                                                        className='text-gray-300 text-sm'>
-                                                                        View
-                                                                        profile
-                                                                    </Link>
                                                                 </div>
                                                             </div>
                                                         </Menu.Item>

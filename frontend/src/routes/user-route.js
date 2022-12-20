@@ -6,7 +6,6 @@ import VerifyAccount from '../pages/VerifyAccount';
 import React from 'react';
 import SearchResults from '../pages/SearchResults';
 import VideoPlayback from '../pages/VideoPlayback';
-import UserProfile from '../pages/UserProfile';
 import GoogleAuth from '../pages/GoogleAuth';
 import ResetPassword from '../pages/ResetPassword';
 import ResetPasswordCallback from '../pages/ResetPasswordCallback';
@@ -24,7 +23,6 @@ function UserRoutes() {
                 />
             </Route>
             <Route path='/google-auth' element={<GoogleAuth />} />
-            <Route path='/profile' element={<UserProfile />} />
             <Route path='/account'>
                 <Route path='reset-password'>
                     <Route index element={<ResetPassword />} />

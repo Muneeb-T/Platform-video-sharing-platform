@@ -14,7 +14,6 @@ function VideoGroup4({ videos }) {
                     thumbnail,
                     title,
                     video: videoProperties,
-                    uploadedBy,
                     views,
                     createdAt,
                     description,

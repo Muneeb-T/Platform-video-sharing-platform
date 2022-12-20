@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import LikeIcon from '@mui/icons-material/ThumbUpAlt';
 import DislikeIcon from '@mui/icons-material/ThumbDownAlt';
 import AvatarThumbnail from '../assets/images/avatar-thumbnail.png';
 import moment from 'moment';
-import { useSelector, useDispatch } from 'react-redux';
-import { likeOrDislikeComment, saveComment } from '../redux/features/video/videoSlice';
+import { useDispatch } from 'react-redux';
+import {
+    likeOrDislikeComment,
+    saveComment,
+} from '../redux/features/video/videoSlice';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Field, Form, Formik } from 'formik';
-import { Menu } from '@headlessui/react';
-import EmojiPicker from 'emoji-picker-react';
 import SendIcon from '@mui/icons-material/Send';
-import EmojiIcon from '@mui/icons-material/EmojiEmotions';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 function Comments({ comments, videoId, user, channelOwnerId }) {
     const [showReplyInput, setShowReplyInput] = useState(null);
@@ -39,7 +39,8 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                     src={
                                         commentedUser?.profilePicture?.url ||
                                         commentedUser?.googleAccount?.picture ||
-                                        commentedUser?.facebookAccount?.picture ||
+                                        commentedUser?.facebookAccount
+                                            ?.picture ||
                                         AvatarThumbnail
                                     }
                                     referrerPolicy='no-referrer'
@@ -49,8 +50,10 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                     <div>
                                         <p
                                             className={`text-gray-300 ${
-                                                (commentedUser?._id === user?._id ||
-                                                    commentedUser?._id === channelOwnerId) &&
+                                                (commentedUser?._id ===
+                                                    user?._id ||
+                                                    commentedUser?._id ===
+                                                        channelOwnerId) &&
                                                 'bg-gray-600 w-max rounded-full px-3'
                                             }`}>
                                             {commentedUser?._id === user?._id
@@ -62,7 +65,9 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                     <div className='flex gap-5 items-center text-sm'>
                                         <div
                                             className={`flex gap-2 text-xs ${
-                                                !user ? 'text-gray-500' : 'text-gray-300'
+                                                !user
+                                                    ? 'text-gray-500'
+                                                    : 'text-gray-300'
                                             } items-center`}>
                                             <button
                                                 onClick={() => {
@@ -74,7 +79,9 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                                         })
                                                     );
                                                 }}
-                                                className={`${liked && 'text-blue-600'}`}>
+                                                className={`${
+                                                    liked && 'text-blue-600'
+                                                }`}>
                                                 <LikeIcon
                                                     sx={{ fontSize: 'medium' }}
                                                     className='cursor-pointer'
@@ -85,10 +92,14 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                         </div>
                                         <div
                                             className={`flex gap-2 text-xs ${
-                                                !user ? 'text-gray-500' : 'text-gray-300'
+                                                !user
+                                                    ? 'text-gray-500'
+                                                    : 'text-gray-300'
                                             } items-center`}>
                                             <button
-                                                className={`${disliked && 'text-red-600'}`}
+                                                className={`${
+                                                    disliked && 'text-red-600'
+                                                }`}
                                                 onClick={() => {
                                                     dispatch(
                                                         likeOrDislikeComment({
@@ -112,7 +123,8 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                             onClick={() =>
                                                 setShowReplyInput(
                                                     showReplyInput
-                                                        ? showReplyInput === commentId
+                                                        ? showReplyInput ===
+                                                          commentId
                                                             ? null
                                                             : commentId
                                                         : commentId
@@ -133,7 +145,10 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                                     reply: { commentId },
                                                     text: '',
                                                 }}
-                                                onSubmit={(values, { resetForm }) => {
+                                                onSubmit={(
+                                                    values,
+                                                    { resetForm }
+                                                ) => {
                                                     dispatch(
                                                         saveComment({
                                                             userId: user?._id,
@@ -149,10 +164,14 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                                                 <img
                                                                     className='h-8 w-8 rounded-full mr-2'
                                                                     src={
-                                                                        user?.profilePicture?.url ||
-                                                                        user?.googleAccount
+                                                                        user
+                                                                            ?.profilePicture
+                                                                            ?.url ||
+                                                                        user
+                                                                            ?.googleAccount
                                                                             ?.picture ||
-                                                                        user?.facebookAccount
+                                                                        user
+                                                                            ?.facebookAccount
                                                                             ?.pictrue ||
                                                                         AvatarThumbnail
                                                                     }
@@ -164,7 +183,9 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                                                     type='text'
                                                                     name='text'
                                                                     // disabled={commentSaveLoading}
-                                                                    value={values.text}
+                                                                    value={
+                                                                        values.text
+                                                                    }
                                                                     autoComplete='off'
                                                                     className='shadow-none text-gray-300 p-2 bg-transparent border-0 border-b w-full border-gray-700 text-sm appearance-none  focus:outline-none focus:shadow-outline'
                                                                     placeholder='Add your reply...'
@@ -202,15 +223,22 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                                                 <button
                                                                     type='submit'
                                                                     disabled={
-                                                                        values.text?.length === 0
+                                                                        values
+                                                                            .text
+                                                                            ?.length ===
+                                                                        0
                                                                     }
                                                                     className={`h-10 w-10 shrink-0 rounded-full bg-gray-700 ${
-                                                                        values.text.length !== 0
+                                                                        values
+                                                                            .text
+                                                                            .length !==
+                                                                        0
                                                                             ? 'text-white'
                                                                             : 'text-gray-400'
                                                                     }`}>
                                                                     <span className='sr-only'>
-                                                                        Send message
+                                                                        Send
+                                                                        message
                                                                     </span>
 
                                                                     {
@@ -230,179 +258,192 @@ function Comments({ comments, videoId, user, channelOwnerId }) {
                                             </Formik>
                                         </div>
                                     )}
-                                    {replies.length > 3 && showReplyInput === commentId && (
-                                        <button
-                                            onClick={() =>
-                                                setShowReplies({
-                                                    show: !showReplies.show,
-                                                    id: showReplies?.show ? null : commentId,
-                                                })
-                                            }
-                                            type='button'
-                                            className='shrink-0 py-1 px-5 text-gray-300 rounded-full bg-gray-700'>
-                                            <span className='sr-only'>Show replies</span>
-                                            {showReplies.show
-                                                ? `Hide replies`
-                                                : `Show all ${replies.length} replies`}
-                                            {showReplies.show ? (
-                                                <ArrowRightIcon area-hidden='true' />
-                                            ) : (
-                                                <ArrowDropDownIcon aria-hidden='true' />
-                                            )}
-                                        </button>
-                                    )}
+                                    {replies.length > 3 &&
+                                        showReplyInput === commentId && (
+                                            <button
+                                                onClick={() =>
+                                                    setShowReplies({
+                                                        show: !showReplies.show,
+                                                        id: showReplies?.show
+                                                            ? null
+                                                            : commentId,
+                                                    })
+                                                }
+                                                type='button'
+                                                className='shrink-0 py-1 px-5 text-gray-300 rounded-full bg-gray-700'>
+                                                <span className='sr-only'>
+                                                    Show replies
+                                                </span>
+                                                {showReplies.show
+                                                    ? `Hide replies`
+                                                    : `Show all ${replies.length} replies`}
+                                                {showReplies.show ? (
+                                                    <ArrowRightIcon area-hidden='true' />
+                                                ) : (
+                                                    <ArrowDropDownIcon aria-hidden='true' />
+                                                )}
+                                            </button>
+                                        )}
                                     <div>
                                         {replies &&
-                                            replies?.map((reply, replyIndex) => {
-                                                const {
-                                                    userId: repliedUser,
-                                                    text: replyText,
-                                                    likes: replyLikes,
-                                                    dislikes: replyDislikes,
-                                                    createdAt: replyCreatedAt,
-                                                    liked: replyLiked,
-                                                    disliked: replyDisliked,
-                                                    id: replyId,
-                                                } = reply;
-                                                return (
-                                                    <div key={replyId}>
-                                                        {showReplyInput === commentId &&
-                                                            ((showReplies.show &&
-                                                                showReplies.id === commentId) ||
-                                                                replyIndex < 3) && (
-                                                                <>
-                                                                    <div className='flex py-2'>
-                                                                        <img
-                                                                            className='h-8 w-8 rounded-full mr-2'
-                                                                            src={
-                                                                                repliedUser
-                                                                                    ?.profilePicture
-                                                                                    ?.url ||
-                                                                                repliedUser
-                                                                                    ?.googleAccount
-                                                                                    ?.picture ||
-                                                                                repliedUser
-                                                                                    ?.facebookAccount
-                                                                                    ?.picture ||
-                                                                                AvatarThumbnail
-                                                                            }
-                                                                            referrerPolicy='no-referrer'
-                                                                            alt='commentor profile pic'
-                                                                        />
-                                                                        <div className='text-sm space-y-2'>
-                                                                            <div>
-                                                                                <p
-                                                                                    className={`text-gray-300 ${
-                                                                                        (repliedUser?._id ===
-                                                                                            user?._id ||
-                                                                                            repliedUser?._id ===
-                                                                                                channelOwnerId) &&
-                                                                                        'bg-gray-600 w-max rounded-full px-3'
-                                                                                    }`}>
-                                                                                    {repliedUser?._id ===
-                                                                                    user?._id
-                                                                                        ? 'You'
-                                                                                        : repliedUser?.username}
-                                                                                </p>
-                                                                                <p className='text-gray-400'>
-                                                                                    {replyText}
-                                                                                </p>
-                                                                            </div>
-                                                                            <div className='flex gap-5 items-center text-sm'>
-                                                                                <div
-                                                                                    className={`flex gap-2 text-xs ${
-                                                                                        !user
-                                                                                            ? 'text-gray-500'
-                                                                                            : 'text-gray-300'
-                                                                                    } items-center`}>
-                                                                                    <button
-                                                                                        onClick={() =>
-                                                                                            dispatch(
-                                                                                                likeOrDislikeComment(
-                                                                                                    {
-                                                                                                        videoId,
-                                                                                                        commentId,
-                                                                                                        like: user?._id,
-                                                                                                        reply: {
-                                                                                                            replyId,
-                                                                                                        },
-                                                                                                    }
-                                                                                                )
-                                                                                            )
-                                                                                        }
-                                                                                        className={`${
-                                                                                            replyLiked &&
-                                                                                            'text-blue-600'
+                                            replies?.map(
+                                                (reply, replyIndex) => {
+                                                    const {
+                                                        userId: repliedUser,
+                                                        text: replyText,
+                                                        likes: replyLikes,
+                                                        dislikes: replyDislikes,
+                                                        createdAt:
+                                                            replyCreatedAt,
+                                                        liked: replyLiked,
+                                                        disliked: replyDisliked,
+                                                        id: replyId,
+                                                    } = reply;
+                                                    return (
+                                                        <div key={replyId}>
+                                                            {showReplyInput ===
+                                                                commentId &&
+                                                                ((showReplies.show &&
+                                                                    showReplies.id ===
+                                                                        commentId) ||
+                                                                    replyIndex <
+                                                                        3) && (
+                                                                    <>
+                                                                        <div className='flex py-2'>
+                                                                            <img
+                                                                                className='h-8 w-8 rounded-full mr-2'
+                                                                                src={
+                                                                                    repliedUser
+                                                                                        ?.profilePicture
+                                                                                        ?.url ||
+                                                                                    repliedUser
+                                                                                        ?.googleAccount
+                                                                                        ?.picture ||
+                                                                                    repliedUser
+                                                                                        ?.facebookAccount
+                                                                                        ?.picture ||
+                                                                                    AvatarThumbnail
+                                                                                }
+                                                                                referrerPolicy='no-referrer'
+                                                                                alt='commentor profile pic'
+                                                                            />
+                                                                            <div className='text-sm space-y-2'>
+                                                                                <div>
+                                                                                    <p
+                                                                                        className={`text-gray-300 ${
+                                                                                            (repliedUser?._id ===
+                                                                                                user?._id ||
+                                                                                                repliedUser?._id ===
+                                                                                                    channelOwnerId) &&
+                                                                                            'bg-gray-600 w-max rounded-full px-3'
                                                                                         }`}>
-                                                                                        <LikeIcon
-                                                                                            sx={{
-                                                                                                fontSize:
-                                                                                                    'medium',
-                                                                                            }}
-                                                                                            className='cursor-pointer'
-                                                                                        />
-                                                                                    </button>
-
-                                                                                    <p>
-                                                                                        {replyLikes ||
-                                                                                            0}
+                                                                                        {repliedUser?._id ===
+                                                                                        user?._id
+                                                                                            ? 'You'
+                                                                                            : repliedUser?.username}
+                                                                                    </p>
+                                                                                    <p className='text-gray-400'>
+                                                                                        {
+                                                                                            replyText
+                                                                                        }
                                                                                     </p>
                                                                                 </div>
-                                                                                <div
-                                                                                    className={`flex gap-2 text-xs ${
-                                                                                        !user
-                                                                                            ? 'text-gray-500'
-                                                                                            : 'text-gray-300'
-                                                                                    } items-center`}>
-                                                                                    <button
-                                                                                        className={`${
-                                                                                            replyDisliked &&
-                                                                                            'text-red-600'
-                                                                                        }`}
-                                                                                        onClick={() => {
-                                                                                            dispatch(
-                                                                                                likeOrDislikeComment(
-                                                                                                    {
-                                                                                                        videoId,
-                                                                                                        commentId,
-                                                                                                        dislike:
-                                                                                                            user?._id,
-                                                                                                        reply: {
-                                                                                                            replyId,
-                                                                                                        },
-                                                                                                    }
+                                                                                <div className='flex gap-5 items-center text-sm'>
+                                                                                    <div
+                                                                                        className={`flex gap-2 text-xs ${
+                                                                                            !user
+                                                                                                ? 'text-gray-500'
+                                                                                                : 'text-gray-300'
+                                                                                        } items-center`}>
+                                                                                        <button
+                                                                                            onClick={() =>
+                                                                                                dispatch(
+                                                                                                    likeOrDislikeComment(
+                                                                                                        {
+                                                                                                            videoId,
+                                                                                                            commentId,
+                                                                                                            like: user?._id,
+                                                                                                            reply: {
+                                                                                                                replyId,
+                                                                                                            },
+                                                                                                        }
+                                                                                                    )
                                                                                                 )
-                                                                                            );
-                                                                                        }}>
-                                                                                        <DislikeIcon
-                                                                                            sx={{
-                                                                                                fontSize:
-                                                                                                    'medium',
-                                                                                            }}
-                                                                                            className='cursor-pointer'
-                                                                                        />
-                                                                                    </button>
+                                                                                            }
+                                                                                            className={`${
+                                                                                                replyLiked &&
+                                                                                                'text-blue-600'
+                                                                                            }`}>
+                                                                                            <LikeIcon
+                                                                                                sx={{
+                                                                                                    fontSize:
+                                                                                                        'medium',
+                                                                                                }}
+                                                                                                className='cursor-pointer'
+                                                                                            />
+                                                                                        </button>
 
-                                                                                    <p>
-                                                                                        {replyDislikes ||
-                                                                                            0}
+                                                                                        <p>
+                                                                                            {replyLikes ||
+                                                                                                0}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        className={`flex gap-2 text-xs ${
+                                                                                            !user
+                                                                                                ? 'text-gray-500'
+                                                                                                : 'text-gray-300'
+                                                                                        } items-center`}>
+                                                                                        <button
+                                                                                            className={`${
+                                                                                                replyDisliked &&
+                                                                                                'text-red-600'
+                                                                                            }`}
+                                                                                            onClick={() => {
+                                                                                                dispatch(
+                                                                                                    likeOrDislikeComment(
+                                                                                                        {
+                                                                                                            videoId,
+                                                                                                            commentId,
+                                                                                                            dislike:
+                                                                                                                user?._id,
+                                                                                                            reply: {
+                                                                                                                replyId,
+                                                                                                            },
+                                                                                                        }
+                                                                                                    )
+                                                                                                );
+                                                                                            }}>
+                                                                                            <DislikeIcon
+                                                                                                sx={{
+                                                                                                    fontSize:
+                                                                                                        'medium',
+                                                                                                }}
+                                                                                                className='cursor-pointer'
+                                                                                            />
+                                                                                        </button>
+
+                                                                                        <p>
+                                                                                            {replyDislikes ||
+                                                                                                0}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                    <p className='text-xs text-gray-500'>
+                                                                                        {moment(
+                                                                                            replyCreatedAt
+                                                                                        ).from(
+                                                                                            new Date()
+                                                                                        )}
                                                                                     </p>
                                                                                 </div>
-                                                                                <p className='text-xs text-gray-500'>
-                                                                                    {moment(
-                                                                                        replyCreatedAt
-                                                                                    ).from(
-                                                                                        new Date()
-                                                                                    )}
-                                                                                </p>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                </>
-                                                            )}
-                                                    </div>
-                                                );
-                                            })}
+                                                                    </>
+                                                                )}
+                                                        </div>
+                                                    );
+                                                }
+                                            )}
                                     </div>
                                 </div>
                             </div>

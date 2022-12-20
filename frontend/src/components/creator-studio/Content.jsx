@@ -3,8 +3,6 @@ import VideoThumbnail from '../VideoThumbnail';
 import DetailsIcon from '@mui/icons-material/Edit';
 import AnalyticsIcon from '@mui/icons-material/BarChart';
 import CommentIcon from '@mui/icons-material/Comment';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Link } from 'react-router-dom';
 import CalendarIcon from '@mui/icons-material/CalendarMonth';
 import ViewsIcon from '@mui/icons-material/Visibility';
 import LikeIcon from '@mui/icons-material/ThumbUpAlt';
@@ -12,7 +10,6 @@ import DislikeIcon from '@mui/icons-material/ThumbDown';
 import moment from 'moment';
 import {
     setSelectedVideos,
-    resetSelectedVideos,
     updateVideo,
     reset,
 } from '../../redux/features/video/videoSlice';
@@ -89,13 +86,6 @@ function Content(props) {
                                         <p className='text-gray-300 line-clamp-1'>
                                             {title}
                                         </p>
-                                        {/* <button className='rounded-full px-1 bg-gray-300 bg-opacity-20'>
-                                                        <MoreVertIcon
-                                                            sx={{
-                                                                fontSize: 'small',
-                                                            }}
-                                                        />
-                                                    </button> */}
 
                                         <p className='line-clamp-1 text-gray-500 text-xs'>
                                             {description}

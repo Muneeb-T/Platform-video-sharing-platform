@@ -1,14 +1,19 @@
 import React, { useEffect } from 'react';
 import UploadIcon from '@mui/icons-material/Upload';
 import LiveStreamingIcon from '@mui/icons-material/WifiTethering';
-import { setShowVideoUploadModal, reset } from '../../redux/features/video/videoSlice';
+import {
+    setShowVideoUploadModal,
+    reset,
+} from '../../redux/features/video/videoSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import VideoUploadModal from '../../pages/creator-studio/VideoUploadModal';
 import { toast } from 'react-toastify';
 function TopBar({ title }) {
-    const { isVideoDetailsSaveSuccess, uploadingOnProcess, isVideoUploadError } = useSelector(
-        (state) => state.video
-    );
+    const {
+        isVideoDetailsSaveSuccess,
+        uploadingOnProcess,
+        isVideoUploadError,
+    } = useSelector((state) => state.video);
     useEffect(() => {
         if (!uploadingOnProcess) {
             if (isVideoDetailsSaveSuccess) {
