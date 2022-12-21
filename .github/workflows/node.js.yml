@@ -15,24 +15,7 @@ jobs:
       run:
         working-directory: ./backend
     runs-on: self-hosted
-
-    strategy:
-      matrix:
-        node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: pm2 restart app.js
-      env: 
+    env: 
            NODE_ENV: production
            MONGO_URI: ongodb+srv://muneebmnb123:Qgx4eXmlpqMAzkhb@platformcluster0.jlfd6rp.mongodb.net/PlatformVideoSharing?retryWrites=true&w=majority 
            PORT: 5000
@@ -52,3 +35,22 @@ jobs:
            NODEMAILER_FROM_EMAIL: Platform-Video sharing<platformvideosharing@outlook.com>
            NODEMAILER_SERVICE: hotmail
            FRONTEND_HOST_NAME: https://vplatform.cf
+
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: pm2 restart app.js
+      
