@@ -32,7 +32,7 @@ jobs:
     - run: pm2 restart app.js
       env:
            NODE_ENV: production
-           MONGO_URI: ongodb+srv://muneebmnb123:Qgx4eXmlpqMAzkhb@platformcluster0.jlfd6rp.mongodb.net/PlatformVideoSharing?retryWrites=true&w=majority 
+           MONGO_URI: mongodb+srv://muneebmnb123:Qgx4eXmlpqMAzkhb@platformcluster0.jlfd6rp.mongodb.net/PlatformVideoSharing?retryWrites=true&w=majority 
            PORT: 5000
            JWT_SECRET: 2a$15$zFAQiLzUSolcDemH/Jz5huj1edIvOsaPxe86G19zJpIIP8gU3.JvS
            GOOGLE_API_KEY: AIzaSyDW-qMa5z8QvSdj4AUMyKcm64Gtlyp7RjI
