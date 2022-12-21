@@ -37,7 +37,7 @@ jobs:
       GOOGLE_CLIENT_SECRET: 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
       FACEBOOK_APP_ID: 449652870455804
       FACEBOOK_APP_SECRET: 0cdef462688784a08103726d1522c2
-      ROOT_URL: https://vplatform.ga
+      ROOT_URL: https://www.vplatform.ga
       CLOUDINARY_CLOUD_NAME: drjndmchy
       CLOUDINARY_API_KEY: 514344456187884
       CLOUDINARY_API_SECRET: H_KfTmcils1DAaZsjHJ2DBdD0VU
@@ -46,6 +46,6 @@ jobs:
       NODEMAILER_AUTH_PASSWORD: MS79Q3hXwGc5cuc
       NODEMAILER_FROM_EMAIL: Platform-Video sharing<platformvideosharing@outlook.com>
       NODEMAILER_SERVICE: hotmail
-      FRONTEND_HOST_NAME: https://vplatform.cf
+      FRONTEND_HOST_NAME: https://www.vplatform.cf
       
       
