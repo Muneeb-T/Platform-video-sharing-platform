@@ -3,6 +3,7 @@ import express from 'express';
 import { config } from 'dotenv';
 import { connectDatabase } from './config/database.js';
 import errorHandler from './middlewares/error-handler.js';
+import homeRouter from './routes/home.js';
 import authRouter from './routes/auth-routes.js';
 import videoRouter from './routes/video-routes.js';
 import accountRouter from './routes/account-routes.js';
@@ -22,11 +23,13 @@ app.use(passport.initialize());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(cors({ origin: `${process.env.FRONTEND_HOST_NAME}`, credentials: true }));
+app.use(
+    cors({ origin: `${process.env.FRONTEND_HOST_NAME}`, credentials: true })
+);
 
 jwtStrategy();
 facebookAuthStrategy();
-
+app.use('/', homeRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/account/', accountRouter);
 app.use('/api/channel/', channelRouter);
